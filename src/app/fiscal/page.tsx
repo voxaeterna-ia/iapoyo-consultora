@@ -207,30 +207,94 @@ export default function FiscalPage() {
                   </div>
                 )}
 
-                {/* Tabla referencia */}
-                <div className="mt-4 overflow-x-auto">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="bg-gray-50">
-                        <th className="px-2 py-1.5 text-left font-medium text-gray-500">Cat</th>
-                        <th className="px-2 py-1.5 text-right font-medium text-gray-500">Fact. anual</th>
-                        <th className="px-2 py-1.5 text-right font-medium text-gray-500">Sup (m²)</th>
-                        <th className="px-2 py-1.5 text-right font-medium text-gray-500">Energía (kWh)</th>
-                        <th className="px-2 py-1.5 text-right font-medium text-gray-500">Alquiler</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {MONOTRIBUTO_CATEGORIAS.map(c => (
-                        <tr key={c.cat} className={`border-t border-gray-100 ${c.cat === data.categoria ? 'bg-blue-50 font-semibold' : ''}`}>
-                          <td className="px-2 py-1">{c.cat}</td>
-                          <td className="px-2 py-1 text-right">{formatARS(c.fact)}</td>
-                          <td className="px-2 py-1 text-right">{c.sup}</td>
-                          <td className="px-2 py-1 text-right">{c.energia.toLocaleString('es-AR')}</td>
-                          <td className="px-2 py-1 text-right">{formatARS(c.alquiler)}</td>
+                {/* Tabla cuotas — Servicios */}
+                <div className="mt-5">
+                  <h3 className="text-xs font-semibold text-[#2D4A6B] mb-2 uppercase tracking-wide">Cuotas mensuales — Locación / Prestación de Servicios (Feb–Jul 2026)</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="bg-[#2D4A6B] text-white">
+                          <th className="px-2 py-1.5 text-left font-medium">Cat</th>
+                          <th className="px-2 py-1.5 text-right font-medium">Límite fact.</th>
+                          <th className="px-2 py-1.5 text-right font-medium">Cuota</th>
+                          <th className="px-2 py-1.5 text-right font-medium">Obra Social</th>
+                          <th className="px-2 py-1.5 text-right font-medium">ART</th>
+                          <th className="px-2 py-1.5 text-right font-medium">Total/mes</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {MONOTRIBUTO_CATEGORIAS.map(c => {
+                          const esCatActual = c.cat === data.categoria
+                          const esCatSugerida = catSugerida?.cat === c.cat
+                          const total = c.cuota + c.obraSocial + c.art
+                          return (
+                            <tr key={c.cat} className={`border-t border-gray-100 ${esCatSugerida ? 'bg-blue-100 font-bold' : esCatActual ? 'bg-yellow-50 font-semibold' : 'hover:bg-gray-50'}`}>
+                              <td className="px-2 py-1.5">
+                                <span className="flex items-center gap-1">
+                                  {c.cat}
+                                  {esCatActual && <span className="text-yellow-600 text-[10px]">← actual</span>}
+                                  {esCatSugerida && !esCatActual && <span className="text-blue-600 text-[10px]">← sugerida</span>}
+                                </span>
+                              </td>
+                              <td className="px-2 py-1.5 text-right">{formatARS(c.fact)}</td>
+                              <td className="px-2 py-1.5 text-right">{formatARS(c.cuota)}</td>
+                              <td className="px-2 py-1.5 text-right">{formatARS(c.obraSocial)}</td>
+                              <td className="px-2 py-1.5 text-right">{formatARS(c.art)}</td>
+                              <td className="px-2 py-1.5 text-right font-bold">{formatARS(total)}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Tabla cuotas — Comercio */}
+                <div className="mt-5">
+                  <h3 className="text-xs font-semibold text-[#2D4A6B] mb-2 uppercase tracking-wide">Cuotas mensuales — Venta de Cosas Muebles (Feb–Jul 2026)</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="bg-[#4CAF50] text-white">
+                          <th className="px-2 py-1.5 text-left font-medium">Cat</th>
+                          <th className="px-2 py-1.5 text-right font-medium">Límite fact.</th>
+                          <th className="px-2 py-1.5 text-right font-medium">Precio unit. máx.</th>
+                          <th className="px-2 py-1.5 text-right font-medium">Cuota</th>
+                          <th className="px-2 py-1.5 text-right font-medium">Total/mes</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {MONOTRIBUTO_CATEGORIAS.map(c => {
+                          const esCatActual = c.cat === data.categoria
+                          const esCatSugerida = catSugerida?.cat === c.cat
+                          const soloServicios = ['I', 'J', 'K'].includes(c.cat)
+                          const precioUnitMax = soloServicios ? null : Math.round(c.fact / 100)
+                          const total = c.cuota + c.obraSocial + c.art
+                          return (
+                            <tr key={c.cat} className={`border-t border-gray-100 ${esCatSugerida ? 'bg-blue-100 font-bold' : esCatActual ? 'bg-yellow-50 font-semibold' : 'hover:bg-gray-50'}`}>
+                              <td className="px-2 py-1.5">
+                                <span className="flex items-center gap-1">
+                                  {c.cat}
+                                  {esCatActual && <span className="text-yellow-600 text-[10px]">← actual</span>}
+                                  {esCatSugerida && !esCatActual && <span className="text-blue-600 text-[10px]">← sugerida</span>}
+                                </span>
+                              </td>
+                              <td className="px-2 py-1.5 text-right">{formatARS(c.fact)}</td>
+                              <td className="px-2 py-1.5 text-right text-gray-500">
+                                {soloServicios ? <span className="text-gray-400">Solo servicios</span> : formatARS(precioUnitMax!)}
+                              </td>
+                              <td className="px-2 py-1.5 text-right">{formatARS(c.cuota)}</td>
+                              <td className="px-2 py-1.5 text-right font-bold">{formatARS(total)}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <p className="text-xs text-yellow-800">⚠️ Los valores de cuota, obra social y ART son orientativos y pueden variar. Verificá los valores exactos vigentes en ARCA antes de recategorizarte. Consultá con tu contador.</p>
                 </div>
               </div>
             </>

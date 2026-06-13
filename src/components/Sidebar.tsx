@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 
 const nav = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard', label: 'Panel de Control', icon: LayoutDashboard },
   { href: '/negocio', label: 'Mi Negocio', icon: Building2 },
   { href: '/fiscal', label: 'Categoría Fiscal', icon: Scale },
   { href: '/iapoyo', label: 'IApoyo IA', icon: Bot },

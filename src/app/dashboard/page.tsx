@@ -5,16 +5,22 @@ import { createClient } from '@/lib/supabase'
 import Sidebar from '@/components/Sidebar'
 import AuthGuard from '@/components/AuthGuard'
 import Link from 'next/link'
-import { Building2, Scale, Bot, Landmark, TrendingUp, AlertCircle } from 'lucide-react'
-import { formatARS, MESES } from '@/types'
+import { Building2, Scale, Bot, Landmark, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { formatARS, MESES, MONOTRIBUTO_CATEGORIAS } from '@/types'
+import { Cheque } from '@/types'
+
+interface DashboardStats {
+  facturacionAcumulada: number
+  acreditacionesAcumuladas: number
+  chequesPendientes: Cheque[]
+  categoriaActual: string
+  mesCierre: number
+  anioCierre: number
+}
 
 export default function Dashboard() {
-  const [stats, setStats] = useState({
-    facturacionMes: 0,
-    chequesPendientes: 0,
-    categoriaActual: '-',
-    proximoVencimiento: null as string | null,
-  })
+  const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
@@ -23,116 +29,231 @@ export default function Dashboard() {
       if (!user) return
 
       const now = new Date()
-      const mes = now.getMonth() + 1
-      const anio = now.getFullYear()
+      // Mes anterior (si es enero, tomar dic del año anterior)
+      let mesCierre = now.getMonth() // getMonth() ya es 0-based, así que es el mes anterior
+      let anioCierre = now.getFullYear()
+      if (mesCierre === 0) {
+        mesCierre = 12
+        anioCierre = anioCierre - 1
+      }
 
-      const [negocio, cheques, fiscal] = await Promise.all([
+      const [negocioRes, chequesRes, fiscalRes, acreditacionesRes] = await Promise.all([
         supabase
           .from('negocio_mensual')
-          .select('facturacion')
+          .select('mes, facturacion, acreditaciones')
           .eq('user_id', user.id)
-          .eq('anio', anio)
-          .eq('mes', mes)
-          .single(),
+          .eq('anio', anioCierre)
+          .lte('mes', mesCierre),
         supabase
           .from('cheques')
-          .select('id, fecha_pago')
+          .select('*')
           .eq('user_id', user.id)
-          .eq('estado', 'pendiente'),
+          .eq('estado', 'pendiente')
+          .order('fecha_pago'),
         supabase
           .from('categoria_fiscal')
           .select('categoria')
           .eq('user_id', user.id)
           .single(),
+        supabase
+          .from('acreditaciones')
+          .select('mes, total_acred, imp_creditos')
+          .eq('user_id', user.id)
+          .eq('anio', anioCierre)
+          .lte('mes', mesCierre),
       ])
 
-      const pendientes = cheques.data || []
-      const proxVenc = pendientes
-        .map(c => c.fecha_pago)
-        .filter(Boolean)
-        .sort()[0] || null
+      const negocioRows = negocioRes.data || []
+      const acreditacionesRows = acreditacionesRes.data || []
+
+      const facturacionAcumulada = negocioRows.reduce((a, r) => a + (r.facturacion || 0), 0)
+
+      // Acreditaciones: usar negocio si hay, sino calcular desde impuesto
+      let acreditacionesAcumuladas = 0
+      for (let m = 1; m <= mesCierre; m++) {
+        const negocioMes = negocioRows.find(r => r.mes === m)
+        if (negocioMes && negocioMes.acreditaciones > 0) {
+          acreditacionesAcumuladas += negocioMes.acreditaciones
+        } else {
+          const acredMes = acreditacionesRows.find(r => r.mes === m)
+          if (acredMes && acredMes.imp_creditos > 0) {
+            acreditacionesAcumuladas += acredMes.imp_creditos / 0.006
+          }
+        }
+      }
 
       setStats({
-        facturacionMes: negocio.data?.facturacion || 0,
-        chequesPendientes: pendientes.length,
-        categoriaActual: fiscal.data?.categoria || '-',
-        proximoVencimiento: proxVenc,
+        facturacionAcumulada,
+        acreditacionesAcumuladas,
+        chequesPendientes: chequesRes.data || [],
+        categoriaActual: fiscalRes.data?.categoria || 'A',
+        mesCierre,
+        anioCierre,
       })
+      setLoading(false)
     }
     load()
   }, [])
 
+  if (loading) {
+    return (
+      <AuthGuard>
+        <div className="flex min-h-screen bg-gray-50">
+          <Sidebar />
+          <main className="flex-1 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D4A6B]" />
+          </main>
+        </div>
+      </AuthGuard>
+    )
+  }
+
   const now = new Date()
+  const mesCierreLabel = stats ? `Ene–${MESES[stats.mesCierre - 1].slice(0, 3)} ${stats.anioCierre}` : ''
+  const catData = MONOTRIBUTO_CATEGORIAS.find(c => c.cat === stats?.categoriaActual)
+  const progreso = catData && stats ? Math.min((stats.facturacionAcumulada / catData.fact) * 100, 100) : 0
+  const progresoColor = progreso < 75 ? '#4CAF50' : progreso < 90 ? '#FF9800' : '#f44336'
 
   return (
     <AuthGuard>
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
-        <main className="flex-1 p-6">
-          <h1 className="text-2xl font-bold text-[#2D4A6B] mb-1">Dashboard</h1>
-          <p className="text-gray-500 text-sm mb-6">{MESES[now.getMonth()]} {now.getFullYear()}</p>
+        <main className="flex-1 p-4 md:p-6 overflow-auto">
+          <h1 className="text-2xl font-bold text-[#2D4A6B] mb-1">Panel de Control</h1>
+          <p className="text-gray-500 text-sm mb-6">Acumulado al {MESES[(stats?.mesCierre ?? 1) - 1]} {stats?.anioCierre} · Actualizado al {now.toLocaleDateString('es-AR')}</p>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <StatCard
-              title="Facturación del mes"
-              value={formatARS(stats.facturacionMes)}
-              icon={<TrendingUp size={20} className="text-[#4CAF50]" />}
-              color="green"
-            />
-            <StatCard
-              title="Cheques pendientes"
-              value={String(stats.chequesPendientes)}
-              icon={<AlertCircle size={20} className="text-[#FF7043]" />}
-              color="orange"
-            />
-            <StatCard
-              title="Categoría Monotributo"
-              value={stats.categoriaActual}
-              icon={<Scale size={20} className="text-[#2D4A6B]" />}
-              color="blue"
-            />
-            <StatCard
-              title="Próximo vencimiento"
-              value={stats.proximoVencimiento
-                ? new Date(stats.proximoVencimiento + 'T00:00:00').toLocaleDateString('es-AR')
-                : 'Sin cheques'}
-              icon={<AlertCircle size={20} className="text-gray-400" />}
-              color="gray"
-            />
+          {/* Fila top: Facturación + Acreditaciones + Categoría */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+            {/* Facturación acumulada */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5">
+              <div className="flex items-center gap-2 mb-1">
+                <TrendingUp size={16} className="text-[#4CAF50]" />
+                <span className="text-xs text-gray-500 font-medium">Facturación acumulada</span>
+              </div>
+              <p className="text-xs text-gray-400 mb-2">{mesCierreLabel}</p>
+              <p className="text-xl font-bold text-gray-800">{formatARS(stats?.facturacionAcumulada || 0)}</p>
+              {catData && (
+                <p className="text-xs text-gray-400 mt-1">
+                  {((stats?.facturacionAcumulada || 0) / catData.fact * 100).toFixed(1)}% del límite cat. {stats?.categoriaActual}
+                </p>
+              )}
+            </div>
+
+            {/* Acreditaciones acumuladas */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5">
+              <div className="flex items-center gap-2 mb-1">
+                <Landmark size={16} className="text-[#2D4A6B]" />
+                <span className="text-xs text-gray-500 font-medium">Acreditaciones acumuladas</span>
+              </div>
+              <p className="text-xs text-gray-400 mb-2">{mesCierreLabel}</p>
+              <p className="text-xl font-bold text-gray-800">{formatARS(stats?.acreditacionesAcumuladas || 0)}</p>
+            </div>
+
+            {/* Categoría Monotributo */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5">
+              <div className="flex items-center gap-2 mb-1">
+                <Scale size={16} className="text-[#FF7043]" />
+                <span className="text-xs text-gray-500 font-medium">Categoría Monotributo</span>
+              </div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl flex-shrink-0" style={{ backgroundColor: progresoColor }}>
+                  {stats?.categoriaActual}
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500">Límite: {catData ? formatARS(catData.fact) : '-'}</p>
+                  <p className="text-xs font-medium mt-0.5" style={{ color: progresoColor }}>
+                    {progreso < 75 ? 'En regla ✓' : progreso < 90 ? '⚠️ Atención' : '🔴 Riesgo'}
+                  </p>
+                </div>
+              </div>
+              <div className="w-full bg-gray-100 rounded-full h-2.5">
+                <div className="h-2.5 rounded-full transition-all" style={{ width: `${progreso}%`, backgroundColor: progresoColor }} />
+              </div>
+              <p className="text-xs text-gray-400 mt-1">{progreso.toFixed(1)}% del límite</p>
+              {progreso >= 90 && (
+                <div className="mt-2 bg-red-50 border border-red-200 rounded-lg p-2">
+                  <p className="text-xs text-red-600 font-medium">⚠️ Cerca del límite — considerá recategorizarte</p>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Cheques pendientes */}
+          <div className="bg-white rounded-xl border border-gray-100 mb-6">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <AlertCircle size={16} className="text-[#FF7043]" />
+                <h2 className="font-semibold text-[#2D4A6B]">Cheques pendientes</h2>
+              </div>
+              <div className="flex gap-3 text-xs text-gray-500">
+                <span>{stats?.chequesPendientes.length || 0} cheques</span>
+                <span className="font-medium text-gray-700">
+                  {formatARS((stats?.chequesPendientes || []).reduce((a, c) => a + c.importe, 0))}
+                </span>
+              </div>
+            </div>
+
+            {(!stats?.chequesPendientes || stats.chequesPendientes.length === 0) ? (
+              <div className="flex items-center gap-2 px-5 py-6 text-gray-400">
+                <CheckCircle2 size={16} />
+                <span className="text-sm">Sin cheques pendientes</span>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {stats.chequesPendientes.map(c => {
+                  const hoy = new Date()
+                  hoy.setHours(0, 0, 0, 0)
+                  const venc = c.fecha_pago ? new Date(c.fecha_pago + 'T00:00:00') : null
+                  const diffDias = venc ? Math.floor((venc.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)) : null
+
+                  let urgencia = '🔵'
+                  let urgenciaColor = '#2D4A6B'
+                  let urgenciaLabel = 'Más de 7 días'
+                  if (diffDias !== null) {
+                    if (diffDias <= 0) { urgencia = '🔴'; urgenciaColor = '#f44336'; urgenciaLabel = diffDias === 0 ? 'Vence hoy' : 'Vencido' }
+                    else if (diffDias <= 7) { urgencia = '🟡'; urgenciaColor = '#FF9800'; urgenciaLabel = `${diffDias} día${diffDias > 1 ? 's' : ''}` }
+                    else { urgenciaLabel = `${diffDias} días` }
+                  }
+
+                  return (
+                    <div key={c.id} className="flex items-center gap-3 px-5 py-3">
+                      <span className="text-lg">{urgencia}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-700 truncate">{c.beneficiario}</p>
+                        <p className="text-xs text-gray-400">{c.banco} #{c.nro}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-sm font-bold text-gray-800">{formatARS(c.importe)}</p>
+                        <p className="text-xs font-medium" style={{ color: urgenciaColor }}>
+                          {venc ? venc.toLocaleDateString('es-AR') : '-'} · {urgenciaLabel}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Links rápidos */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { href: '/negocio', label: 'Mi Negocio', desc: 'Registros mensuales y cheques', icon: Building2, color: '#2D4A6B' },
-              { href: '/fiscal', label: 'Categoría Fiscal', desc: 'Monotributo y recategorización', icon: Scale, color: '#4CAF50' },
-              { href: '/iapoyo', label: 'IApoyo IA', desc: 'Asistente fiscal y legal', icon: Bot, color: '#FF7043' },
-              { href: '/acreditaciones', label: 'Acreditaciones', desc: 'Control bancario mensual', icon: Landmark, color: '#2D4A6B' },
-            ].map(({ href, label, desc, icon: Icon, color }) => (
-              <Link
-                key={href}
-                href={href}
-                className="bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md transition-shadow"
-              >
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style={{ backgroundColor: color + '20' }}>
-                  <Icon size={20} style={{ color }} />
+              { href: '/negocio', label: 'Mi Negocio', icon: Building2, color: '#2D4A6B' },
+              { href: '/fiscal', label: 'Categoría Fiscal', icon: Scale, color: '#4CAF50' },
+              { href: '/iapoyo', label: 'IApoyo IA', icon: Bot, color: '#FF7043' },
+              { href: '/acreditaciones', label: 'Acreditaciones', icon: Landmark, color: '#2D4A6B' },
+            ].map(({ href, label, icon: Icon, color }) => (
+              <Link key={href} href={href} className="bg-white rounded-xl p-4 border border-gray-100 hover:shadow-md transition-shadow flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: color + '20' }}>
+                  <Icon size={16} style={{ color }} />
                 </div>
-                <div className="font-semibold text-gray-800 text-sm">{label}</div>
-                <div className="text-xs text-gray-500 mt-1">{desc}</div>
+                <span className="font-medium text-gray-700 text-sm">{label}</span>
               </Link>
             ))}
           </div>
         </main>
       </div>
     </AuthGuard>
-  )
-}
-
-function StatCard({ title, value, icon, color }: { title: string; value: string; icon: React.ReactNode; color: string }) {
-  const bg = { green: 'bg-green-50', orange: 'bg-orange-50', blue: 'bg-blue-50', gray: 'bg-gray-50' }[color]
-  return (
-    <div className={`${bg} rounded-xl p-4`}>
-      <div className="flex items-center gap-2 mb-2">{icon}<span className="text-xs text-gray-500">{title}</span></div>
-      <div className="text-lg font-bold text-gray-800 truncate">{value}</div>
-    </div>
   )
 }
