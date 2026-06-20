@@ -178,7 +178,8 @@ function PanelInden({ onClose }: { onClose: () => void }) {
     mp: number; pd: string;
     integ: number; integDetail: string;
     dpago: number; dpagoDetail: string;
-    sacT: number; sacDetail: string;
+    sacProp: number; sacPropDetail: string;
+    sacConc: number; sacConcDetail: string;
     vacA: number; vacADetail: string;
     vaM: number; vaMDetail: string;
     noreg: number; noregDetail: string;
@@ -224,14 +225,7 @@ function PanelInden({ onClose }: { onClose: () => void }) {
     const dpago = Math.round((rem / 30) * dE)
     const dpagoDetail = `${dE} días trabajados × ${formatARS(rem / 30)}/día`
 
-    const iniS = egrDate.getMonth() < 6
-      ? new Date(egrDate.getFullYear(), 0, 1)
-      : new Date(egrDate.getFullYear(), 6, 1)
-    const dSem = Math.round((egrDate.getTime() - iniS.getTime()) / 86400000)
-    const diasSem = egrDate.getMonth() < 6 ? 181 : 184
-    const sacT = Math.round(((rem * (dSem / diasSem) * 6) / 12) + mp / 12 + integ / 12)
-    const sacDetail = `${dSem} días del semestre`
-
+    // Vacaciones (calculadas antes del SAC para incluirlas en SAC sobre conceptos)
     const dvac = dv(per)
     const mEnA = Math.max(egrDate.getMonth() + (egrDate.getDate() >= 15 ? 1 : 0), 1)
     const vacA = Math.round((rem / 25) * dvac * (mEnA / 12))
@@ -247,12 +241,31 @@ function PanelInden({ onClose }: { onClose: () => void }) {
       vaMDetail = `${dvaA} días × ${ma}/12 meses (año anterior)`
     }
 
+    // SAC proporcional del semestre
+    const iniS = egrDate.getMonth() < 6
+      ? new Date(egrDate.getFullYear(), 0, 1)
+      : new Date(egrDate.getFullYear(), 6, 1)
+    const dSem = Math.round((egrDate.getTime() - iniS.getTime()) / 86400000)
+    const diasSem = egrDate.getMonth() < 6 ? 181 : 184
+    const sacProp = Math.round((rem / 2) * (dSem / diasSem))
+    const sacPropDetail = `${formatARS(rem)}/2 × ${dSem} días del semestre`
+
+    // SAC sobre conceptos de la liquidación (preaviso + integración + vacaciones)
+    const sacConc = Math.round((mp + integ + vacA + vaM) / 12)
+    const sacConcParts = [
+      mp > 0 ? 'preaviso' : '',
+      integ > 0 ? 'integración' : '',
+      vacA > 0 ? 'vacaciones' : '',
+      vaM > 0 ? 'vac. año ant.' : '',
+    ].filter(Boolean).join(' + ')
+    const sacConcDetail = sacConcParts ? `(${sacConcParts}) ÷ 12` : 'No aplica'
+
     const noreg = nrv > 0 ? nrv * per * 2 : 0
     const noregDetail = nrv > 0 ? `${formatARS(nrv)} × ${per} × 2 (Art. 8 Ley 24.013)` : ''
 
-    const total = art + mp + integ + dpago + sacT + vacA + vaM + noreg
+    const total = art + mp + integ + dpago + sacProp + sacConc + vacA + vaM + noreg
 
-    setResult({ lbl, per, aA, aM, art, artDetail, mp, pd, integ, integDetail, dpago, dpagoDetail, sacT, sacDetail, vacA, vacADetail, vaM, vaMDetail, noreg, noregDetail, total })
+    setResult({ lbl, per, aA, aM, art, artDetail, mp, pd, integ, integDetail, dpago, dpagoDetail, sacProp, sacPropDetail, sacConc, sacConcDetail, vacA, vacADetail, vaM, vaMDetail, noreg, noregDetail, total })
   }
 
   return (
@@ -328,9 +341,10 @@ function PanelInden({ onClose }: { onClose: () => void }) {
             { label: 'Preaviso', detail: result.pd, value: result.mp, show: true },
             { label: 'Integración mes despido', detail: result.integDetail, value: result.integ, show: true },
             { label: 'Días trabajados en el mes', detail: result.dpagoDetail, value: result.dpago, show: true },
-            { label: 'SAC proporcional', detail: result.sacDetail, value: result.sacT, show: true },
+            { label: 'SAC proporcional del semestre', detail: result.sacPropDetail, value: result.sacProp, show: true },
             { label: 'Vacaciones año en curso', detail: result.vacADetail, value: result.vacA, show: true },
             { label: 'Vacaciones año anterior no gozadas', detail: result.vaMDetail, value: result.vaM, show: va === 'n' },
+            { label: 'SAC sobre conceptos finales', detail: result.sacConcDetail, value: result.sacConc, show: result.sacConc > 0 },
             { label: 'Trabajo no registrado', detail: result.noregDetail, value: result.noreg, show: result.noreg > 0 },
           ].filter(r => r.show).map((row, i) => (
             <div key={i} className="flex justify-between items-start py-1.5 border-b border-gray-100">
