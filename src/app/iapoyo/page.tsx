@@ -662,6 +662,7 @@ const CATS_PLATA = [
   { key: 'salud',        label: 'Salud',           emoji: '🏥', subs: [] },
   { key: 'educacion',    label: 'Educación',       emoji: '🎓', subs: [] },
   { key: 'mascotas',     label: 'Mascotas',        emoji: '🐾', subs: ['🍖 Comida', '🩺 Veterinario', '✂️ Peluquería'] },
+  { key: 'materiales',   label: 'Materiales e insumos', emoji: '🔧', subs: ['🪵 Materiales', '🧴 Insumos', '🛠️ Herramientas', '📦 Otros'] },
   { key: 'alquiler',     label: 'Alquiler',        emoji: '🏠', subs: [] },
   { key: 'sueldos',      label: 'Sueldos y jornales', emoji: '👷', subs: ['💵 Sueldo', '🏦 Cargas sociales', '📄 Otro'] },
   { key: 'otros',        label: 'Otros gastos',    emoji: '➕', subs: ['🍔 Comidas rápidas', '📦 Mercado Libre', '☕ Cafetería', '🚌 Movilidad', '✏️ Otro (editable)'] },
@@ -975,6 +976,162 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
 
       {!configurado && (
         <p className="text-xs text-gray-400 text-center">Configurá tu valor hora para empezar a cargar gastos</p>
+      )}
+
+      {/* Informe del período */}
+      {configurado && (ingresoTotal > 0 || gastos.length > 0) && (
+        <InformePlata
+          tipoIngreso={tipoIngreso}
+          ingresoTotal={ingresoTotal}
+          horasTotal={horasTotal}
+          valorHora={valorHora}
+          ingresosDiarios={ingresosDiarios}
+          gastos={gastos}
+          totalGastos={totalGastos}
+          pesoRestante={pesoRestante}
+        />
+      )}
+    </div>
+  )
+}
+
+type InformePlataProps = {
+  tipoIngreso: 'dependencia' | 'independiente'
+  ingresoTotal: number
+  horasTotal: number
+  valorHora: number
+  ingresosDiarios: IngDiario[]
+  gastos: GastoPlata[]
+  totalGastos: number
+  pesoRestante: number
+}
+
+function InformePlata({ tipoIngreso, ingresoTotal, horasTotal, valorHora, ingresosDiarios, gastos, totalGastos, pesoRestante }: InformePlataProps) {
+  const [abierto, setAbierto] = useState(false)
+
+  const ahora = new Date()
+  const periodo = ahora.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })
+
+  // Agrupar gastos por categoría
+  const porCategoria: Record<string, number> = {}
+  gastos.forEach(g => {
+    porCategoria[g.cat] = (porCategoria[g.cat] || 0) + g.monto
+  })
+
+  function formatHoras(h: number) {
+    const hh = Math.floor(Math.abs(h))
+    const mm = Math.round((Math.abs(h) - hh) * 60)
+    return `${hh} h${mm > 0 ? ` ${mm} min` : ''}`
+  }
+
+  return (
+    <div className="border border-[#2D4A6B]/20 rounded-xl overflow-hidden">
+      <button onClick={() => setAbierto(v => !v)}
+        className="w-full flex items-center justify-between px-4 py-3 bg-[#2D4A6B] text-white text-sm font-semibold">
+        <span>📄 Informe del período — {periodo}</span>
+        <span className="text-lg">{abierto ? '▲' : '▼'}</span>
+      </button>
+
+      {abierto && (
+        <div className="p-4 space-y-4 text-sm">
+
+          {/* Encabezado */}
+          <div className="text-center border-b border-gray-100 pb-3">
+            <p className="text-xs text-gray-400 uppercase tracking-wider">IApoyo Consultora · Mi Plata</p>
+            <p className="font-bold text-[#2D4A6B] text-base capitalize">{periodo}</p>
+            <p className="text-xs text-gray-500">{tipoIngreso === 'dependencia' ? 'Relación de dependencia' : 'Actividad independiente'}</p>
+          </div>
+
+          {/* Ingresos */}
+          <div>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">💰 Ingresos</p>
+            {tipoIngreso === 'dependencia' ? (
+              <div className="flex justify-between bg-green-50 rounded-lg px-3 py-2">
+                <span className="text-gray-700">Sueldo neto</span>
+                <span className="font-bold text-green-700">{formatARS(ingresoTotal)}</span>
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {ingresosDiarios.map(i => (
+                  <div key={i.id} className="flex justify-between items-center bg-green-50 rounded-lg px-3 py-1.5">
+                    <div>
+                      <p className="text-gray-700 text-xs">{i.desc || 'Servicio'}</p>
+                      <p className="text-[10px] text-gray-400">{i.fecha} · {formatHoras(i.horas)}</p>
+                    </div>
+                    <span className="font-bold text-green-700 text-xs">{formatARS(i.monto)}</span>
+                  </div>
+                ))}
+                <div className="flex justify-between px-3 py-1.5 border-t border-green-100 font-bold">
+                  <span className="text-gray-700">Total ingresos</span>
+                  <span className="text-green-700">{formatARS(ingresoTotal)}</span>
+                </div>
+              </div>
+            )}
+            <div className="flex justify-between px-3 py-1 mt-1 text-xs text-gray-500">
+              <span>Horas trabajadas</span>
+              <span>{formatHoras(horasTotal)} · {formatARS(valorHora)}/h</span>
+            </div>
+          </div>
+
+          {/* Gastos por categoría */}
+          {gastos.length > 0 && (
+            <div>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">💸 Gastos por categoría</p>
+              <div className="space-y-1">
+                {Object.entries(porCategoria).sort((a, b) => b[1] - a[1]).map(([cat, total]) => (
+                  <div key={cat} className="flex justify-between bg-red-50 rounded-lg px-3 py-1.5">
+                    <span className="text-gray-700 text-xs">{cat}</span>
+                    <span className="font-semibold text-red-600 text-xs">{formatARS(total)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Gastos detallados */}
+          {gastos.length > 0 && (
+            <div>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">🧾 Detalle de gastos</p>
+              <div className="space-y-1">
+                {[...gastos].sort((a, b) => a.fecha.localeCompare(b.fecha)).map(g => (
+                  <div key={g.id} className="flex justify-between items-center border-b border-gray-50 px-1 py-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">{g.emoji}</span>
+                      <div>
+                        <p className="text-xs text-gray-700">{g.cat}{g.desc ? ` · ${g.desc}` : ''}</p>
+                        <p className="text-[10px] text-gray-400">{g.fecha}</p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-semibold text-gray-700">{formatARS(g.monto)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Resumen final */}
+          <div className="bg-[#2D4A6B] rounded-xl p-4 text-white space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-white/70">Total ingresos</span>
+              <span className="font-bold text-green-300">{formatARS(ingresoTotal)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-white/70">Total gastos</span>
+              <span className="font-bold text-red-300">{formatARS(totalGastos)}</span>
+            </div>
+            <div className="flex justify-between text-sm border-t border-white/20 pt-2">
+              <span className="font-semibold">Resultado del mes</span>
+              <span className={`font-bold text-lg ${pesoRestante >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                {pesoRestante >= 0 ? '+' : ''}{formatARS(pesoRestante)}
+              </span>
+            </div>
+            {ingresoTotal > 0 && totalGastos > 0 && (
+              <p className="text-[10px] text-white/50 text-center pt-1">
+                Gastaste el {Math.round((totalGastos / ingresoTotal) * 100)}% de tus ingresos
+              </p>
+            )}
+          </div>
+        </div>
       )}
     </div>
   )
