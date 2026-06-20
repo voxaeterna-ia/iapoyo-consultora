@@ -896,16 +896,17 @@ const MODULOS_GRID = [
 
 // ─── Panel pPlata (Mi Plata) ──────────────────────────────────────────────────
 const CATS_PLATA = [
-  { key: 'super', label: 'Súper', emoji: '🛒', subs: [] },
-  { key: 'combustible', label: 'Combustible', emoji: '⛽', subs: [] },
-  { key: 'esparcimiento', label: 'Esparcimiento', emoji: '🎉', subs: [] },
-  { key: 'servicios', label: 'Servicios', emoji: '💡', subs: [] },
-  { key: 'impuestos', label: 'Imp. y tasas', emoji: '📋', subs: [] },
-  { key: 'mascotas', label: 'Mascotas', emoji: '🐾', subs: ['Comida', 'Veterinario', 'Peluquería'] },
-  { key: 'salud', label: 'Salud', emoji: '❤️', subs: [] },
-  { key: 'educacion', label: 'Educación', emoji: '📚', subs: [] },
-  { key: 'alquiler', label: 'Alquiler y sueldos', emoji: '🏘️', subs: ['Alquiler', 'Sueldos y jornales', 'Cargas sociales', 'Otro'] },
-  { key: 'otros', label: 'Otros gastos', emoji: '➕', subs: ['Comidas rápidas', 'Mercado Libre', 'Cafetería', 'Movilidad', 'Otro (editable)'] },
+  { key: 'super',        label: 'Súper',          emoji: '🛒', subs: [] },
+  { key: 'combustible',  label: 'Combustible',     emoji: '⛽', subs: [] },
+  { key: 'esparcimiento',label: 'Esparcimiento',   emoji: '🎉', subs: [] },
+  { key: 'servicios',    label: 'Servicios',       emoji: '💡', subs: [] },
+  { key: 'impuestos',    label: 'Imp. y tasas',    emoji: '📋', subs: [] },
+  { key: 'salud',        label: 'Salud',           emoji: '🏥', subs: [] },
+  { key: 'educacion',    label: 'Educación',       emoji: '🎓', subs: [] },
+  { key: 'mascotas',     label: 'Mascotas',        emoji: '🐾', subs: ['🍖 Comida', '🩺 Veterinario', '✂️ Peluquería'] },
+  { key: 'alquiler',     label: 'Alquiler',        emoji: '🏠', subs: [] },
+  { key: 'sueldos',      label: 'Sueldos y jornales', emoji: '👷', subs: ['💵 Sueldo', '🏦 Cargas sociales', '📄 Otro'] },
+  { key: 'otros',        label: 'Otros gastos',    emoji: '➕', subs: ['🍔 Comidas rápidas', '📦 Mercado Libre', '☕ Cafetería', '🚌 Movilidad', '✏️ Otro (editable)'] },
 ]
 
 type GastoPlata = { id: number; cat: string; emoji: string; monto: number; desc: string; fecha: string }
