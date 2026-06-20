@@ -25,139 +25,32 @@ function dv(p: number): number {
 
 // ─── Panel pNombre (Marcas) ───────────────────────────────────────────────────
 function PanelNombre({ onClose }: { onClose: () => void }) {
-  const [nombre, setNombre] = useState('')
-  const [actividad, setActividad] = useState('')
-  const [dominio, setDominio] = useState('')
-  const [rrss, setRrss] = useState('')
-  const [contactNombre, setContactNombre] = useState('')
-  const [tel, setTel] = useState('')
-  const [email, setEmail] = useState('')
-  const [logoFile, setLogoFile] = useState<File | null>(null)
-  const [logoPreview, setLogoPreview] = useState<string | null>(null)
-  const [enviando, setEnviando] = useState(false)
-  const [ok, setOk] = useState(false)
-  const [err, setErr] = useState('')
-  const fileRef = useRef<HTMLInputElement>(null)
-
-  function handleFile(file: File | null) {
-    setLogoFile(file)
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader()
-      reader.onload = e => setLogoPreview(e.target?.result as string)
-      reader.readAsDataURL(file)
-    } else {
-      setLogoPreview(null)
-    }
-  }
-
-  async function handleEnviar() {
-    if (!nombre || !actividad || !contactNombre || !tel) { setErr('Completá los campos obligatorios (*)'); return }
-    setErr('')
-    setEnviando(true)
-    let logoUrl: string | null = null
-    if (logoFile) {
-      try {
-        const supabase = createClient()
-        const ext = logoFile.name.split('.').pop()
-        const path = `logos/${Date.now()}.${ext}`
-        const { data: up } = await supabase.storage.from('logos').upload(path, logoFile, { upsert: true })
-        if (up) {
-          const { data: ud } = supabase.storage.from('logos').getPublicUrl(path)
-          logoUrl = ud?.publicUrl || null
-        }
-      } catch { logoUrl = null }
-    }
-    try {
-      await fetch('/api/consulta', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tipo: 'Marcas Comerciales',
-          nombre: contactNombre, email, telefono: tel,
-          datos: { nombre_comercial: nombre, actividad, dominio, rrss, logo_url: logoUrl },
-        }),
-      })
-      setOk(true)
-    } catch { setErr('Error al enviar. Intentá de nuevo.') }
-    finally { setEnviando(false) }
-  }
-
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-sm">¿Mi nombre está protegido?</h3>
+        <h3 className="font-semibold text-[#2D4A6B] text-sm">™️ Protección de Marca Comercial</h3>
         <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
-      {ok ? (
-        <p className="text-[#4CAF50] text-sm font-medium">✅ Solicitud enviada. Te contactaremos en 48 hs hábiles.</p>
-      ) : (
-        <div className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">Nombre comercial *</label>
-              <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Tu marca o nombre comercial"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">Actividad *</label>
-              <input value={actividad} onChange={e => setActividad(e.target.value)} placeholder="Rubro o actividad"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">Dominio web (opcional)</label>
-              <input value={dominio} onChange={e => setDominio(e.target.value)} placeholder="www.tunombre.com"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">Instagram / Facebook</label>
-              <input value={rrss} onChange={e => setRrss(e.target.value)} placeholder="@tunegocio"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">Nombre y apellido *</label>
-              <input value={contactNombre} onChange={e => setContactNombre(e.target.value)} placeholder="Juan Pérez"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">Tel / WhatsApp *</label>
-              <input value={tel} onChange={e => setTel(e.target.value)} placeholder="11-1234-5678"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="juan@mail.com"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-            </div>
-          </div>
-          {/* Logo upload */}
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Logo (opcional)</label>
-            <div
-              onClick={() => fileRef.current?.click()}
-              onDragOver={e => e.preventDefault()}
-              onDrop={e => { e.preventDefault(); handleFile(e.dataTransfer.files?.[0] || null) }}
-              className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:border-[#4CAF50] transition-colors">
-              {logoPreview
-                // eslint-disable-next-line @next/next/no-img-element
-                ? <img src={logoPreview} alt="logo preview" className="h-20 mx-auto object-contain" />
-                : logoFile
-                  ? <p className="text-sm text-[#4CAF50]">✓ {logoFile.name}</p>
-                  : <>
-                      <p className="text-sm text-gray-400">Arrastrá tu logo aquí o hacé clic</p>
-                      <p className="text-xs text-gray-300 mt-1">PNG, JPG, SVG</p>
-                    </>
-              }
-            </div>
-            <input ref={fileRef} type="file" accept="image/*,.svg,.pdf" className="hidden"
-              onChange={e => handleFile(e.target.files?.[0] || null)} />
-          </div>
-          {err && <p className="text-xs text-red-500">{err}</p>}
-          <button onClick={handleEnviar} disabled={enviando}
-            className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg text-sm font-medium hover:bg-[#1e3350] disabled:opacity-50">
-            {enviando ? 'Enviando...' : 'Enviar solicitud de análisis'}
-          </button>
+      <div className="space-y-3">
+        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+          <p className="text-sm font-semibold text-[#2D4A6B] mb-2">¿Tu nombre está protegido?</p>
+          <p className="text-xs text-gray-600 leading-relaxed">El registro de marca ante el INPI te da exclusividad legal por 10 años. Una marca registrada prevalece sobre dominios web y usuarios de Instagram y Facebook.</p>
         </div>
-      )}
+        <div className="grid grid-cols-1 gap-2">
+          {[
+            { icon: '✅', text: 'Búsqueda de antecedentes en base INPI' },
+            { icon: '📝', text: 'Presentación y seguimiento del trámite' },
+            { icon: '🛡️', text: 'Monitoreo de marcas similares' },
+            { icon: '⚖️', text: 'Defensa ante oposiciones' },
+          ].map(({ icon, text }) => (
+            <div key={text} className="flex items-center gap-3 bg-gray-50 rounded-lg px-3 py-2">
+              <span className="text-lg">{icon}</span>
+              <p className="text-xs text-gray-700">{text}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-gray-500 text-center pt-1">Usá el chat de abajo para hacer tu consulta</p>
+      </div>
     </div>
   )
 }
@@ -597,29 +490,6 @@ function PanelAlquiler({ onClose }: { onClose: () => void }) {
 
 // ─── Panel pPatente (Consulta Multas) ─────────────────────────────────────────
 function PanelPatente({ onClose }: { onClose: () => void }) {
-  const [patente, setPatente] = useState('')
-  const [nombre, setNombre] = useState('')
-  const [tel, setTel] = useState('')
-  const [email, setEmail] = useState('')
-  const [enviando, setEnviando] = useState(false)
-  const [ok, setOk] = useState(false)
-  const [err, setErr] = useState('')
-
-  async function handleEnviar() {
-    if (!patente || !nombre || !tel) { setErr('Completá los campos obligatorios (*)'); return }
-    setErr('')
-    setEnviando(true)
-    try {
-      await fetch('/api/consulta', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tipo: 'Vehículos & Fotomultas', nombre, email, telefono: tel, datos: { patente } }),
-      })
-      setOk(true)
-    } catch { setErr('Error al enviar. Intentá de nuevo.') }
-    finally { setEnviando(false) }
-  }
-
   const NULIDAD = [
     'Lugar de infracción impreciso o incorrecto.',
     'Falta de señalización de velocidad máxima o radar.',
@@ -644,43 +514,10 @@ function PanelPatente({ onClose }: { onClose: () => void }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-sm">Consulta de Multas por Patente</h3>
+        <h3 className="font-semibold text-[#2D4A6B] text-sm">🚗 Multas & Fotomultas</h3>
         <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
-      {ok ? (
-        <p className="text-[#4CAF50] text-sm font-medium mb-4">✅ Consulta enviada. Un asesor te contactará en menos de 48 hs hábiles.</p>
-      ) : (
-        <div className="space-y-3 mb-4">
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Patente *</label>
-            <input value={patente} onChange={e => setPatente(e.target.value.toUpperCase())} maxLength={8}
-              placeholder="AA 123 BB"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-2xl font-bold tracking-widest text-center uppercase focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">Nombre y apellido *</label>
-              <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Juan Pérez"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">Tel / WhatsApp *</label>
-              <input value={tel} onChange={e => setTel(e.target.value)} placeholder="11-1234-5678"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="juan@mail.com"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
-            </div>
-          </div>
-          {err && <p className="text-xs text-red-500">{err}</p>}
-          <button onClick={handleEnviar} disabled={enviando}
-            className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg text-sm font-medium hover:bg-[#1e3350] disabled:opacity-50">
-            {enviando ? 'Enviando...' : 'Enviar consulta'}
-          </button>
-        </div>
-      )}
+      <p className="text-xs text-gray-500 mb-4">Usá el chat de abajo para hacer tu consulta sobre una infracción específica.</p>
       {/* Motivos de Nulidad */}
       <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-3">
         <h4 className="font-semibold text-[#FF7043] text-sm mb-2">Motivos de Nulidad de Fotomulta</h4>
@@ -711,101 +548,22 @@ const MKT_SERVICIOS = [
 ]
 
 function PanelMkt({ onClose }: { onClose: () => void }) {
-  const [activeService, setActiveService] = useState<string | null>(null)
-  const [nombre, setNombre] = useState('')
-  const [tel, setTel] = useState('')
-  const [email, setEmail] = useState('')
-  const [desc, setDesc] = useState('')
-  const [enviando, setEnviando] = useState(false)
-  const [ok, setOk] = useState(false)
-  const [err, setErr] = useState('')
-
-  async function handleEnviar() {
-    if (!nombre || !tel) { setErr('Completá nombre y teléfono.'); return }
-    setErr('')
-    setEnviando(true)
-    try {
-      await fetch('/api/consulta', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tipo: 'Marketing', nombre, email, telefono: tel, datos: { servicio: activeService, descripcion: desc } }),
-      })
-      setOk(true)
-    } catch { setErr('Error al enviar.') }
-    finally { setEnviando(false) }
-  }
-
-  function resetForm() {
-    setNombre(''); setTel(''); setEmail(''); setDesc(''); setOk(false); setErr(''); setActiveService(null)
-  }
-
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-sm">Servicios de Marketing</h3>
+        <h3 className="font-semibold text-[#2D4A6B] text-sm">📱 Servicios de Marketing</h3>
         <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
-      {activeService ? (
-        <div className="space-y-3">
-          <p className="text-sm font-medium text-[#2D4A6B]">Solicitar información — Servicio: <strong>{activeService}</strong></p>
-          {ok ? (
-            <div>
-              <p className="text-[#4CAF50] text-sm font-medium">¡Solicitud enviada! Te contactaremos en 48 hs hábiles...</p>
-              <button onClick={resetForm} className="mt-3 text-sm text-[#2D4A6B] underline">Volver</button>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs text-gray-500 block mb-1">Nombre y apellido *</label>
-                  <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Juan Pérez"
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 block mb-1">Tel / WhatsApp *</label>
-                  <input value={tel} onChange={e => setTel(e.target.value)} placeholder="11-1234-5678"
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 block mb-1">Email</label>
-                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="juan@mail.com"
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 block mb-1">Descripción del proyecto</label>
-                  <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2} placeholder="Contanos tu idea..."
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none" />
-                </div>
-              </div>
-              {err && <p className="text-xs text-red-500">{err}</p>}
-              <div className="flex gap-2">
-                <button onClick={handleEnviar} disabled={enviando}
-                  className="flex-1 bg-[#2D4A6B] text-white py-2 rounded-lg text-sm font-medium hover:bg-[#1e3350] disabled:opacity-50">
-                  {enviando ? 'Enviando...' : 'Enviar'}
-                </button>
-                <button onClick={resetForm}
-                  className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
-                  Cancelar
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-3">
-          {MKT_SERVICIOS.map(s => (
-            <div key={s.nombre} className="border border-gray-200 rounded-xl p-3">
-              <p className="text-xl mb-1">{s.icon}</p>
-              <p className="text-sm font-semibold text-[#2D4A6B]">{s.nombre}</p>
-              <p className="text-xs text-gray-500 mb-2">{s.desc}</p>
-              <button onClick={() => setActiveService(s.nombre)}
-                className="w-full bg-[#FF7043] text-white py-1.5 rounded-lg text-xs font-medium hover:bg-[#e64a19]">
-                Solicitar info
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-2 gap-3">
+        {MKT_SERVICIOS.map(s => (
+          <div key={s.nombre} className="border border-gray-200 rounded-xl p-3">
+            <p className="text-xl mb-1">{s.icon}</p>
+            <p className="text-sm font-semibold text-[#2D4A6B]">{s.nombre}</p>
+            <p className="text-xs text-gray-500">{s.desc}</p>
+          </div>
+        ))}
+      </div>
+      <p className="text-xs text-gray-500 text-center mt-4">Usá el chat de abajo para consultar sobre cualquier servicio</p>
     </div>
   )
 }
@@ -1363,7 +1121,7 @@ export default function IApoyoPage() {
                     {messages.length === 0 && (
                       <div className="flex flex-col items-center justify-center h-full text-gray-400 py-8">
                         <Bot size={28} className="mb-2 text-[#2D4A6B] opacity-30" />
-                        <p className="text-sm text-center">Usá los botones de arriba o escribí tu consulta</p>
+                        <p className="text-sm text-center">Seleccioná un botón de arriba para obtener información</p>
                       </div>
                     )}
                     {messages.map((m, i) => (
@@ -1414,7 +1172,7 @@ export default function IApoyoPage() {
                   {messages.length === 0 && (
                     <div className="flex flex-col items-center justify-center h-full text-gray-400 py-6">
                       <Bot size={28} className="mb-2 text-[#2D4A6B] opacity-30" />
-                      <p className="text-sm">Seleccioná un módulo o escribí tu consulta</p>
+                      <p className="text-sm">Seleccioná un módulo para comenzar</p>
                     </div>
                   )}
                   {messages.map((m, i) => (
