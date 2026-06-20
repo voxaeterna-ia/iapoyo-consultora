@@ -251,7 +251,8 @@ function PanelInden({ onClose }: { onClose: () => void }) {
     const sacPropDetail = `${formatARS(rem)}/2 × ${dSem} días del semestre`
 
     // SAC sobre conceptos de la liquidación (indemnización + preaviso + integración + vacaciones)
-    const sacConc = Math.round((art + mp + integ + vacA + vaM) / 12)
+    const sacConcBase = art + mp + integ + vacA + vaM
+    const sacConc = Math.round(sacConcBase * 0.0833)
     const sacConcParts = [
       art > 0 ? 'indemnización' : '',
       mp > 0 ? 'preaviso' : '',
@@ -259,7 +260,7 @@ function PanelInden({ onClose }: { onClose: () => void }) {
       vacA > 0 ? 'vacaciones' : '',
       vaM > 0 ? 'vac. año ant.' : '',
     ].filter(Boolean).join(' + ')
-    const sacConcDetail = sacConcParts ? `(${sacConcParts}) ÷ 12` : 'No aplica'
+    const sacConcDetail = sacConcParts ? `(${sacConcParts}) × 8,33%` : 'No aplica'
 
     const noreg = nrv > 0 ? nrv * per * 2 : 0
     const noregDetail = nrv > 0 ? `${formatARS(nrv)} × ${per} × 2 (Art. 8 Ley 24.013)` : ''
