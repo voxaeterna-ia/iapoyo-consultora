@@ -26,7 +26,7 @@ function dv(p: number): number {
 // ─── Panel pNombre (Marcas) ───────────────────────────────────────────────────
 function PanelNombre({ onClose }: { onClose: () => void }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
+    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-[#2D4A6B] text-sm">™️ Protección de Marca Comercial</h3>
         <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
@@ -164,7 +164,7 @@ function PanelInden({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
+    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-[#2D4A6B] text-sm">Calculadora Indemnización</h3>
         <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
@@ -287,7 +287,7 @@ function PanelCosto({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
+    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-[#2D4A6B] text-sm">Costo Laboral Completo</h3>
         <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
@@ -386,7 +386,7 @@ function PanelAlquiler({ onClose }: { onClose: () => void }) {
   const last24 = histData.slice(-24)
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
+    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-[#2D4A6B] text-sm">Actualización de Alquiler</h3>
         <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
@@ -512,7 +512,7 @@ function PanelPatente({ onClose }: { onClose: () => void }) {
   ]
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
+    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-[#2D4A6B] text-sm">🚗 Multas & Fotomultas</h3>
         <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
@@ -549,7 +549,7 @@ const MKT_SERVICIOS = [
 
 function PanelMkt({ onClose }: { onClose: () => void }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
+    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-[#2D4A6B] text-sm">📱 Servicios de Marketing</h3>
         <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
@@ -744,7 +744,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
   const puedeAgregarGasto = !!montoGasto && (!catActiva?.subs.length || !!subActiva)
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3 space-y-5">
+    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 space-y-4 w-full overflow-hidden">
       <div className="flex justify-between items-center">
         <h3 className="font-semibold text-[#2D4A6B] text-sm">💰 Mi Plata</h3>
         <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
@@ -758,7 +758,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
         </div>
         {configurado ? (
           <>
-            <p className="text-3xl font-bold mb-1">{formatARS(valorHora)} <span className="text-sm text-gray-400">/hora</span></p>
+            <p className="text-2xl font-bold mb-1">{formatARS(valorHora)} <span className="text-sm text-gray-400">/hora</span></p>
             <p className="text-xs text-gray-400">
               {formatARS(ingresoTotal)} · {formatHoras(horasTotal)} · {tipoIngreso === 'dependencia' ? 'Relación de dependencia' : 'Actividad independiente'}
             </p>
@@ -786,7 +786,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 mb-2">¿Cuántas horas trabajás por mes?</p>
-                  <div className="grid grid-cols-4 gap-2 mb-2">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
                     {[['80','medio turno'],['120','6h × día'],['160','full time'],['200','+ extras']].map(([h, sub]) => (
                       <button key={h} onClick={() => setHoras(h)}
                         className={`py-2 rounded-lg text-xs border transition-colors ${horas === h ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300' : 'border-white/20 text-gray-400 hover:border-white/40'}`}>
@@ -1210,9 +1210,9 @@ export default function IApoyoPage() {
 
   return (
     <AuthGuard>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-gray-50 overflow-x-hidden">
         <Sidebar />
-        <main className="flex-1 flex flex-col overflow-auto">
+        <main className="flex-1 flex flex-col overflow-auto min-w-0">
           {/* Header Banner */}
           <div className="bg-gradient-to-r from-[#2D4A6B] to-[#3d6a9e] px-4 py-3 flex items-center gap-3">
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center flex-shrink-0">
