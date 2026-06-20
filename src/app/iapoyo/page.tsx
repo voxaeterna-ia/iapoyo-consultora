@@ -1214,25 +1214,25 @@ export default function IApoyoPage() {
         <Sidebar />
         <main className="flex-1 flex flex-col overflow-auto">
           {/* Header Banner */}
-          <div className="bg-gradient-to-r from-[#2D4A6B] to-[#3d6a9e] px-6 py-5 flex items-center gap-4">
-            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-xl">🤖</span>
+          <div className="bg-gradient-to-r from-[#2D4A6B] to-[#3d6a9e] px-4 py-3 flex items-center gap-3">
+            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-base">🤖</span>
             </div>
             <div>
-              <h1 className="text-white font-bold text-xl">IApoyo</h1>
-              <p className="text-blue-200 text-sm">Seleccioná un módulo</p>
+              <h1 className="text-white font-bold text-base leading-tight">IApoyo</h1>
+              <p className="text-blue-200 text-xs">Seleccioná un módulo</p>
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col p-4 md:p-6">
+          <div className="flex-1 flex flex-col p-3 md:p-6">
             {/* Module Grid */}
             {!modulo && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 md:grid-cols-3 gap-2">
                 {MODULOS_GRID.map(m => (
                   <button key={m.id} onClick={() => selectModulo(m.id)}
-                    className="bg-white border-2 border-gray-200 rounded-xl p-5 text-left hover:border-[#4CAF50] hover:shadow-sm transition-all flex flex-col items-center text-center gap-2">
-                    <span className="text-3xl">{m.emoji}</span>
-                    <span className="text-sm font-semibold text-[#2D4A6B]">{m.label}</span>
+                    className="bg-white border-2 border-gray-200 rounded-xl p-3 text-left hover:border-[#4CAF50] hover:shadow-sm transition-all flex flex-col items-center text-center gap-1">
+                    <span className="text-2xl">{m.emoji}</span>
+                    <span className="text-xs font-semibold text-[#2D4A6B] leading-tight">{m.label}</span>
                   </button>
                 ))}
               </div>
@@ -1240,20 +1240,20 @@ export default function IApoyoPage() {
 
             {/* Ecosistema */}
             {modulo && eco && (
-              <div className="space-y-4 flex-1 flex flex-col">
+              <div className="space-y-2 flex-1 flex flex-col">
                 {/* Back + title */}
-                <div className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3">
+                <div className="flex items-center gap-2 bg-white rounded-xl border border-gray-200 px-3 py-2">
                   <button onClick={goBack} className="text-[#2D4A6B] hover:text-[#1e3350]">
-                    <ArrowLeft size={20} />
+                    <ArrowLeft size={18} />
                   </button>
-                  <span className="font-semibold text-[#2D4A6B]">{MODULOS_GRID.find(m => m.id === modulo)?.emoji} {eco.titulo}</span>
+                  <span className="font-semibold text-[#2D4A6B] text-sm">{MODULOS_GRID.find(m => m.id === modulo)?.emoji} {eco.titulo}</span>
                 </div>
 
                 {/* Quick question buttons */}
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {eco.btns.map((btn, i) => (
                     <button key={i} onClick={() => handleEcoBtn(btn)}
-                      className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                         btn.action === 'panel' && openPanels.has(btn.panelId!)
                           ? 'border-[#FF7043] bg-orange-50 text-[#FF7043]'
                           : 'border-gray-200 bg-white text-gray-700 hover:border-[#2D4A6B] hover:text-[#2D4A6B]'
@@ -1273,37 +1273,37 @@ export default function IApoyoPage() {
                 {openPanels.has('pPlata') && <PanelMiPlata onClose={() => closePanel('pPlata')} />}
 
                 {/* Chat always visible */}
-                <div className="flex-1 flex flex-col mt-2">
-                  <div className="flex-1 bg-white rounded-xl border border-gray-100 overflow-y-auto p-4 mb-3 min-h-[200px] max-h-[380px]">
+                <div className="flex-1 flex flex-col mt-1">
+                  <div className="flex-1 bg-white rounded-xl border border-gray-100 overflow-y-auto p-3 mb-2 min-h-[160px] max-h-[300px]">
                     {messages.length === 0 && (
-                      <div className="flex flex-col items-center justify-center h-full text-gray-400 py-8">
-                        <Bot size={28} className="mb-2 text-[#2D4A6B] opacity-30" />
-                        <p className="text-sm text-center">Seleccioná un botón de arriba para obtener información</p>
+                      <div className="flex flex-col items-center justify-center h-full text-gray-400 py-6">
+                        <Bot size={22} className="mb-1 text-[#2D4A6B] opacity-30" />
+                        <p className="text-xs text-center">Seleccioná un botón de arriba para obtener información</p>
                       </div>
                     )}
                     {messages.map((m, i) => (
-                      <div key={i} className={`flex gap-2 mb-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div key={i} className={`flex gap-1.5 mb-2 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {m.role === 'assistant' && (
-                          <div className="w-7 h-7 rounded-full bg-[#2D4A6B] flex items-center justify-center flex-shrink-0">
-                            <Bot size={14} className="text-white" />
+                          <div className="w-6 h-6 rounded-full bg-[#2D4A6B] flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Bot size={12} className="text-white" />
                           </div>
                         )}
-                        <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
+                        <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs whitespace-pre-wrap ${
                           m.role === 'user' ? 'bg-[#2D4A6B] text-white rounded-tr-sm' : 'bg-gray-100 text-gray-800 rounded-tl-sm'
                         }`}>{m.content}</div>
                         {m.role === 'user' && (
-                          <div className="w-7 h-7 rounded-full bg-[#4CAF50] flex items-center justify-center flex-shrink-0">
-                            <User size={14} className="text-white" />
+                          <div className="w-6 h-6 rounded-full bg-[#4CAF50] flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <User size={12} className="text-white" />
                           </div>
                         )}
                       </div>
                     ))}
                     {chatLoading && (
-                      <div className="flex gap-2">
-                        <div className="w-7 h-7 rounded-full bg-[#2D4A6B] flex items-center justify-center">
-                          <Bot size={14} className="text-white" />
+                      <div className="flex gap-1.5">
+                        <div className="w-6 h-6 rounded-full bg-[#2D4A6B] flex items-center justify-center">
+                          <Bot size={12} className="text-white" />
                         </div>
-                        <div className="bg-gray-100 rounded-2xl px-4 py-2.5 text-sm text-gray-400">Consultando...</div>
+                        <div className="bg-gray-100 rounded-2xl px-3 py-2 text-xs text-gray-400">Consultando...</div>
                       </div>
                     )}
                     <div ref={endRef} />
@@ -1312,10 +1312,10 @@ export default function IApoyoPage() {
                     <input value={chatInput} onChange={e => setChatInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendChat()}
                       placeholder="Escribí tu consulta..."
-                      className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+                      className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
                     <button onClick={() => sendChat()} disabled={chatLoading || !chatInput.trim()}
-                      className="bg-[#2D4A6B] text-white px-4 py-2.5 rounded-xl hover:bg-[#1e3350] disabled:opacity-40">
-                      <Send size={16} />
+                      className="bg-[#2D4A6B] text-white px-3 py-2 rounded-xl hover:bg-[#1e3350] disabled:opacity-40">
+                      <Send size={14} />
                     </button>
                   </div>
                 </div>
@@ -1324,37 +1324,37 @@ export default function IApoyoPage() {
 
             {/* Chat also visible on main grid (no module selected) */}
             {!modulo && (
-              <div className="flex flex-col mt-4">
-                <div className="bg-white rounded-xl border border-gray-100 overflow-y-auto p-4 mb-3 min-h-[160px] max-h-[300px]">
+              <div className="flex flex-col mt-2">
+                <div className="bg-white rounded-xl border border-gray-100 overflow-y-auto p-3 mb-2 min-h-[160px] max-h-[300px]">
                   {messages.length === 0 && (
                     <div className="flex flex-col items-center justify-center h-full text-gray-400 py-6">
-                      <Bot size={28} className="mb-2 text-[#2D4A6B] opacity-30" />
-                      <p className="text-sm">Seleccioná un módulo para comenzar</p>
+                      <Bot size={22} className="mb-1 text-[#2D4A6B] opacity-30" />
+                      <p className="text-xs">Seleccioná un módulo para comenzar</p>
                     </div>
                   )}
                   {messages.map((m, i) => (
-                    <div key={i} className={`flex gap-2 mb-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div key={i} className={`flex gap-1.5 mb-2 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                       {m.role === 'assistant' && (
-                        <div className="w-7 h-7 rounded-full bg-[#2D4A6B] flex items-center justify-center flex-shrink-0">
-                          <Bot size={14} className="text-white" />
+                        <div className="w-6 h-6 rounded-full bg-[#2D4A6B] flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Bot size={12} className="text-white" />
                         </div>
                       )}
-                      <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
+                      <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs whitespace-pre-wrap ${
                         m.role === 'user' ? 'bg-[#2D4A6B] text-white rounded-tr-sm' : 'bg-gray-100 text-gray-800 rounded-tl-sm'
                       }`}>{m.content}</div>
                       {m.role === 'user' && (
-                        <div className="w-7 h-7 rounded-full bg-[#4CAF50] flex items-center justify-center flex-shrink-0">
-                          <User size={14} className="text-white" />
+                        <div className="w-6 h-6 rounded-full bg-[#4CAF50] flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <User size={12} className="text-white" />
                         </div>
                       )}
                     </div>
                   ))}
                   {chatLoading && (
-                    <div className="flex gap-2">
-                      <div className="w-7 h-7 rounded-full bg-[#2D4A6B] flex items-center justify-center">
-                        <Bot size={14} className="text-white" />
+                    <div className="flex gap-1.5">
+                      <div className="w-6 h-6 rounded-full bg-[#2D4A6B] flex items-center justify-center">
+                        <Bot size={12} className="text-white" />
                       </div>
-                      <div className="bg-gray-100 rounded-2xl px-4 py-2.5 text-sm text-gray-400">Consultando...</div>
+                      <div className="bg-gray-100 rounded-2xl px-3 py-2 text-xs text-gray-400">Consultando...</div>
                     </div>
                   )}
                   <div ref={endRef} />
@@ -1363,10 +1363,10 @@ export default function IApoyoPage() {
                   <input value={chatInput} onChange={e => setChatInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendChat()}
                     placeholder="Escribí tu consulta general..."
-                    className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+                    className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
                   <button onClick={() => sendChat()} disabled={chatLoading || !chatInput.trim()}
-                    className="bg-[#2D4A6B] text-white px-4 py-2.5 rounded-xl hover:bg-[#1e3350] disabled:opacity-40">
-                    <Send size={16} />
+                    className="bg-[#2D4A6B] text-white px-3 py-2 rounded-xl hover:bg-[#1e3350] disabled:opacity-40">
+                    <Send size={14} />
                   </button>
                 </div>
               </div>
