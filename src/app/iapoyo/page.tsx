@@ -879,8 +879,7 @@ const ECOSISTEMAS: Record<ModuleId, { titulo: string; btns: EcoBtn[] }> = {
   plata: {
     titulo: 'Mi Plata',
     btns: [
-      { label: '💰 Configurar mi valor hora', action: 'panel', panelId: 'pPlata' },
-      { label: '⚡ Cargar gasto rápido', action: 'panel', panelId: 'pPlata' },
+      { label: '💰 Abrir Mi Plata', action: 'panel', panelId: 'pPlata' },
     ],
   },
 }
@@ -911,24 +910,35 @@ const CATS_PLATA = [
 type GastoPlata = { id: number; cat: string; emoji: string; monto: number; desc: string; fecha: string }
 
 function PanelMiPlata({ onClose }: { onClose: () => void }) {
+  const hoyISO = new Date().toISOString().split('T')[0]
   const [tipoIngreso, setTipoIngreso] = useState<'dependencia' | 'independiente'>('dependencia')
   const [ingreso, setIngreso] = useState('')
   const [horas, setHoras] = useState('')
   const [configurado, setConfigurado] = useState(false)
+  // Ingresos independiente por día
+  const [ingresosDiarios, setIngresosDiarios] = useState<{ id: number; monto: number; desc: string; fecha: string }[]>([])
+  const [montoIngDiario, setMontoIngDiario] = useState('')
+  const [descIngDiario, setDescIngDiario] = useState('')
+  const [fechaIngDiario, setFechaIngDiario] = useState(hoyISO)
+  const [nextIngId, setNextIngId] = useState(1)
+  // Gastos
   const [catActiva, setCatActiva] = useState<{ key: string; label: string; emoji: string } | null>(null)
   const [montoGasto, setMontoGasto] = useState('')
   const [descGasto, setDescGasto] = useState('')
+  const [fechaGasto, setFechaGasto] = useState(hoyISO)
   const [gastos, setGastos] = useState<GastoPlata[]>([])
   const [nextId, setNextId] = useState(1)
 
-  const ingresoNum = parseFloat(ingreso) || 0
+  const ingresoFijo = parseFloat(ingreso) || 0
+  const totalIngDiarios = ingresosDiarios.reduce((s, i) => s + i.monto, 0)
+  const ingresoTotal = tipoIngreso === 'dependencia' ? ingresoFijo : totalIngDiarios
   const horasNum = parseFloat(horas) || 0
-  const valorHora = horasNum > 0 && ingresoNum > 0 ? Math.round(ingresoNum / horasNum) : 0
+  const valorHora = horasNum > 0 && ingresoTotal > 0 ? Math.round(ingresoTotal / horasNum) : 0
 
   const totalGastos = gastos.reduce((s, g) => s + g.monto, 0)
   const horasGastadas = valorHora > 0 ? totalGastos / valorHora : 0
   const horasRestantes = horasNum - horasGastadas
-  const pesoRestante = ingresoNum - totalGastos
+  const pesoRestante = ingresoTotal - totalGastos
 
   function formatHoras(h: number) {
     const hh = Math.floor(Math.abs(h))
@@ -937,7 +947,17 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
   }
 
   function guardarConfig() {
-    if (ingresoNum > 0 && horasNum > 0) setConfigurado(true)
+    const ok = tipoIngreso === 'dependencia' ? ingresoFijo > 0 && horasNum > 0 : totalIngDiarios > 0 && horasNum > 0
+    if (ok) setConfigurado(true)
+  }
+
+  function agregarIngDiario() {
+    if (!montoIngDiario) return
+    setIngresosDiarios(prev => [{ id: nextIngId, monto: parseFloat(montoIngDiario) || 0, desc: descIngDiario, fecha: fechaIngDiario }, ...prev])
+    setNextIngId(n => n + 1)
+    setMontoIngDiario('')
+    setDescIngDiario('')
+    setFechaIngDiario(hoyISO)
   }
 
   function agregarGasto() {
@@ -948,18 +968,19 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
       emoji: catActiva.emoji,
       monto: parseFloat(montoGasto) || 0,
       desc: descGasto,
-      fecha: new Date().toLocaleDateString('es-AR'),
+      fecha: fechaGasto,
     }
     setGastos(prev => [g, ...prev])
     setNextId(n => n + 1)
     setMontoGasto('')
     setDescGasto('')
+    setFechaGasto(hoyISO)
     setCatActiva(null)
   }
 
-  function eliminarGasto(id: number) {
-    setGastos(prev => prev.filter(g => g.id !== id))
-  }
+  const puedoConfigurar = tipoIngreso === 'dependencia'
+    ? ingresoFijo > 0 && horasNum > 0
+    : totalIngDiarios > 0 && horasNum > 0
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3 space-y-5">
@@ -968,7 +989,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
         <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
 
-      {/* Configuración valor hora */}
+      {/* Tarjeta valor hora */}
       <div className="bg-gray-900 rounded-xl p-4 text-white">
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs uppercase tracking-widest text-yellow-400 font-semibold">⏰ Tu valor hora</span>
@@ -979,15 +1000,17 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
         {configurado ? (
           <>
             <p className="text-3xl font-bold mb-1">{formatARS(valorHora)} <span className="text-sm text-gray-400">/hora</span></p>
-            <p className="text-xs text-gray-400">{formatARS(ingresoNum)} mensuales · {horasNum} hs/mes · {tipoIngreso === 'dependencia' ? 'Relación de dependencia' : 'Actividad independiente'}</p>
+            <p className="text-xs text-gray-400">
+              {formatARS(ingresoTotal)} {tipoIngreso === 'independiente' ? 'facturado este mes' : 'mensuales'} · {horasNum} hs/mes · {tipoIngreso === 'dependencia' ? 'Relación de dependencia' : 'Actividad independiente'}
+            </p>
           </>
         ) : (
           <div className="space-y-3">
-            {/* Tipo de ingreso */}
+            {/* Tipo ingreso */}
             <div>
               <p className="text-xs text-gray-400 mb-2">Tipo de ingreso</p>
               <div className="flex gap-2">
-                {([['dependencia', '👔 Relación de dependencia'], ['independiente', '🧾 Actividad independiente']] as const).map(([val, lbl]) => (
+                {([['dependencia', '👔 En relación de dependencia'], ['independiente', '🧾 Actividad independiente']] as const).map(([val, lbl]) => (
                   <button key={val} onClick={() => setTipoIngreso(val)}
                     className={`flex-1 text-xs py-2 px-2 rounded-lg border transition-colors ${tipoIngreso === val ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300' : 'border-white/20 text-gray-400 hover:border-white/40'}`}>
                     {lbl}
@@ -995,15 +1018,58 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                 ))}
               </div>
             </div>
-            {/* Ingreso mensual */}
-            <div>
-              <p className="text-xs text-gray-400 mb-1">{tipoIngreso === 'dependencia' ? 'Sueldo neto mensual ($)' : 'Ingreso mensual neto ($)'}</p>
-              <input type="number" value={ingreso} onChange={e => setIngreso(e.target.value)} placeholder="Ej: 850000"
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
-              {tipoIngreso === 'independiente' && (
-                <p className="text-xs text-gray-500 mt-1">Ingresá tu facturación neta descontando impuestos y cargas</p>
-              )}
-            </div>
+
+            {/* Ingreso dependencia */}
+            {tipoIngreso === 'dependencia' && (
+              <div>
+                <p className="text-xs text-gray-400 mb-1">Sueldo neto mensual ($)</p>
+                <input type="number" value={ingreso} onChange={e => setIngreso(e.target.value)} placeholder="Ej: 850000"
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
+              </div>
+            )}
+
+            {/* Ingresos independiente por día */}
+            {tipoIngreso === 'independiente' && (
+              <div className="space-y-2">
+                <p className="text-xs text-gray-400">Cargá tus ingresos por venta de servicios</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-[10px] text-gray-500 mb-1">Monto ($)</p>
+                    <input type="number" value={montoIngDiario} onChange={e => setMontoIngDiario(e.target.value)} placeholder="Ej: 50000"
+                      className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-500 mb-1">Fecha</p>
+                    <input type="date" value={fechaIngDiario} onChange={e => setFechaIngDiario(e.target.value)}
+                      className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400" />
+                  </div>
+                </div>
+                <input type="text" value={descIngDiario} onChange={e => setDescIngDiario(e.target.value)} placeholder="Descripción del servicio (opcional)"
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
+                <button onClick={agregarIngDiario} disabled={!montoIngDiario}
+                  className="w-full bg-yellow-400/20 text-yellow-300 border border-yellow-400/40 py-2 rounded-lg text-xs font-medium disabled:opacity-40">
+                  + Agregar ingreso
+                </button>
+                {ingresosDiarios.length > 0 && (
+                  <div className="space-y-1 max-h-36 overflow-y-auto">
+                    {ingresosDiarios.map(i => (
+                      <div key={i.id} className="flex justify-between items-center bg-white/5 rounded-lg px-3 py-1.5">
+                        <div>
+                          <p className="text-xs text-white">{i.desc || 'Servicio'} <span className="text-gray-400">· {i.fecha}</span></p>
+                          <p className="text-xs font-bold text-yellow-300">{formatARS(i.monto)}</p>
+                        </div>
+                        <button onClick={() => setIngresosDiarios(prev => prev.filter(x => x.id !== i.id))} className="text-gray-500 hover:text-red-400 text-lg">×</button>
+                      </div>
+                    ))}
+                    <div className="flex justify-between px-3 py-1.5 border-t border-white/10">
+                      <p className="text-xs text-gray-400">Total ingresado</p>
+                      <p className="text-xs font-bold text-yellow-300">{formatARS(totalIngDiarios)}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Horas */}
             <div>
               <p className="text-xs text-gray-400 mb-2">¿Cuántas horas trabajás por mes?</p>
@@ -1019,13 +1085,14 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
               <input type="number" value={horas} onChange={e => setHoras(e.target.value)} placeholder="O escribí las horas exactas"
                 className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
             </div>
-            {ingresoNum > 0 && horasNum > 0 && (
+
+            {puedoConfigurar && (
               <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-lg p-3 text-center">
                 <p className="text-xs text-yellow-300 mb-1">tu valor hora será</p>
-                <p className="text-2xl font-bold text-yellow-300">{formatARS(valorHora)}</p>
+                <p className="text-2xl font-bold text-yellow-300">{formatARS(Math.round(ingresoTotal / horasNum))}</p>
               </div>
             )}
-            <button onClick={guardarConfig} disabled={!(ingresoNum > 0 && horasNum > 0)}
+            <button onClick={guardarConfig} disabled={!puedoConfigurar}
               className="w-full bg-yellow-400 text-gray-900 font-semibold py-2.5 rounded-lg text-sm disabled:opacity-40">
               Calcular mi vida en horas
             </button>
@@ -1033,10 +1100,10 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
         )}
       </div>
 
-      {/* Desglose gastos en tiempo */}
+      {/* Desglose gastos */}
       {configurado && gastos.length > 0 && (
         <div className="bg-gray-50 rounded-xl p-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">🕒 Tu vida este mes se fue así</p>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">🕒 Tu vida este mes se fue así</p>
           <p className="text-xs text-gray-400 mb-3">Cada gasto traducido a horas de trabajo</p>
           <div className="space-y-2">
             {gastos.map(g => (
@@ -1045,7 +1112,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                   <span className="text-lg">{g.emoji}</span>
                   <div>
                     <p className="text-sm font-medium text-gray-800">{g.cat}{g.desc ? ` · ${g.desc}` : ''}</p>
-                    <p className="text-xs text-gray-500">{formatARS(g.monto)}</p>
+                    <p className="text-xs text-gray-500">{formatARS(g.monto)} · {g.fecha}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -1053,12 +1120,11 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                     <p className="text-sm font-bold text-red-500">{formatHoras(g.monto / valorHora)}</p>
                     <p className="text-[10px] text-gray-400">{g.monto / valorHora < 24 ? 'menos de un día' : `${(g.monto / valorHora / 24).toFixed(1)} días`}</p>
                   </div>
-                  <button onClick={() => eliminarGasto(g.id)} className="text-gray-300 hover:text-red-400 text-lg leading-none">×</button>
+                  <button onClick={() => setGastos(prev => prev.filter(x => x.id !== g.id))} className="text-gray-300 hover:text-red-400 text-lg leading-none">×</button>
                 </div>
               </div>
             ))}
           </div>
-          {/* Resumen */}
           <div className="mt-3 bg-green-50 border border-green-100 rounded-lg px-4 py-3 flex justify-between items-center">
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Te quedan en el mes</p>
@@ -1072,19 +1138,29 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
         </div>
       )}
 
-      {/* Cargar gasto rápido */}
+      {/* Categorías de gasto */}
       {configurado && (
         <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">⚡ Cargar gasto rápido</p>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">⚡ Tocá una categoría para cargar gasto</p>
           {catActiva ? (
             <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2">
                 <span className="text-2xl">{catActiva.emoji}</span>
                 <p className="font-medium text-gray-800">{catActiva.label}</p>
                 <button onClick={() => setCatActiva(null)} className="ml-auto text-xs text-gray-400 hover:text-gray-600">✕ cancelar</button>
               </div>
-              <input type="number" value={montoGasto} onChange={e => setMontoGasto(e.target.value)} placeholder="Monto ($)"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2D4A6B]" />
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Monto ($)</p>
+                  <input type="number" value={montoGasto} onChange={e => setMontoGasto(e.target.value)} placeholder="0"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2D4A6B]" />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Fecha</p>
+                  <input type="date" value={fechaGasto} onChange={e => setFechaGasto(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2D4A6B]" />
+                </div>
+              </div>
               <input type="text" value={descGasto} onChange={e => setDescGasto(e.target.value)} placeholder="Descripción (opcional)"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2D4A6B]" />
               {montoGasto && valorHora > 0 && (
