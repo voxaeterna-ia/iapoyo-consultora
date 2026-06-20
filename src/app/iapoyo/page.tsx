@@ -896,18 +896,20 @@ const MODULOS_GRID = [
 
 // ─── Panel pPlata (Mi Plata) ──────────────────────────────────────────────────
 const CATS_PLATA = [
-  { key: 'super', label: 'Súper', emoji: '🛒' },
-  { key: 'combustible', label: 'Combustible', emoji: '⛽' },
-  { key: 'esparcimiento', label: 'Esparcimiento', emoji: '🎉' },
-  { key: 'servicios', label: 'Servicios', emoji: '💡' },
-  { key: 'impuestos', label: 'Imp. y tasas', emoji: '📋' },
-  { key: 'mascotas', label: 'Mascotas', emoji: '🐾' },
-  { key: 'salud', label: 'Salud', emoji: '❤️' },
-  { key: 'educacion', label: 'Educación', emoji: '📚' },
-  { key: 'otros', label: 'Otros gastos', emoji: '➕' },
+  { key: 'super', label: 'Súper', emoji: '🛒', subs: [] },
+  { key: 'combustible', label: 'Combustible', emoji: '⛽', subs: [] },
+  { key: 'esparcimiento', label: 'Esparcimiento', emoji: '🎉', subs: [] },
+  { key: 'servicios', label: 'Servicios', emoji: '💡', subs: [] },
+  { key: 'impuestos', label: 'Imp. y tasas', emoji: '📋', subs: [] },
+  { key: 'mascotas', label: 'Mascotas', emoji: '🐾', subs: ['Comida', 'Veterinario', 'Peluquería'] },
+  { key: 'salud', label: 'Salud', emoji: '❤️', subs: [] },
+  { key: 'educacion', label: 'Educación', emoji: '📚', subs: [] },
+  { key: 'alquiler', label: 'Alquiler y sueldos', emoji: '🏘️', subs: ['Alquiler', 'Sueldos y jornales', 'Cargas sociales', 'Otro'] },
+  { key: 'otros', label: 'Otros gastos', emoji: '➕', subs: ['Comidas rápidas', 'Mercado Libre', 'Cafetería', 'Movilidad', 'Otro (editable)'] },
 ]
 
 type GastoPlata = { id: number; cat: string; emoji: string; monto: number; desc: string; fecha: string }
+type IngDiario = { id: number; monto: number; horas: number; desc: string; fecha: string }
 
 function PanelMiPlata({ onClose }: { onClose: () => void }) {
   const hoyISO = new Date().toISOString().split('T')[0]
@@ -915,14 +917,17 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
   const [ingreso, setIngreso] = useState('')
   const [horas, setHoras] = useState('')
   const [configurado, setConfigurado] = useState(false)
-  // Ingresos independiente por día
-  const [ingresosDiarios, setIngresosDiarios] = useState<{ id: number; monto: number; desc: string; fecha: string }[]>([])
-  const [montoIngDiario, setMontoIngDiario] = useState('')
-  const [descIngDiario, setDescIngDiario] = useState('')
-  const [fechaIngDiario, setFechaIngDiario] = useState(hoyISO)
+  // Ingresos independiente
+  const [ingresosDiarios, setIngresosDiarios] = useState<IngDiario[]>([])
+  const [montoIng, setMontoIng] = useState('')
+  const [horasIng, setHorasIng] = useState('')
+  const [descIng, setDescIng] = useState('')
+  const [fechaIng, setFechaIng] = useState(hoyISO)
   const [nextIngId, setNextIngId] = useState(1)
   // Gastos
-  const [catActiva, setCatActiva] = useState<{ key: string; label: string; emoji: string } | null>(null)
+  const [catActiva, setCatActiva] = useState<{ key: string; label: string; emoji: string; subs: string[] } | null>(null)
+  const [subActiva, setSubActiva] = useState('')
+  const [otroEditable, setOtroEditable] = useState('')
   const [montoGasto, setMontoGasto] = useState('')
   const [descGasto, setDescGasto] = useState('')
   const [fechaGasto, setFechaGasto] = useState(hoyISO)
@@ -931,56 +936,52 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
 
   const ingresoFijo = parseFloat(ingreso) || 0
   const totalIngDiarios = ingresosDiarios.reduce((s, i) => s + i.monto, 0)
+  const totalHorasInd = ingresosDiarios.reduce((s, i) => s + i.horas, 0)
   const ingresoTotal = tipoIngreso === 'dependencia' ? ingresoFijo : totalIngDiarios
-  const horasNum = parseFloat(horas) || 0
-  const valorHora = horasNum > 0 && ingresoTotal > 0 ? Math.round(ingresoTotal / horasNum) : 0
+  const horasTotal = tipoIngreso === 'dependencia' ? (parseFloat(horas) || 0) : totalHorasInd
+  const valorHora = horasTotal > 0 && ingresoTotal > 0 ? Math.round(ingresoTotal / horasTotal) : 0
 
   const totalGastos = gastos.reduce((s, g) => s + g.monto, 0)
   const horasGastadas = valorHora > 0 ? totalGastos / valorHora : 0
-  const horasRestantes = horasNum - horasGastadas
+  const horasRestantes = horasTotal - horasGastadas
   const pesoRestante = ingresoTotal - totalGastos
 
   function formatHoras(h: number) {
     const hh = Math.floor(Math.abs(h))
     const mm = Math.round((Math.abs(h) - hh) * 60)
-    return `${hh} h ${mm > 0 ? mm + ' min' : ''}`.trim()
+    return `${hh} h${mm > 0 ? ` ${mm} min` : ''}`
   }
 
-  function guardarConfig() {
-    const ok = tipoIngreso === 'dependencia' ? ingresoFijo > 0 && horasNum > 0 : totalIngDiarios > 0 && horasNum > 0
-    if (ok) setConfigurado(true)
-  }
+  const puedoConfigurar = tipoIngreso === 'dependencia'
+    ? ingresoFijo > 0 && (parseFloat(horas) || 0) > 0
+    : totalIngDiarios > 0 && totalHorasInd > 0
 
-  function agregarIngDiario() {
-    if (!montoIngDiario) return
-    setIngresosDiarios(prev => [{ id: nextIngId, monto: parseFloat(montoIngDiario) || 0, desc: descIngDiario, fecha: fechaIngDiario }, ...prev])
+  function guardarConfig() { if (puedoConfigurar) setConfigurado(true) }
+
+  function agregarIng() {
+    if (!montoIng || !horasIng) return
+    setIngresosDiarios(prev => [...prev, { id: nextIngId, monto: parseFloat(montoIng) || 0, horas: parseFloat(horasIng) || 0, desc: descIng, fecha: fechaIng }])
     setNextIngId(n => n + 1)
-    setMontoIngDiario('')
-    setDescIngDiario('')
-    setFechaIngDiario(hoyISO)
+    setMontoIng(''); setHorasIng(''); setDescIng(''); setFechaIng(hoyISO)
   }
 
   function agregarGasto() {
     if (!catActiva || !montoGasto) return
-    const g: GastoPlata = {
-      id: nextId,
-      cat: catActiva.label,
-      emoji: catActiva.emoji,
-      monto: parseFloat(montoGasto) || 0,
-      desc: descGasto,
-      fecha: fechaGasto,
-    }
-    setGastos(prev => [g, ...prev])
+    const subLabel = subActiva === 'Otro (editable)' ? (otroEditable || 'Otro') : subActiva
+    const desc = [subLabel, descGasto].filter(Boolean).join(' · ')
+    setGastos(prev => [{ id: nextId, cat: catActiva.label, emoji: catActiva.emoji, monto: parseFloat(montoGasto) || 0, desc, fecha: fechaGasto }, ...prev])
     setNextId(n => n + 1)
-    setMontoGasto('')
-    setDescGasto('')
-    setFechaGasto(hoyISO)
-    setCatActiva(null)
+    setMontoGasto(''); setDescGasto(''); setFechaGasto(hoyISO); setSubActiva(''); setOtroEditable(''); setCatActiva(null)
   }
 
-  const puedoConfigurar = tipoIngreso === 'dependencia'
-    ? ingresoFijo > 0 && horasNum > 0
-    : totalIngDiarios > 0 && horasNum > 0
+  function seleccionarCat(cat: typeof CATS_PLATA[0]) {
+    setCatActiva(cat)
+    setSubActiva(cat.subs.length === 0 ? '' : '')
+    setOtroEditable('')
+    setMontoGasto(''); setDescGasto(''); setFechaGasto(hoyISO)
+  }
+
+  const puedeAgregarGasto = !!montoGasto && (!catActiva?.subs.length || !!subActiva)
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3 space-y-5">
@@ -993,20 +994,17 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
       <div className="bg-gray-900 rounded-xl p-4 text-white">
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs uppercase tracking-widest text-yellow-400 font-semibold">⏰ Tu valor hora</span>
-          {configurado && (
-            <button onClick={() => setConfigurado(false)} className="text-xs bg-white/10 text-yellow-300 px-3 py-1 rounded-full">editar</button>
-          )}
+          {configurado && <button onClick={() => setConfigurado(false)} className="text-xs bg-white/10 text-yellow-300 px-3 py-1 rounded-full">editar</button>}
         </div>
         {configurado ? (
           <>
             <p className="text-3xl font-bold mb-1">{formatARS(valorHora)} <span className="text-sm text-gray-400">/hora</span></p>
             <p className="text-xs text-gray-400">
-              {formatARS(ingresoTotal)} {tipoIngreso === 'independiente' ? 'facturado este mes' : 'mensuales'} · {horasNum} hs/mes · {tipoIngreso === 'dependencia' ? 'Relación de dependencia' : 'Actividad independiente'}
+              {formatARS(ingresoTotal)} · {formatHoras(horasTotal)} · {tipoIngreso === 'dependencia' ? 'Relación de dependencia' : 'Actividad independiente'}
             </p>
           </>
         ) : (
           <div className="space-y-3">
-            {/* Tipo ingreso */}
             <div>
               <p className="text-xs text-gray-400 mb-2">Tipo de ingreso</p>
               <div className="flex gap-2">
@@ -1019,77 +1017,85 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
               </div>
             </div>
 
-            {/* Ingreso dependencia */}
             {tipoIngreso === 'dependencia' && (
-              <div>
-                <p className="text-xs text-gray-400 mb-1">Sueldo neto mensual ($)</p>
-                <input type="number" value={ingreso} onChange={e => setIngreso(e.target.value)} placeholder="Ej: 850000"
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
-              </div>
+              <>
+                <div>
+                  <p className="text-xs text-gray-400 mb-1">Sueldo neto mensual ($)</p>
+                  <input type="number" value={ingreso} onChange={e => setIngreso(e.target.value)} placeholder="Ej: 850000"
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 mb-2">¿Cuántas horas trabajás por mes?</p>
+                  <div className="grid grid-cols-4 gap-2 mb-2">
+                    {[['80','medio turno'],['120','6h × día'],['160','full time'],['200','+ extras']].map(([h, sub]) => (
+                      <button key={h} onClick={() => setHoras(h)}
+                        className={`py-2 rounded-lg text-xs border transition-colors ${horas === h ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300' : 'border-white/20 text-gray-400 hover:border-white/40'}`}>
+                        <span className="font-bold">{h} h</span><br /><span className="text-[10px]">{sub}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <input type="number" value={horas} onChange={e => setHoras(e.target.value)} placeholder="O escribí las horas exactas"
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
+                </div>
+              </>
             )}
 
-            {/* Ingresos independiente por día */}
             {tipoIngreso === 'independiente' && (
               <div className="space-y-2">
-                <p className="text-xs text-gray-400">Cargá tus ingresos por venta de servicios</p>
+                <p className="text-xs text-gray-400">Cargá cada ingreso con las horas que dedicaste</p>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <p className="text-[10px] text-gray-500 mb-1">Monto ($)</p>
-                    <input type="number" value={montoIngDiario} onChange={e => setMontoIngDiario(e.target.value)} placeholder="Ej: 50000"
+                    <input type="number" value={montoIng} onChange={e => setMontoIng(e.target.value)} placeholder="Ej: 80000"
                       className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-gray-500 mb-1">Fecha</p>
-                    <input type="date" value={fechaIngDiario} onChange={e => setFechaIngDiario(e.target.value)}
-                      className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400" />
+                    <p className="text-[10px] text-gray-500 mb-1">Horas afectadas</p>
+                    <input type="number" value={horasIng} onChange={e => setHorasIng(e.target.value)} placeholder="Ej: 4"
+                      className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
                   </div>
                 </div>
-                <input type="text" value={descIngDiario} onChange={e => setDescIngDiario(e.target.value)} placeholder="Descripción del servicio (opcional)"
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
-                <button onClick={agregarIngDiario} disabled={!montoIngDiario}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-[10px] text-gray-500 mb-1">Fecha</p>
+                    <input type="date" value={fechaIng} onChange={e => setFechaIng(e.target.value)}
+                      className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-500 mb-1">Descripción</p>
+                    <input type="text" value={descIng} onChange={e => setDescIng(e.target.value)} placeholder="Servicio..."
+                      className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
+                  </div>
+                </div>
+                <button onClick={agregarIng} disabled={!montoIng || !horasIng}
                   className="w-full bg-yellow-400/20 text-yellow-300 border border-yellow-400/40 py-2 rounded-lg text-xs font-medium disabled:opacity-40">
                   + Agregar ingreso
                 </button>
                 {ingresosDiarios.length > 0 && (
-                  <div className="space-y-1 max-h-36 overflow-y-auto">
+                  <div className="space-y-1 max-h-44 overflow-y-auto">
                     {ingresosDiarios.map(i => (
                       <div key={i.id} className="flex justify-between items-center bg-white/5 rounded-lg px-3 py-1.5">
                         <div>
                           <p className="text-xs text-white">{i.desc || 'Servicio'} <span className="text-gray-400">· {i.fecha}</span></p>
-                          <p className="text-xs font-bold text-yellow-300">{formatARS(i.monto)}</p>
+                          <p className="text-[10px] text-gray-400">{formatARS(i.monto)} · {formatHoras(i.horas)} afectadas → {formatARS(i.horas > 0 ? Math.round(i.monto / i.horas) : 0)}/h</p>
                         </div>
-                        <button onClick={() => setIngresosDiarios(prev => prev.filter(x => x.id !== i.id))} className="text-gray-500 hover:text-red-400 text-lg">×</button>
+                        <button onClick={() => setIngresosDiarios(prev => prev.filter(x => x.id !== i.id))} className="text-gray-500 hover:text-red-400 text-lg ml-2">×</button>
                       </div>
                     ))}
-                    <div className="flex justify-between px-3 py-1.5 border-t border-white/10">
-                      <p className="text-xs text-gray-400">Total ingresado</p>
-                      <p className="text-xs font-bold text-yellow-300">{formatARS(totalIngDiarios)}</p>
+                    <div className="grid grid-cols-3 gap-1 px-3 py-2 border-t border-white/10 text-center">
+                      <div><p className="text-[10px] text-gray-400">Total ingresos</p><p className="text-xs font-bold text-yellow-300">{formatARS(totalIngDiarios)}</p></div>
+                      <div><p className="text-[10px] text-gray-400">Horas totales</p><p className="text-xs font-bold text-yellow-300">{formatHoras(totalHorasInd)}</p></div>
+                      <div><p className="text-[10px] text-gray-400">Valor/hora</p><p className="text-xs font-bold text-yellow-300">{totalHorasInd > 0 ? formatARS(Math.round(totalIngDiarios / totalHorasInd)) : '—'}</p></div>
                     </div>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Horas */}
-            <div>
-              <p className="text-xs text-gray-400 mb-2">¿Cuántas horas trabajás por mes?</p>
-              <div className="grid grid-cols-4 gap-2 mb-2">
-                {[['80', 'medio turno'], ['120', '6h × día'], ['160', 'full time'], ['200', '+ extras']].map(([h, sub]) => (
-                  <button key={h} onClick={() => setHoras(h)}
-                    className={`py-2 rounded-lg text-xs border transition-colors ${horas === h ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300' : 'border-white/20 text-gray-400 hover:border-white/40'}`}>
-                    <span className="font-bold">{h} h</span><br />
-                    <span className="text-[10px]">{sub}</span>
-                  </button>
-                ))}
-              </div>
-              <input type="number" value={horas} onChange={e => setHoras(e.target.value)} placeholder="O escribí las horas exactas"
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
-            </div>
-
             {puedoConfigurar && (
               <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-lg p-3 text-center">
                 <p className="text-xs text-yellow-300 mb-1">tu valor hora será</p>
-                <p className="text-2xl font-bold text-yellow-300">{formatARS(Math.round(ingresoTotal / horasNum))}</p>
+                <p className="text-2xl font-bold text-yellow-300">{formatARS(Math.round(ingresoTotal / horasTotal))}</p>
               </div>
             )}
             <button onClick={guardarConfig} disabled={!puedoConfigurar}
@@ -1149,6 +1155,26 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                 <p className="font-medium text-gray-800">{catActiva.label}</p>
                 <button onClick={() => setCatActiva(null)} className="ml-auto text-xs text-gray-400 hover:text-gray-600">✕ cancelar</button>
               </div>
+
+              {/* Subcategorías */}
+              {catActiva.subs.length > 0 && (
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Subcategoría</p>
+                  <div className="flex flex-wrap gap-2">
+                    {catActiva.subs.map(s => (
+                      <button key={s} onClick={() => setSubActiva(s)}
+                        className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${subActiva === s ? 'border-[#2D4A6B] bg-[#2D4A6B] text-white' : 'border-gray-200 text-gray-600 hover:border-[#2D4A6B]'}`}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                  {subActiva === 'Otro (editable)' && (
+                    <input type="text" value={otroEditable} onChange={e => setOtroEditable(e.target.value)} placeholder="Escribí el concepto..."
+                      className="mt-2 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2D4A6B]" />
+                  )}
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Monto ($)</p>
@@ -1169,7 +1195,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                   <p className="text-lg font-bold text-[#FF7043]">{formatHoras(parseFloat(montoGasto) / valorHora)} de trabajo</p>
                 </div>
               )}
-              <button onClick={agregarGasto} disabled={!montoGasto}
+              <button onClick={agregarGasto} disabled={!puedeAgregarGasto}
                 className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg text-sm font-medium disabled:opacity-40">
                 Agregar gasto
               </button>
@@ -1177,7 +1203,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
           ) : (
             <div className="grid grid-cols-3 gap-2">
               {CATS_PLATA.map(cat => (
-                <button key={cat.key} onClick={() => setCatActiva(cat)}
+                <button key={cat.key} onClick={() => seleccionarCat(cat)}
                   className="flex flex-col items-center justify-center gap-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl py-3 px-2 transition-colors">
                   <span className="text-2xl">{cat.emoji}</span>
                   <span className="text-xs text-gray-700 font-medium text-center leading-tight">{cat.label}</span>
