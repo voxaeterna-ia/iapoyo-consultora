@@ -811,7 +811,7 @@ function PanelMkt({ onClose }: { onClose: () => void }) {
 }
 
 // ─── Ecosistema por módulo ─────────────────────────────────────────────────────
-type ModuleId = 'fiscal' | 'marcas' | 'inden' | 'costos' | 'autos' | 'mkt'
+type ModuleId = 'fiscal' | 'marcas' | 'inden' | 'costos' | 'autos' | 'mkt' | 'plata'
 
 interface EcoBtn {
   label: string
@@ -876,6 +876,13 @@ const ECOSISTEMAS: Record<ModuleId, { titulo: string; btns: EcoBtn[] }> = {
       { label: 'Meta Ads vs Google Ads', action: 'directMsg', directMsg: 'Meta Ads (Facebook e Instagram) impacta a usuarios según sus intereses, comportamientos y características demográficas —ideal para generar demanda en audiencias que aún no te conocen. Google Ads captura demanda existente: aparece cuando alguien busca activamente tu producto o servicio —ideal para conversión directa. Lo óptimo para la mayoría de los negocios es combinar ambas plataformas según el objetivo: Meta para awareness y branding, Google para captura de intención de compra. En IApoyo Consultora armamos la estrategia según tu rubro y presupuesto.' },
     ],
   },
+  plata: {
+    titulo: 'Mi Plata',
+    btns: [
+      { label: '💰 Configurar mi valor hora', action: 'panel', panelId: 'pPlata' },
+      { label: '⚡ Cargar gasto rápido', action: 'panel', panelId: 'pPlata' },
+    ],
+  },
 }
 
 const MODULOS_GRID = [
@@ -885,7 +892,232 @@ const MODULOS_GRID = [
   { id: 'costos' as ModuleId, label: 'Alquileres & Costos', emoji: '🏠' },
   { id: 'autos' as ModuleId, label: 'Vehículos & Fotomultas', emoji: '🚗' },
   { id: 'mkt' as ModuleId, label: 'Marketing', emoji: '📱' },
+  { id: 'plata' as ModuleId, label: 'Mi Plata', emoji: '💰' },
 ]
+
+// ─── Panel pPlata (Mi Plata) ──────────────────────────────────────────────────
+const CATS_PLATA = [
+  { key: 'super', label: 'Súper', emoji: '🛒' },
+  { key: 'combustible', label: 'Combustible', emoji: '⛽' },
+  { key: 'esparcimiento', label: 'Esparcimiento', emoji: '🎉' },
+  { key: 'servicios', label: 'Servicios', emoji: '💡' },
+  { key: 'impuestos', label: 'Imp. y tasas', emoji: '📋' },
+  { key: 'mascotas', label: 'Mascotas', emoji: '🐾' },
+  { key: 'salud', label: 'Salud', emoji: '❤️' },
+  { key: 'educacion', label: 'Educación', emoji: '📚' },
+  { key: 'otros', label: 'Otros gastos', emoji: '➕' },
+]
+
+type GastoPlata = { id: number; cat: string; emoji: string; monto: number; desc: string; fecha: string }
+
+function PanelMiPlata({ onClose }: { onClose: () => void }) {
+  const [tipoIngreso, setTipoIngreso] = useState<'dependencia' | 'independiente'>('dependencia')
+  const [ingreso, setIngreso] = useState('')
+  const [horas, setHoras] = useState('')
+  const [configurado, setConfigurado] = useState(false)
+  const [catActiva, setCatActiva] = useState<{ key: string; label: string; emoji: string } | null>(null)
+  const [montoGasto, setMontoGasto] = useState('')
+  const [descGasto, setDescGasto] = useState('')
+  const [gastos, setGastos] = useState<GastoPlata[]>([])
+  const [nextId, setNextId] = useState(1)
+
+  const ingresoNum = parseFloat(ingreso) || 0
+  const horasNum = parseFloat(horas) || 0
+  const valorHora = horasNum > 0 && ingresoNum > 0 ? Math.round(ingresoNum / horasNum) : 0
+
+  const totalGastos = gastos.reduce((s, g) => s + g.monto, 0)
+  const horasGastadas = valorHora > 0 ? totalGastos / valorHora : 0
+  const horasRestantes = horasNum - horasGastadas
+  const pesoRestante = ingresoNum - totalGastos
+
+  function formatHoras(h: number) {
+    const hh = Math.floor(Math.abs(h))
+    const mm = Math.round((Math.abs(h) - hh) * 60)
+    return `${hh} h ${mm > 0 ? mm + ' min' : ''}`.trim()
+  }
+
+  function guardarConfig() {
+    if (ingresoNum > 0 && horasNum > 0) setConfigurado(true)
+  }
+
+  function agregarGasto() {
+    if (!catActiva || !montoGasto) return
+    const g: GastoPlata = {
+      id: nextId,
+      cat: catActiva.label,
+      emoji: catActiva.emoji,
+      monto: parseFloat(montoGasto) || 0,
+      desc: descGasto,
+      fecha: new Date().toLocaleDateString('es-AR'),
+    }
+    setGastos(prev => [g, ...prev])
+    setNextId(n => n + 1)
+    setMontoGasto('')
+    setDescGasto('')
+    setCatActiva(null)
+  }
+
+  function eliminarGasto(id: number) {
+    setGastos(prev => prev.filter(g => g.id !== id))
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3 space-y-5">
+      <div className="flex justify-between items-center">
+        <h3 className="font-semibold text-[#2D4A6B] text-sm">💰 Mi Plata</h3>
+        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+      </div>
+
+      {/* Configuración valor hora */}
+      <div className="bg-gray-900 rounded-xl p-4 text-white">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs uppercase tracking-widest text-yellow-400 font-semibold">⏰ Tu valor hora</span>
+          {configurado && (
+            <button onClick={() => setConfigurado(false)} className="text-xs bg-white/10 text-yellow-300 px-3 py-1 rounded-full">editar</button>
+          )}
+        </div>
+        {configurado ? (
+          <>
+            <p className="text-3xl font-bold mb-1">{formatARS(valorHora)} <span className="text-sm text-gray-400">/hora</span></p>
+            <p className="text-xs text-gray-400">{formatARS(ingresoNum)} mensuales · {horasNum} hs/mes · {tipoIngreso === 'dependencia' ? 'Relación de dependencia' : 'Actividad independiente'}</p>
+          </>
+        ) : (
+          <div className="space-y-3">
+            {/* Tipo de ingreso */}
+            <div>
+              <p className="text-xs text-gray-400 mb-2">Tipo de ingreso</p>
+              <div className="flex gap-2">
+                {([['dependencia', '👔 Relación de dependencia'], ['independiente', '🧾 Actividad independiente']] as const).map(([val, lbl]) => (
+                  <button key={val} onClick={() => setTipoIngreso(val)}
+                    className={`flex-1 text-xs py-2 px-2 rounded-lg border transition-colors ${tipoIngreso === val ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300' : 'border-white/20 text-gray-400 hover:border-white/40'}`}>
+                    {lbl}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Ingreso mensual */}
+            <div>
+              <p className="text-xs text-gray-400 mb-1">{tipoIngreso === 'dependencia' ? 'Sueldo neto mensual ($)' : 'Ingreso mensual neto ($)'}</p>
+              <input type="number" value={ingreso} onChange={e => setIngreso(e.target.value)} placeholder="Ej: 850000"
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
+              {tipoIngreso === 'independiente' && (
+                <p className="text-xs text-gray-500 mt-1">Ingresá tu facturación neta descontando impuestos y cargas</p>
+              )}
+            </div>
+            {/* Horas */}
+            <div>
+              <p className="text-xs text-gray-400 mb-2">¿Cuántas horas trabajás por mes?</p>
+              <div className="grid grid-cols-4 gap-2 mb-2">
+                {[['80', 'medio turno'], ['120', '6h × día'], ['160', 'full time'], ['200', '+ extras']].map(([h, sub]) => (
+                  <button key={h} onClick={() => setHoras(h)}
+                    className={`py-2 rounded-lg text-xs border transition-colors ${horas === h ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300' : 'border-white/20 text-gray-400 hover:border-white/40'}`}>
+                    <span className="font-bold">{h} h</span><br />
+                    <span className="text-[10px]">{sub}</span>
+                  </button>
+                ))}
+              </div>
+              <input type="number" value={horas} onChange={e => setHoras(e.target.value)} placeholder="O escribí las horas exactas"
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
+            </div>
+            {ingresoNum > 0 && horasNum > 0 && (
+              <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-lg p-3 text-center">
+                <p className="text-xs text-yellow-300 mb-1">tu valor hora será</p>
+                <p className="text-2xl font-bold text-yellow-300">{formatARS(valorHora)}</p>
+              </div>
+            )}
+            <button onClick={guardarConfig} disabled={!(ingresoNum > 0 && horasNum > 0)}
+              className="w-full bg-yellow-400 text-gray-900 font-semibold py-2.5 rounded-lg text-sm disabled:opacity-40">
+              Calcular mi vida en horas
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Desglose gastos en tiempo */}
+      {configurado && gastos.length > 0 && (
+        <div className="bg-gray-50 rounded-xl p-4">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">🕒 Tu vida este mes se fue así</p>
+          <p className="text-xs text-gray-400 mb-3">Cada gasto traducido a horas de trabajo</p>
+          <div className="space-y-2">
+            {gastos.map(g => (
+              <div key={g.id} className="flex items-center justify-between bg-red-50 rounded-lg px-3 py-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{g.emoji}</span>
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">{g.cat}{g.desc ? ` · ${g.desc}` : ''}</p>
+                    <p className="text-xs text-gray-500">{formatARS(g.monto)}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-red-500">{formatHoras(g.monto / valorHora)}</p>
+                    <p className="text-[10px] text-gray-400">{g.monto / valorHora < 24 ? 'menos de un día' : `${(g.monto / valorHora / 24).toFixed(1)} días`}</p>
+                  </div>
+                  <button onClick={() => eliminarGasto(g.id)} className="text-gray-300 hover:text-red-400 text-lg leading-none">×</button>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Resumen */}
+          <div className="mt-3 bg-green-50 border border-green-100 rounded-lg px-4 py-3 flex justify-between items-center">
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Te quedan en el mes</p>
+              <p className="text-2xl font-bold text-green-700">{formatHoras(horasRestantes)}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-gray-500">o sea</p>
+              <p className="text-lg font-bold text-green-700">{formatARS(Math.max(pesoRestante, 0))}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cargar gasto rápido */}
+      {configurado && (
+        <div>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">⚡ Cargar gasto rápido</p>
+          {catActiva ? (
+            <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-2xl">{catActiva.emoji}</span>
+                <p className="font-medium text-gray-800">{catActiva.label}</p>
+                <button onClick={() => setCatActiva(null)} className="ml-auto text-xs text-gray-400 hover:text-gray-600">✕ cancelar</button>
+              </div>
+              <input type="number" value={montoGasto} onChange={e => setMontoGasto(e.target.value)} placeholder="Monto ($)"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2D4A6B]" />
+              <input type="text" value={descGasto} onChange={e => setDescGasto(e.target.value)} placeholder="Descripción (opcional)"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2D4A6B]" />
+              {montoGasto && valorHora > 0 && (
+                <div className="bg-orange-50 rounded-lg p-2 text-center">
+                  <p className="text-xs text-gray-500">Este gasto equivale a</p>
+                  <p className="text-lg font-bold text-[#FF7043]">{formatHoras(parseFloat(montoGasto) / valorHora)} de trabajo</p>
+                </div>
+              )}
+              <button onClick={agregarGasto} disabled={!montoGasto}
+                className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg text-sm font-medium disabled:opacity-40">
+                Agregar gasto
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-2">
+              {CATS_PLATA.map(cat => (
+                <button key={cat.key} onClick={() => setCatActiva(cat)}
+                  className="flex flex-col items-center justify-center gap-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl py-3 px-2 transition-colors">
+                  <span className="text-2xl">{cat.emoji}</span>
+                  <span className="text-xs text-gray-700 font-medium text-center leading-tight">{cat.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {!configurado && (
+        <p className="text-xs text-gray-400 text-center">Configurá tu valor hora para empezar a cargar gastos</p>
+      )}
+    </div>
+  )
+}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function IApoyoPage() {
@@ -1020,6 +1252,7 @@ export default function IApoyoPage() {
                 {openPanels.has('pAlquiler') && <PanelAlquiler onClose={() => closePanel('pAlquiler')} />}
                 {openPanels.has('pPatente') && <PanelPatente onClose={() => closePanel('pPatente')} />}
                 {openPanels.has('pMkt') && <PanelMkt onClose={() => closePanel('pMkt')} />}
+                {openPanels.has('pPlata') && <PanelMiPlata onClose={() => closePanel('pPlata')} />}
 
                 {/* Chat always visible */}
                 <div className="flex-1 flex flex-col mt-2">
