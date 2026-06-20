@@ -1211,7 +1211,7 @@ export default function IApoyoPage() {
   return (
     <AuthGuard>
       <div className="flex flex-col md:flex-row min-h-screen bg-gray-50 overflow-x-hidden">
-        <div className="hidden md:block"><Sidebar /></div>
+        <Sidebar hideMobile />
         <main className="flex-1 flex flex-col overflow-auto min-w-0">
           {/* Header Banner */}
           <div className="bg-gradient-to-r from-[#2D4A6B] to-[#3d6a9e] px-4 py-3 flex items-center gap-3">
