@@ -809,18 +809,18 @@ const ECOSISTEMAS: Record<ModuleId, { titulo: string; btns: EcoBtn[] }> = {
   fiscal: {
     titulo: 'Consultas Fiscales',
     btns: [
-      { label: '¿Cuánto puedo facturar?', action: 'chat', chatMsg: '¿Cuánto puedo facturar este mes en monotributo?' },
-      { label: '¿Cerca de recategorización?', action: 'chat', chatMsg: '¿Estoy cerca de cambiar de categoría de monotributo?' },
-      { label: '¿Cuándo vence AFIP?', action: 'chat', chatMsg: '¿Cuándo vence mi obligación mensual de AFIP?' },
-      { label: '¿Qué gastos cargar?', action: 'chat', chatMsg: '¿Qué gastos puedo cargar como deducibles en Argentina?' },
-      { label: 'Acreditaciones vs facturación', action: 'chat', chatMsg: '¿Por qué mis acreditaciones bancarias superan mi facturación?' },
-      { label: '¿Qué pasa si no presento?', action: 'chat', chatMsg: '¿Qué pasa si no presento la declaración jurada de monotributo a tiempo?' },
+      { label: '¿Cuánto puedo facturar?', action: 'directMsg', directMsg: 'Los límites anuales de facturación en Monotributo varían según la categoría y la actividad (servicios o venta de bienes). Para 2024/2025, las categorías van desde la A hasta la K, con topes que oscilan entre $7.600.000 y $68.000.000 aproximadamente según actualizaciones periódicas. Es fundamental controlar el acumulado mensual para anticipar una recategorización. En IApoyo Consultora hacemos un seguimiento personalizado de tu situación para que nunca te tomen por sorpresa.' },
+      { label: '¿Cerca de recategorización?', action: 'directMsg', directMsg: 'La recategorización en Monotributo se realiza en enero y julio de cada año, tomando como referencia los últimos 12 meses de facturación, energía eléctrica consumida y superficie del local afectado. Si tu facturación acumulada se acerca al tope de tu categoría actual, debés recategorizarte —o de lo contrario AFIP puede hacerlo de oficio con recargos. Te recomendamos revisar tu situación con al menos 60 días de anticipación. Consultanos para hacer el análisis.' },
+      { label: '¿Cuándo vence AFIP?', action: 'directMsg', directMsg: 'Los vencimientos de AFIP dependen del tipo de obligación y de la terminación de CUIT. El Monotributo vence el día 7 de cada mes (con variación según terminación). El IVA, Ganancias e Ingresos Brutos tienen calendarios propios publicados en el sitio de AFIP. En IApoyo Consultora llevamos el control de todos tus vencimientos para que nunca pierdas una fecha clave.' },
+      { label: '¿Qué gastos cargar?', action: 'directMsg', directMsg: 'Los gastos deducibles dependen del régimen impositivo. En Monotributo no se deducen gastos del impuesto integrado. En Responsable Inscripto, son deducibles los gastos necesarios para obtener y conservar la renta gravada: alquileres, servicios, rodados, honorarios, tecnología, entre otros, siempre respaldados con comprobante válido. Para Ganancias de cuarta categoría (relación de dependencia), existen deducciones específicas. Cada situación es particular: consultanos para maximizar tu ahorro fiscal.' },
+      { label: 'Acreditaciones vs facturación', action: 'directMsg', directMsg: 'AFIP cruza sistemáticamente las acreditaciones bancarias con la facturación declarada. Diferencias injustificadas pueden generar fiscalizaciones, intimaciones y ajustes impositivos con intereses y multas. Es importante que ingresos de cualquier origen (transferencias, Mercado Pago, tarjetas) estén correctamente respaldados. En IApoyo Consultora analizamos tu situación bancaria-fiscal para identificar desvíos antes de que lo haga el organismo.' },
+      { label: '¿Qué pasa si no presento?', action: 'directMsg', directMsg: 'La falta de presentación de declaraciones juradas genera multas formales automáticas cuyo importe fue significativamente incrementado por la Ley 27.742 (Ley de Bases, 2024) y sus resoluciones reglamentarias. A esto se suma la posible suspensión de la CUIT, la imposibilidad de emitir facturas electrónicas, la exclusión del Monotributo y la facultad de AFIP de determinar la deuda de oficio. Regularizar la situación antes de ser intimado reduce sustancialmente los costos. Contactá a IApoyo Consultora para evaluar tu caso y minimizar el impacto.' },
     ],
   },
   marcas: {
     titulo: 'Marcas Comerciales',
     btns: [
-      { label: '¿Por qué registrar mi marca?', action: 'directMsg', directMsg: 'Registrar tu marca en Argentina te da la exclusividad legal para usarla en todo el país y te protege frente a terceros. Sin registro, otra persona podría solicitar la marca a su nombre. Además, la marca registrada prevalece sobre un dominio web o perfil en redes sociales — el titular puede exigir el cese del uso, transferencia de dominios y acciones legales. El trámite se realiza ante el INPI con vigencia de 10 años renovables. ¡Contactate con nosotros para asesorarte! 😊' },
+      { label: '¿Por qué registrar mi marca?', action: 'directMsg', directMsg: 'El registro de marca ante el INPI otorga la titularidad exclusiva del signo distintivo por 10 años renovables, y su alcance va más allá de lo comercial: una marca registrada prevalece sobre el dominio web (aunque el dominio haya sido comprado primero) y es el instrumento legal más efectivo para reclamar la identidad en redes sociales como Instagram y Facebook, donde las plataformas priorizan a titulares de marcas ante denuncias de suplantación o uso no autorizado del nombre. Sin registro, cualquier tercero puede usar tu nombre, registrarlo él mismo y dejarte sin herramientas legales para defenderte. En IApoyo Consultora acompañamos todo el proceso de registro, monitoreo y defensa de tu marca.' },
       { label: '¿Mi nombre está protegido?', action: 'panel', panelId: 'pNombre' },
     ],
   },
@@ -828,9 +828,9 @@ const ECOSISTEMAS: Record<ModuleId, { titulo: string; btns: EcoBtn[] }> = {
     titulo: 'Indemnización Laboral',
     btns: [
       { label: 'Calcular indemnización', action: 'panel', panelId: 'pInden' },
-      { label: '¿Qué incluye la liquidación?', action: 'chat', chatMsg: '¿Qué conceptos incluye una liquidación final por despido en Argentina?' },
-      { label: '¿Cuánto es el preaviso?', action: 'chat', chatMsg: '¿Cuánto es el preaviso según la antigüedad en Argentina?' },
-      { label: '¿Cómo se calcula el SAC?', action: 'chat', chatMsg: '¿Cómo se calcula el SAC en una liquidación final?' },
+      { label: '¿Qué incluye la liquidación?', action: 'directMsg', directMsg: 'Una liquidación laboral ante un despido sin causa incluye: indemnización por antigüedad (art. 245 LCT), preaviso omitido o indemnización sustitutiva, integración del mes de despido (si no coincide con fin de mes), SAC proporcional al semestre en curso, vacaciones proporcionales no gozadas, y días trabajados del último período. En casos de trabajo no registrado o deficiente registro, pueden adicionarse indemnizaciones especiales de la Ley 24.013. Cada caso tiene particularidades: consultanos para verificar que la liquidación sea correcta.' },
+      { label: '¿Cuánto es el preaviso?', action: 'directMsg', directMsg: 'Según el art. 231 de la LCT, el plazo de preaviso es de 15 días durante el período de prueba, 1 mes si la antigüedad es inferior a 5 años, y 2 meses si supera los 5 años. Si el empleador no otorga el preaviso, debe abonar una indemnización sustitutiva equivalente a los salarios del período. Además, si el despido no ocurre el último día del mes, corresponde la "integración del mes de despido" hasta completar el mes calendario. Usá nuestra calculadora para obtener el detalle exacto de tu situación.' },
+      { label: '¿Cómo se calcula el SAC?', action: 'directMsg', directMsg: 'El SAC (Sueldo Anual Complementario) equivale al 50% de la mejor remuneración mensual del semestre. Al momento de la liquidación final se abona el proporcional del semestre en curso: se divide el SAC semestral por 6 y se multiplica por los meses trabajados en ese período (contando fracción mayor a 15 días como mes completo). Nuestra calculadora incluye este concepto automáticamente una vez que ingresás las fechas y la remuneración.' },
     ],
   },
   costos: {
@@ -838,26 +838,26 @@ const ECOSISTEMAS: Record<ModuleId, { titulo: string; btns: EcoBtn[] }> = {
     btns: [
       { label: 'Costo laboral completo', action: 'panel', panelId: 'pCosto' },
       { label: 'Actualización de alquiler', action: 'panel', panelId: 'pAlquiler' },
-      { label: '¿Cómo funciona el ICL?', action: 'chat', chatMsg: '¿Cómo funciona el ICL para actualizar alquileres en Argentina?' },
-      { label: '¿Qué son las cargas patronales?', action: 'chat', chatMsg: '¿Cuáles son las cargas sociales patronales en Argentina?' },
+      { label: '¿Cómo funciona el ICL?', action: 'directMsg', directMsg: 'El Índice de Contratos de Locación (ICL) es elaborado por el Banco Central de la República Argentina (BCRA) y se publica diariamente. Desde la Ley 27.551, los contratos de alquiler habitacional se actualizan anualmente usando este índice, que combina en partes iguales la variación del IPC (inflación) y el RIPTE (remuneración promedio de trabajadores). La actualización se calcula dividiendo el índice del día de la actualización por el índice del día del inicio del contrato. Nuestra herramienta realiza este cálculo automáticamente con datos actualizados.' },
+      { label: '¿Qué son las cargas patronales?', action: 'directMsg', directMsg: 'Las cargas patronales son los aportes y contribuciones que el empleador debe ingresar mensualmente al sistema de seguridad social, sobre la remuneración bruta del trabajador. Incluyen: contribuciones al SIPA (jubilación), INSSJP (PAMI), asignaciones familiares, Fondo Nacional de Empleo, obra social patronal y ART (Aseguradora de Riesgos del Trabajo). En promedio representan entre el 27% y el 30% adicional sobre el salario bruto, aunque varían según la actividad y el tamaño de la empresa. Nuestra calculadora de costo laboral te muestra el detalle completo.' },
     ],
   },
   autos: {
     titulo: 'Vehículos & Fotomultas',
     btns: [
       { label: 'Consultar multas por patente', action: 'panel', panelId: 'pPatente' },
-      { label: 'Motivos nulidad fotomulta', action: 'chat', chatMsg: '¿Cuáles son los motivos para pedir la nulidad de una fotomulta en Argentina?' },
-      { label: '¿Cómo apelar una multa?', action: 'chat', chatMsg: '¿Cómo se apela una fotomulta en la Provincia de Buenos Aires?' },
-      { label: '¿Cuándo prescribe?', action: 'chat', chatMsg: '¿Cuándo prescribe una infracción de tránsito en Buenos Aires?' },
+      { label: 'Motivos nulidad fotomulta', action: 'directMsg', directMsg: 'Las infracciones de tránsito captadas por sistemas automáticos pueden impugnarse por múltiples causales: deficiencias en la homologación o calibración del dispositivo de detección, falta de señalización adecuada en el lugar, error en la identificación del vehículo o del titular, vicios formales en el acta (fecha, hora, lugar, norma infringida), notificación defectuosa, o prescripción de la infracción. Cada jurisdicción tiene su propio procedimiento. En IApoyo Consultora evaluamos el caso y determinamos la estrategia más adecuada para impugnar.' },
+      { label: '¿Cómo apelar una multa?', action: 'directMsg', directMsg: 'El procedimiento varía según la jurisdicción, pero generalmente implica: presentar un descargo formal ante el organismo que emitió la infracción dentro del plazo legal (habitualmente 15 a 30 días hábiles desde la notificación), adjuntar documentación técnica y jurídica que sustente la impugnación, y en caso de rechazo, recurrir ante la instancia judicial competente. Es fundamental actuar dentro de los plazos para no perder el derecho de defensa. Contactanos dentro de las 48 horas de recibida la notificación para evaluar tu caso.' },
+      { label: '¿Cuándo prescribe?', action: 'directMsg', directMsg: 'En la Ciudad de Buenos Aires, las infracciones de tránsito prescriben a los 2 años desde la fecha de comisión (art. 67 de la Ley de Tránsito N° 2148). En la Provincia de Buenos Aires y otras jurisdicciones los plazos pueden diferir. La prescripción se interrumpe con actos procesales válidos como notificaciones fehacientes o inicio de acciones judiciales. Verificar la fecha exacta de la infracción y los actos interruptivos es clave para determinar si ya operó la prescripción.' },
     ],
   },
   mkt: {
     titulo: 'Marketing',
     btns: [
       { label: 'Ver servicios de Marketing', action: 'panel', panelId: 'pMkt' },
-      { label: '¿Por qué necesito una web?', action: 'chat', chatMsg: '¿Qué ventajas tiene tener una app o web para mi negocio?' },
-      { label: '¿Qué es Community Management?', action: 'chat', chatMsg: '¿Qué es el community management y por qué es importante?' },
-      { label: 'Meta Ads vs Google Ads', action: 'chat', chatMsg: '¿Qué diferencia hay entre Meta Ads y Google Ads para un negocio local?' },
+      { label: '¿Por qué necesito una web?', action: 'directMsg', directMsg: 'Una página web profesional es la base de tu presencia digital y funciona como tu local comercial abierto las 24 horas. A diferencia de las redes sociales —plataformas que no controlás y pueden cambiar sus algoritmos—, tu web es un activo propio. Mejora tu credibilidad ante clientes y proveedores, facilita que te encuentren en Google (SEO), y concentra toda la información de tu negocio en un solo lugar accesible desde cualquier dispositivo. En IApoyo Consultora diseñamos sitios a medida con foco en conversión de clientes.' },
+      { label: '¿Qué es Community Management?', action: 'directMsg', directMsg: 'El community management es la gestión profesional de la presencia de una marca en redes sociales (Instagram, Facebook, LinkedIn, etc.). Incluye la creación de contenido estratégico, publicación consistente, gestión de respuestas y comentarios, y análisis de métricas de rendimiento. Una gestión profesional incrementa el alcance orgánico, fortalece la confianza de tu audiencia y convierte seguidores en clientes. No alcanza con publicar esporádicamente: la consistencia y la estrategia son las claves del crecimiento.' },
+      { label: 'Meta Ads vs Google Ads', action: 'directMsg', directMsg: 'Meta Ads (Facebook e Instagram) impacta a usuarios según sus intereses, comportamientos y características demográficas —ideal para generar demanda en audiencias que aún no te conocen. Google Ads captura demanda existente: aparece cuando alguien busca activamente tu producto o servicio —ideal para conversión directa. Lo óptimo para la mayoría de los negocios es combinar ambas plataformas según el objetivo: Meta para awareness y branding, Google para captura de intención de compra. En IApoyo Consultora armamos la estrategia según tu rubro y presupuesto.' },
     ],
   },
 }
