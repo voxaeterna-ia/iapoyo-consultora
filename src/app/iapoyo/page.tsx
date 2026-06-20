@@ -5,7 +5,6 @@ import Sidebar from '@/components/Sidebar'
 import AuthGuard from '@/components/AuthGuard'
 import { ChatMessage, formatARS } from '@/types'
 import { Send, Bot, User, ArrowLeft } from 'lucide-react'
-import { createClient } from '@/lib/supabase'
 
 // ─── Colors ─────────────────────────────────────────────────────────────────
 // --az:#2D4A6B  --vd:#4CAF50  --na:#FF7043
