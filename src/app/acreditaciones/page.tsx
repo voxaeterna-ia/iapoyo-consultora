@@ -68,11 +68,19 @@ export default function AcreditacionesPage() {
       .single()
 
     if (negocio) {
-      setData(prev => ({
-        ...prev,
+      const updated = {
+        ...data,
+        anio,
+        mes,
         facturacion: negocio.facturacion || 0,
         total_acred: negocio.acreditaciones || 0,
-      }))
+      }
+      setData(updated)
+      await supabase.from('acreditaciones').upsert(
+        { ...updated, user_id: userId },
+        { onConflict: 'user_id,anio,mes' }
+      )
+      load()
     }
     setSyncing(false)
   }
