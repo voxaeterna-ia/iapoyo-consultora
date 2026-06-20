@@ -1211,14 +1211,14 @@ export default function IApoyoPage() {
   return (
     <AuthGuard>
       <div className="flex flex-col md:flex-row min-h-screen bg-gray-50 overflow-x-hidden">
-        <Sidebar />
+        <div className="hidden md:block"><Sidebar /></div>
         <main className="flex-1 flex flex-col overflow-auto min-w-0">
-          {/* Header Banner — solo desktop */}
-          <div className="hidden md:flex bg-gradient-to-r from-[#2D4A6B] to-[#3d6a9e] px-4 py-3 items-center gap-3">
+          {/* Header Banner */}
+          <div className="bg-gradient-to-r from-[#2D4A6B] to-[#3d6a9e] px-4 py-3 flex items-center gap-3">
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center flex-shrink-0">
               <span className="text-base">🤖</span>
             </div>
-            <div>
+            <div className="flex-1">
               <h1 className="text-white font-bold text-base leading-tight">IApoyo</h1>
               <p className="text-blue-200 text-xs">Seleccioná un módulo</p>
             </div>
