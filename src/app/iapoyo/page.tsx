@@ -4,701 +4,1107 @@ import { useState, useRef, useEffect } from 'react'
 import Sidebar from '@/components/Sidebar'
 import AuthGuard from '@/components/AuthGuard'
 import { ChatMessage, formatARS } from '@/types'
-import { Send, Bot, User, ArrowLeft, CheckCircle2, Calculator } from 'lucide-react'
+import { Send, Bot, User, ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 
-const MODULOS = [
-  { id: 'fiscal',        label: 'Consultas Fiscales',      emoji: '📊', desc: 'Monotributo, AFIP, impuestos' },
-  { id: 'marcas',        label: 'Marcas Comerciales',      emoji: '™️',  desc: 'Registro INPI, protección de marca' },
-  { id: 'indemnizacion', label: 'Indemnización Laboral',   emoji: '⚖️', desc: 'Liquidación final, derechos laborales' },
-  { id: 'alquileres',    label: 'Alquileres & Costos',     emoji: '🏠', desc: 'Contratos, actualizaciones, índices' },
-  { id: 'vehiculos',     label: 'Vehículos & Fotomultas',  emoji: '🚗', desc: 'Multas, transferencias, patentes' },
-  { id: 'marketing',     label: 'Marketing & Tecnología',  emoji: '📱', desc: 'Redes sociales, presencia digital' },
-]
+// ─── Colors ─────────────────────────────────────────────────────────────────
+// --az:#2D4A6B  --vd:#4CAF50  --na:#FF7043
 
-// ─── Formulario genérico de consulta ────────────────────────────────────────
-function FormConsulta({
-  tipo, titulo, subtitulo, campos, emoji,
-}: {
-  tipo: string
-  titulo: string
-  subtitulo: string
-  emoji: string
-  campos: Array<{ id: string; label: string; placeholder?: string; type?: string; required?: boolean; options?: string[] }>
-}) {
-  const [valores, setValores] = useState<Record<string, string>>({})
+// ─── Historical index data ───────────────────────────────────────────────────
+const IDX_DATA: Record<string, Array<[string, number, number, number]>> = {
+  icl: [['Ene 2023',519.3,10.6,144.3],['Feb 2023',572.1,10.2,156.8],['Mar 2023',637.4,11.4,171.0],['Abr 2023',712.8,11.8,185.9],['May 2023',801.4,12.4,202.3],['Jun 2023',906.2,13.1,220.3],['Jul 2023',1038.5,14.6,241.5],['Ago 2023',1209.4,16.5,268.5],['Sep 2023',1434.2,18.6,302.2],['Oct 2023',1718.4,19.8,340.3],['Nov 2023',2076.1,20.8,385.6],['Dic 2023',2587.3,24.6,451.0],['Ene 2024',3452.6,33.4,564.9],['Feb 2024',4486.3,29.9,684.2],['Mar 2024',5712.8,27.3,796.3],['Abr 2024',6981.4,22.2,879.5],['May 2024',8143.7,16.6,916.4],['Jun 2024',9287.2,14.0,924.5],['Jul 2024',10412.6,12.1,902.5],['Ago 2024',11498.3,10.4,850.1],['Sep 2024',12487.6,8.6,770.5],['Oct 2024',13412.4,7.4,680.2],['Nov 2024',14285.7,6.5,587.9],['Dic 2024',15180.2,6.3,486.7],['Ene 2025',16142.8,6.3,367.4],['Feb 2025',17024.6,5.5,279.5],['Mar 2025',17896.3,5.1,213.3],['Abr 2025',18724.1,4.6,168.2],['May 2025',19487.3,4.1,139.3]],
+  ipc: [['Ene 2023',1138.3,6.0,98.9],['Feb 2023',1247.9,6.6,101.2],['Mar 2023',1381.1,7.7,102.5],['Abr 2023',1532.2,8.4,102.7],['May 2023',1690.8,7.4,108.5],['Jun 2023',1879.0,12.4,105.8],['Jul 2023',2123.1,13.0,106.0],['Ago 2023',2440.2,12.4,124.3],['Sep 2023',2782.7,12.7,138.7],['Oct 2023',3142.5,8.3,129.3],['Nov 2023',3608.2,12.8,160.9],['Dic 2023',4617.7,25.5,211.4],['Ene 2024',6175.5,20.6,442.6],['Feb 2024',7502.0,13.2,501.0],['Mar 2024',8611.9,11.0,523.4],['Abr 2024',9540.4,8.8,522.8],['May 2024',10457.1,4.2,289.4],['Jun 2024',11090.2,4.6,271.5],['Jul 2024',11705.0,4.0,263.6],['Ago 2024',12298.2,4.2,236.7],['Sep 2024',12905.1,3.5,209.2],['Oct 2024',13484.6,2.4,209.2],['Nov 2024',14020.4,2.4,166.9],['Dic 2024',14580.2,2.7,117.8],['Ene 2025',15142.8,2.3,145.2],['Feb 2025',15673.4,2.4,108.9],['Mar 2025',16204.7,2.6,88.1],['Abr 2025',16660.1,3.7,74.6],['May 2025',17080.2,3.3,63.3]],
+  ripte: [['Ene 2023',496218,12.0,192.4],['Feb 2023',556564,12.2,208.2],['Mar 2023',625748,12.4,222.8],['Abr 2023',706894,13.0,237.7],['May 2023',800012,13.2,253.7],['Jun 2023',912814,14.1,272.3],['Jul 2023',1052411,15.3,293.4],['Ago 2023',1218176,15.8,315.7],['Sep 2023',1413084,16.0,338.3],['Oct 2023',1639378,16.0,359.6],['Nov 2023',1930965,17.7,387.0],['Dic 2023',2312418,19.8,421.9],['Ene 2024',2834512,22.6,471.2],['Feb 2024',3389624,19.6,509.2],['Mar 2024',4016543,18.5,541.9],['Abr 2024',4659482,16.0,558.9],['May 2024',5298347,13.7,562.3],['Jun 2024',5948423,12.3,551.9],['Jul 2024',6578412,10.6,525.2],['Ago 2024',7189341,9.3,490.1],['Sep 2024',7782412,8.2,450.4],['Oct 2024',8342178,7.2,408.8],['Nov 2024',8881234,6.5,360.0],['Dic 2024',9418562,6.1,307.3],['Ene 2025',9941823,5.6,250.8],['Feb 2025',10432417,4.9,207.8],['Mar 2025',10914632,4.6,171.8],['Abr 2025',11364723,4.1,144.0],['May 2025',11812634,3.9,123.0]]
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+function dv(p: number): number {
+  return p >= 20 ? 35 : p >= 10 ? 28 : p >= 5 ? 21 : 14
+}
+
+
+// ─── Panel pNombre (Marcas) ───────────────────────────────────────────────────
+function PanelNombre({ onClose }: { onClose: () => void }) {
   const [nombre, setNombre] = useState('')
+  const [actividad, setActividad] = useState('')
+  const [dominio, setDominio] = useState('')
+  const [rrss, setRrss] = useState('')
+  const [contactNombre, setContactNombre] = useState('')
+  const [tel, setTel] = useState('')
   const [email, setEmail] = useState('')
-  const [telefono, setTelefono] = useState('')
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
-  const [enviado, setEnviado] = useState(false)
-  const [error, setError] = useState('')
+  const [ok, setOk] = useState(false)
+  const [err, setErr] = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
 
-  async function handleEnviar() {
-    if (!nombre || !email) { setError('Completá tu nombre y email.'); return }
-    setError('')
-    setEnviando(true)
-    try {
-      await fetch('/api/consulta', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tipo, nombre, email, telefono, datos: valores }),
-      })
-      setEnviado(true)
-    } catch {
-      setError('Error al enviar. Intentá de nuevo.')
-    } finally {
-      setEnviando(false)
+  function handleFile(file: File | null) {
+    setLogoFile(file)
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = e => setLogoPreview(e.target?.result as string)
+      reader.readAsDataURL(file)
+    } else {
+      setLogoPreview(null)
     }
   }
 
-  if (enviado) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <CheckCircle2 size={48} className="text-[#4CAF50] mb-4" />
-        <h3 className="text-xl font-bold text-[#2D4A6B] mb-2">¡Consulta enviada!</h3>
-        <p className="text-gray-500 text-sm max-w-xs">
-          Te contactaremos a <strong>{email}</strong> dentro de las <strong>48 hs hábiles</strong> con toda la información y el presupuesto.
-        </p>
-        <button onClick={() => { setEnviado(false); setValores({}); setNombre(''); setEmail(''); setTelefono('') }}
-          className="mt-6 text-sm text-[#2D4A6B] underline">Hacer otra consulta</button>
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <p className="text-sm text-blue-700 font-medium">{emoji} {titulo}</p>
-        <p className="text-xs text-blue-600 mt-1">{subtitulo}</p>
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {campos.map(c => (
-            <div key={c.id} className={c.type === 'textarea' ? 'md:col-span-2' : ''}>
-              <label className="text-xs text-gray-500 block mb-1">{c.label}{c.required ? ' *' : ''}</label>
-              {c.options ? (
-                <select value={valores[c.id] || ''} onChange={e => setValores(v => ({ ...v, [c.id]: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]">
-                  <option value="">Seleccioná...</option>
-                  {c.options.map(o => <option key={o}>{o}</option>)}
-                </select>
-              ) : c.type === 'textarea' ? (
-                <textarea value={valores[c.id] || ''} onChange={e => setValores(v => ({ ...v, [c.id]: e.target.value }))}
-                  rows={3} placeholder={c.placeholder}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B] resize-none" />
-              ) : (
-                <input type={c.type || 'text'} value={valores[c.id] || ''} onChange={e => setValores(v => ({ ...v, [c.id]: e.target.value }))}
-                  placeholder={c.placeholder}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-sm">Tus datos de contacto</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Nombre y apellido *</label>
-            <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Juan Pérez"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-          </div>
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Email *</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="juan@mail.com"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-          </div>
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Teléfono</label>
-            <input value={telefono} onChange={e => setTelefono(e.target.value)} placeholder="11-1234-5678"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-          </div>
-        </div>
-      </div>
-
-      {error && <p className="text-sm text-red-500">{error}</p>}
-      <button onClick={handleEnviar} disabled={enviando}
-        className="w-full bg-[#2D4A6B] text-white py-3 rounded-xl font-medium hover:bg-[#1e3350] disabled:opacity-50 transition-colors">
-        {enviando ? 'Enviando...' : '📨 Enviar consulta'}
-      </button>
-      <p className="text-xs text-gray-400 text-center">Un especialista te responderá en 48 hs hábiles.</p>
-    </div>
-  )
-}
-
-// ─── Marcas con logo ─────────────────────────────────────────────────────────
-function ModuloMarcas() {
-  const [nombre, setNombre] = useState('')
-  const [rubro, setRubro] = useState('')
-  const [descripcion, setDescripcion] = useState('')
-  const [clases, setClases] = useState('')
-  const [contactNombre, setContactNombre] = useState('')
-  const [email, setEmail] = useState('')
-  const [telefono, setTelefono] = useState('')
-  const [logoFile, setLogoFile] = useState<File | null>(null)
-  const [enviando, setEnviando] = useState(false)
-  const [enviado, setEnviado] = useState(false)
-  const [error, setError] = useState('')
-  const fileRef = useRef<HTMLInputElement>(null)
-
   async function handleEnviar() {
-    if (!nombre || !contactNombre || !email) { setError('Completá nombre de marca, tu nombre y email.'); return }
-    setError('')
+    if (!nombre || !actividad || !contactNombre || !tel) { setErr('Completá los campos obligatorios (*)'); return }
+    setErr('')
     setEnviando(true)
-    let logoData: string | null = null
-    let logoNombre: string | null = null
+    let logoUrl: string | null = null
     if (logoFile) {
-      logoNombre = logoFile.name
       try {
         const supabase = createClient()
         const ext = logoFile.name.split('.').pop()
         const path = `logos/${Date.now()}.${ext}`
-        const { data: uploadData } = await supabase.storage.from('logos').upload(path, logoFile, { upsert: true })
-        if (uploadData) {
-          const { data: urlData } = supabase.storage.from('logos').getPublicUrl(path)
-          logoData = urlData?.publicUrl || null
+        const { data: up } = await supabase.storage.from('logos').upload(path, logoFile, { upsert: true })
+        if (up) {
+          const { data: ud } = supabase.storage.from('logos').getPublicUrl(path)
+          logoUrl = ud?.publicUrl || null
         }
-      } catch { logoData = null }
+      } catch { logoUrl = null }
     }
     try {
       await fetch('/api/consulta', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          tipo: 'Marcas Comerciales', nombre: contactNombre, email, telefono,
-          datos: { nombre_marca: nombre, rubro, descripcion, clases_inpi: clases, logo_url: logoData, logo_nombre: logoNombre },
+          tipo: 'Marcas Comerciales',
+          nombre: contactNombre, email, telefono: tel,
+          datos: { nombre_comercial: nombre, actividad, dominio, rrss, logo_url: logoUrl },
         }),
       })
-      setEnviado(true)
-    } catch { setError('Error al enviar. Intentá de nuevo.') }
+      setOk(true)
+    } catch { setErr('Error al enviar. Intentá de nuevo.') }
     finally { setEnviando(false) }
   }
 
-  if (enviado) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <CheckCircle2 size={48} className="text-[#4CAF50] mb-4" />
-        <h3 className="text-xl font-bold text-[#2D4A6B] mb-2">¡Consulta enviada!</h3>
-        <p className="text-gray-500 text-sm max-w-xs">
-          Te contactaremos a <strong>{email}</strong> en las próximas <strong>48 hs hábiles</strong>.
-          {logoFile && ' Si el logo no llegó, te lo pediremos por mail.'}
-        </p>
-        <button onClick={() => { setEnviado(false); setNombre(''); setRubro(''); setDescripcion(''); setClases(''); setContactNombre(''); setEmail(''); setTelefono(''); setLogoFile(null) }}
-          className="mt-6 text-sm text-[#2D4A6B] underline">Hacer otra consulta</button>
-      </div>
-    )
-  }
-
   return (
-    <div className="space-y-4">
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <p className="text-sm text-blue-700 font-medium">™️ Registro de Marca — INPI Argentina</p>
-        <p className="text-xs text-blue-600 mt-1">Completá el formulario y un especialista te contactará con el presupuesto y los pasos a seguir en 48 hs hábiles.</p>
+    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-semibold text-[#2D4A6B] text-sm">¿Mi nombre está protegido?</h3>
+        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
-      <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-sm">Datos de la marca</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Nombre de la marca *</label>
-            <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Ej: MiEmpresa"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-          </div>
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Rubro / actividad</label>
-            <input value={rubro} onChange={e => setRubro(e.target.value)} placeholder="Ej: Ropa, Gastronomía..."
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-          </div>
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Descripción del producto/servicio</label>
-          <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} rows={3}
-            placeholder="Describí brevemente qué vas a comercializar con esta marca..."
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B] resize-none" />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Clases INPI (si sabés cuáles)</label>
-          <input value={clases} onChange={e => setClases(e.target.value)} placeholder="Ej: Clase 25 (indumentaria)..."
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Logo / isotipo (opcional)</label>
-          <div onClick={() => fileRef.current?.click()}
-            className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:border-[#4CAF50] transition-colors">
-            {logoFile
-              ? <p className="text-sm text-[#4CAF50] font-medium">✓ {logoFile.name}</p>
-              : <>
-                  <p className="text-sm text-gray-400">Hacé clic para adjuntar tu logo</p>
-                  <p className="text-xs text-gray-300 mt-1">PNG, JPG, SVG — hasta 5MB</p>
-                </>
-            }
-          </div>
-          <input ref={fileRef} type="file" accept="image/*,.svg,.pdf" className="hidden"
-            onChange={e => setLogoFile(e.target.files?.[0] || null)} />
-        </div>
-      </div>
-      <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-sm">Tus datos de contacto</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Nombre y apellido *</label>
-            <input value={contactNombre} onChange={e => setContactNombre(e.target.value)} placeholder="Juan Pérez"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-          </div>
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Email *</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="juan@mail.com"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-          </div>
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Teléfono</label>
-            <input value={telefono} onChange={e => setTelefono(e.target.value)} placeholder="11-1234-5678"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-          </div>
-        </div>
-      </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
-      <button onClick={handleEnviar} disabled={enviando}
-        className="w-full bg-[#2D4A6B] text-white py-3 rounded-xl font-medium hover:bg-[#1e3350] disabled:opacity-50 transition-colors">
-        {enviando ? 'Enviando...' : '📨 Enviar consulta de marca'}
-      </button>
-      <p className="text-xs text-gray-400 text-center">Tu información es confidencial. Te respondemos en 48 hs hábiles.</p>
-    </div>
-  )
-}
-
-// ─── Chat ───────────────────────────────────────────────────────────────────
-function ChatIA({ modulo }: { modulo: typeof MODULOS[0] }) {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
-  const endRef = useRef<HTMLDivElement>(null)
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
-
-  async function send() {
-    if (!input.trim() || loading) return
-    const msg = input
-    setMessages(prev => [...prev, { role: 'user', content: msg }])
-    setInput('')
-    setLoading(true)
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg, module: modulo.id, history: messages.slice(-10) }),
-      })
-      const { response } = await res.json()
-      setMessages(prev => [...prev, { role: 'assistant', content: response }])
-    } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Error al conectar. Intentá de nuevo.' }])
-    } finally { setLoading(false) }
-  }
-
-  return (
-    <>
-      <div className="flex-1 bg-white rounded-xl border border-gray-100 overflow-y-auto p-4 mb-3 min-h-[280px] max-h-[420px]">
-        {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400">
-            <Bot size={32} className="mb-2 text-[#2D4A6B] opacity-30" />
-            <p className="text-sm text-center">Hacé tu consulta sobre {modulo.label}</p>
-            <p className="text-xs text-gray-300 mt-1">{modulo.desc}</p>
-          </div>
-        )}
-        {messages.map((m, i) => (
-          <div key={i} className={`flex gap-2 mb-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {m.role === 'assistant' && (
-              <div className="w-7 h-7 rounded-full bg-[#2D4A6B] flex items-center justify-center flex-shrink-0">
-                <Bot size={14} className="text-white" />
-              </div>
-            )}
-            <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
-              m.role === 'user' ? 'bg-[#2D4A6B] text-white rounded-tr-sm' : 'bg-gray-100 text-gray-800 rounded-tl-sm'
-            }`}>{m.content}</div>
-            {m.role === 'user' && (
-              <div className="w-7 h-7 rounded-full bg-[#4CAF50] flex items-center justify-center flex-shrink-0">
-                <User size={14} className="text-white" />
-              </div>
-            )}
-          </div>
-        ))}
-        {loading && (
-          <div className="flex gap-2">
-            <div className="w-7 h-7 rounded-full bg-[#2D4A6B] flex items-center justify-center">
-              <Bot size={14} className="text-white" />
-            </div>
-            <div className="bg-gray-100 rounded-2xl px-4 py-2.5 text-sm text-gray-400">Consultando...</div>
-          </div>
-        )}
-        <div ref={endRef} />
-      </div>
-      <div className="flex gap-2">
-        <input value={input} onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
-          placeholder={`Consulta sobre ${modulo.label}...`}
-          className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-        <button onClick={send} disabled={loading || !input.trim()}
-          className="bg-[#2D4A6B] text-white px-4 py-2.5 rounded-xl hover:bg-[#1e3350] disabled:opacity-40">
-          <Send size={16} />
-        </button>
-      </div>
-    </>
-  )
-}
-
-// ─── Calculadora Indemnización ───────────────────────────────────────────────
-function CalcIndemnizacion() {
-  const [salario, setSalario] = useState(0)
-  const [anios, setAnios] = useState(0)
-  const [mesesExtra, setMesesExtra] = useState(0)
-  const [preaviso, setPreaviso] = useState<'no-otorgado' | 'otorgado'>('no-otorgado')
-  const [mesesSemestre, setMesesSemestre] = useState(0)
-  const [diasVacaciones, setDiasVacaciones] = useState(0)
-
-  const totalMeses = anios * 12 + mesesExtra
-  const indem245 = salario * Math.max(1, anios)
-  const mesesPreaviso = totalMeses < 60 ? 1 : 2
-  const montoPreaviso = preaviso === 'no-otorgado' ? salario * mesesPreaviso : 0
-  const sacSobreIndemn = (indem245 + montoPreaviso) / 12
-  const montoVacaciones = diasVacaciones > 0 ? (salario / 25) * diasVacaciones : 0
-  const sacProporcional = mesesSemestre > 0 ? (salario / 12) * mesesSemestre : 0
-  const total = indem245 + montoPreaviso + sacSobreIndemn + montoVacaciones + sacProporcional
-
-  const items = [
-    { label: 'Indemnización Art. 245 LCT', sub: `${Math.max(1, anios)} año(s) × ${formatARS(salario)}`, value: indem245, color: '#2D4A6B' },
-    { label: `Preaviso (${mesesPreaviso} mes${mesesPreaviso > 1 ? 'es' : ''})`, sub: preaviso === 'otorgado' ? 'Otorgado — no aplica' : `${mesesPreaviso} mes(es) de salario`, value: montoPreaviso, color: '#FF7043' },
-    { label: 'SAC s/ indemnización y preaviso', sub: '(Art. 245 + preaviso) / 12', value: sacSobreIndemn, color: '#FF9800' },
-    { label: 'Vacaciones no gozadas', sub: `${diasVacaciones} días × ${formatARS(salario / 25)}/día`, value: montoVacaciones, color: '#9C27B0' },
-    { label: 'SAC proporcional', sub: `${mesesSemestre} mes(es) del semestre actual`, value: sacProporcional, color: '#4CAF50' },
-  ]
-
-  return (
-    <div className="bg-white rounded-xl border border-gray-100 p-5">
-      <h3 className="font-semibold text-[#2D4A6B] mb-4 flex items-center gap-2">
-        <Calculator size={16} /> Liquidación Final — Indemnización LCT
-      </h3>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-5">
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Mejor salario mensual ($)</label>
-          <input type="number" value={salario || ''} onChange={e => setSalario(Number(e.target.value))}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Antigüedad — años completos</label>
-          <input type="number" value={anios || ''} onChange={e => setAnios(Number(e.target.value))}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" min={0} />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Meses adicionales</label>
-          <input type="number" value={mesesExtra || ''} onChange={e => setMesesExtra(Number(e.target.value))}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" min={0} max={11} />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Preaviso</label>
-          <select value={preaviso} onChange={e => setPreaviso(e.target.value as 'otorgado' | 'no-otorgado')}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
-            <option value="no-otorgado">No otorgado (se paga)</option>
-            <option value="otorgado">Otorgado (ya trabajado)</option>
-          </select>
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Vacaciones pendientes (días)</label>
-          <input type="number" value={diasVacaciones || ''} onChange={e => setDiasVacaciones(Number(e.target.value))}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" min={0} />
-        </div>
-        <div>
-          <label className="text-xs text-gray-500 block mb-1">Meses en semestre actual</label>
-          <input type="number" value={mesesSemestre || ''} onChange={e => setMesesSemestre(Number(e.target.value))}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" min={0} max={6} />
-        </div>
-      </div>
-      <div className="space-y-2 mb-4">
-        {items.map(item => (
-          <div key={item.label} className="flex items-center justify-between py-2 border-b border-gray-50">
+      {ok ? (
+        <p className="text-[#4CAF50] text-sm font-medium">✅ Solicitud enviada. Te contactaremos en 48 hs hábiles.</p>
+      ) : (
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <p className="text-sm text-gray-700">{item.label}</p>
-              <p className="text-xs text-gray-400">{item.sub}</p>
+              <label className="text-xs text-gray-500 block mb-1">Nombre comercial *</label>
+              <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Tu marca o nombre comercial"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
             </div>
-            <p className="text-sm font-semibold" style={{ color: item.value === 0 ? '#aaa' : item.color }}>
-              {formatARS(item.value)}
-            </p>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Actividad *</label>
+              <input value={actividad} onChange={e => setActividad(e.target.value)} placeholder="Rubro o actividad"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Dominio web (opcional)</label>
+              <input value={dominio} onChange={e => setDominio(e.target.value)} placeholder="www.tunombre.com"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Instagram / Facebook</label>
+              <input value={rrss} onChange={e => setRrss(e.target.value)} placeholder="@tunegocio"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Nombre y apellido *</label>
+              <input value={contactNombre} onChange={e => setContactNombre(e.target.value)} placeholder="Juan Pérez"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Tel / WhatsApp *</label>
+              <input value={tel} onChange={e => setTel(e.target.value)} placeholder="11-1234-5678"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="juan@mail.com"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+            </div>
           </div>
-        ))}
-      </div>
-      <div className="bg-[#2D4A6B] rounded-xl p-4 text-white">
-        <p className="text-xs opacity-70 mb-1">Total liquidación estimada</p>
-        <p className="text-3xl font-bold">{formatARS(total)}</p>
-        <p className="text-xs opacity-60 mt-1">Valores orientativos. Verificar con asesor laboral.</p>
-      </div>
+          {/* Logo upload */}
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Logo (opcional)</label>
+            <div
+              onClick={() => fileRef.current?.click()}
+              onDragOver={e => e.preventDefault()}
+              onDrop={e => { e.preventDefault(); handleFile(e.dataTransfer.files?.[0] || null) }}
+              className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:border-[#4CAF50] transition-colors">
+              {logoPreview
+                // eslint-disable-next-line @next/next/no-img-element
+                ? <img src={logoPreview} alt="logo preview" className="h-20 mx-auto object-contain" />
+                : logoFile
+                  ? <p className="text-sm text-[#4CAF50]">✓ {logoFile.name}</p>
+                  : <>
+                      <p className="text-sm text-gray-400">Arrastrá tu logo aquí o hacé clic</p>
+                      <p className="text-xs text-gray-300 mt-1">PNG, JPG, SVG</p>
+                    </>
+              }
+            </div>
+            <input ref={fileRef} type="file" accept="image/*,.svg,.pdf" className="hidden"
+              onChange={e => handleFile(e.target.files?.[0] || null)} />
+          </div>
+          {err && <p className="text-xs text-red-500">{err}</p>}
+          <button onClick={handleEnviar} disabled={enviando}
+            className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg text-sm font-medium hover:bg-[#1e3350] disabled:opacity-50">
+            {enviando ? 'Enviando...' : 'Enviar solicitud de análisis'}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
 
-// ─── Calculadora Alquiler ────────────────────────────────────────────────────
-function CalcAlquiler() {
-  const [montoBase, setMontoBase] = useState(0)
-  const [variacion, setVariacion] = useState(0)
-  const [indice, setIndice] = useState('ICL')
-  const actualizado = montoBase * (1 + variacion / 100)
-  const aumento = actualizado - montoBase
+// ─── Panel pInden (Calculadora Indemnización) ─────────────────────────────────
+function PanelInden({ onClose }: { onClose: () => void }) {
+  const [ingreso, setIngreso] = useState('')
+  const [egreso, setEgreso] = useState('')
+  const [suel, setSuel] = useState('')
+  const [nr, setNr] = useState('')
+  const [tipo, setTipo] = useState<'s' | 'c'>('s')
+  const [prev, setPrev] = useState<'n' | 's'>('n')
+  const [va, setVa] = useState<'s' | 'n'>('s')
+  const [mesesAnioAnterior, setMesesAnioAnterior] = useState('')
+  const [result, setResult] = useState<null | {
+    lbl: string; per: number; aA: number; aM: number;
+    art: number; artDetail: string;
+    mp: number; pd: string;
+    integ: number; integDetail: string;
+    dpago: number; dpagoDetail: string;
+    sacT: number; sacDetail: string;
+    vacA: number; vacADetail: string;
+    vaM: number; vaMDetail: string;
+    noreg: number; noregDetail: string;
+    total: number;
+  }>(null)
+
+  function calcular() {
+    if (!ingreso || !egreso || !suel) return
+    const s = parseFloat(suel) || 0
+    const nrv = parseFloat(nr) || 0
+
+    const ingDate = new Date(ingreso + 'T00:00:00')
+    const egrDate = new Date(egreso + 'T00:00:00')
+    let aA = egrDate.getFullYear() - ingDate.getFullYear()
+    let aM = egrDate.getMonth() - ingDate.getMonth()
+    let aD = egrDate.getDate() - ingDate.getDate()
+    if (aD < 0) { aM--; aD += 30 }
+    if (aM < 0) { aA--; aM += 12 }
+    const per = Math.max(aA + (aM > 3 ? 1 : 0), 1)
+    const lbl = aA + ' años ' + aM + ' meses'
+    const rem = s + nrv
+    const art = tipo === 's' ? Math.max(rem * per, rem * 2) : 0
+    const artDetail = tipo === 's'
+      ? `${formatARS(rem)} × ${per} períodos (mín. 2)`
+      : 'Despido con causa — no aplica'
+
+    let mp = 0
+    let pd = ''
+    if (tipo === 's' && prev === 'n') {
+      const mesesPrev = per >= 5 ? 2 : 1
+      mp = mesesPrev * rem
+      pd = mesesPrev + ' mes(es) (ant. ' + (per >= 5 ? '≥' : '<') + ' 5 años)'
+    } else {
+      pd = prev === 's' ? 'Preaviso otorgado' : 'No corresponde'
+    }
+
+    const dM = new Date(egrDate.getFullYear(), egrDate.getMonth() + 1, 0).getDate()
+    const dE = egrDate.getDate()
+    const dR = dM - dE
+    const integ = (tipo === 's' && prev === 'n' && dR > 0) ? Math.round((rem / 30) * dR) : 0
+    const integDetail = integ > 0 ? `${dR} días restantes del mes × ${formatARS(rem / 30)}/día` : 'No aplica'
+
+    const dpago = Math.round((rem / 30) * dE)
+    const dpagoDetail = `${dE} días trabajados × ${formatARS(rem / 30)}/día`
+
+    const iniS = egrDate.getMonth() < 6
+      ? new Date(egrDate.getFullYear(), 0, 1)
+      : new Date(egrDate.getFullYear(), 6, 1)
+    const dSem = Math.round((egrDate.getTime() - iniS.getTime()) / 86400000)
+    const diasSem = egrDate.getMonth() < 6 ? 181 : 184
+    const sacT = Math.round(((rem * (dSem / diasSem) * 6) / 12) + mp / 12 + integ / 12)
+    const sacDetail = `${dSem} días del semestre`
+
+    const dvac = dv(per)
+    const mEnA = Math.max(egrDate.getMonth() + (egrDate.getDate() >= 15 ? 1 : 0), 1)
+    const vacA = Math.round((rem / 25) * dvac * (mEnA / 12))
+    const vacADetail = `${dvac} días × ${mEnA}/12 meses`
+
+    let vaM = 0
+    let vaMDetail = ''
+    if (va === 'n') {
+      const ma = parseInt(mesesAnioAnterior) || 12
+      const perA = Math.max(per - 1, 0)
+      const dvaA = dv(perA)
+      vaM = Math.round((rem / 25) * dvaA * (ma / 12))
+      vaMDetail = `${dvaA} días × ${ma}/12 meses (año anterior)`
+    }
+
+    const noreg = nrv > 0 ? nrv * per * 2 : 0
+    const noregDetail = nrv > 0 ? `${formatARS(nrv)} × ${per} × 2 (Art. 8 Ley 24.013)` : ''
+
+    const total = art + mp + integ + dpago + sacT + vacA + vaM + noreg
+
+    setResult({ lbl, per, aA, aM, art, artDetail, mp, pd, integ, integDetail, dpago, dpagoDetail, sacT, sacDetail, vacA, vacADetail, vaM, vaMDetail, noreg, noregDetail, total })
+  }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-5">
-      <h3 className="font-semibold text-[#2D4A6B] mb-4 flex items-center gap-2">
-        <Calculator size={16} /> Actualización de Alquiler
-      </h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-semibold text-[#2D4A6B] text-sm">Calculadora Indemnización</h3>
+        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Monto base ($)</label>
-          <input type="number" value={montoBase || ''} onChange={e => setMontoBase(Number(e.target.value))}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
+          <label className="text-xs text-gray-500 block mb-1">Fecha de ingreso</label>
+          <input type="date" value={ingreso} onChange={e => setIngreso(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Índice de actualización</label>
-          <select value={indice} onChange={e => setIndice(e.target.value)}
+          <label className="text-xs text-gray-500 block mb-1">Fecha de egreso</label>
+          <input type="date" value={egreso} onChange={e => setEgreso(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Mejor remuneración ($)</label>
+          <input type="number" value={suel} onChange={e => setSuel(e.target.value)} placeholder="0"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Rem. no registrada ($)</label>
+          <input type="number" value={nr} onChange={e => setNr(e.target.value)} placeholder="0"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Tipo de despido</label>
+          <select value={tipo} onChange={e => setTipo(e.target.value as 's' | 'c')}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
-            <option>ICL</option><option>IPC</option><option>RIPTE</option><option>CVS</option>
+            <option value="s">Sin causa (Art.245)</option>
+            <option value="c">Con causa</option>
           </select>
         </div>
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Variación {indice} (%)</label>
-          <input type="number" value={variacion || ''} onChange={e => setVariacion(Number(e.target.value))}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
+          <label className="text-xs text-gray-500 block mb-1">¿Se otorgó preaviso?</label>
+          <select value={prev} onChange={e => setPrev(e.target.value as 'n' | 's')}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+            <option value="n">No</option>
+            <option value="s">Sí</option>
+          </select>
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">¿Vacaciones año anterior tomadas?</label>
+          <select value={va} onChange={e => setVa(e.target.value as 's' | 'n')}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+            <option value="s">Sí</option>
+            <option value="n">No — agregar al cálculo</option>
+          </select>
+        </div>
+        {va === 'n' && (
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Meses trabajados ese año</label>
+            <input type="number" value={mesesAnioAnterior} onChange={e => setMesesAnioAnterior(e.target.value)} placeholder="12"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+          </div>
+        )}
+      </div>
+      <button onClick={calcular}
+        className="w-full bg-[#FF7043] text-white py-2.5 rounded-lg text-sm font-medium hover:bg-[#e64a19] mb-4">
+        Calcular
+      </button>
+      {result && (
+        <div className="space-y-1 text-sm">
+          <div className="bg-gray-50 rounded-lg p-3 mb-3">
+            <p className="font-medium text-[#2D4A6B]">Antigüedad: {result.lbl} → {result.per} período{result.per !== 1 ? 's' : ''} computable{result.per !== 1 ? 's' : ''}</p>
+          </div>
+          {[
+            { label: 'Indemnización Art.245', detail: result.artDetail, value: result.art, show: true },
+            { label: 'Preaviso', detail: result.pd, value: result.mp, show: true },
+            { label: 'Integración mes despido', detail: result.integDetail, value: result.integ, show: true },
+            { label: 'Días trabajados en el mes', detail: result.dpagoDetail, value: result.dpago, show: true },
+            { label: 'SAC proporcional', detail: result.sacDetail, value: result.sacT, show: true },
+            { label: 'Vacaciones año en curso', detail: result.vacADetail, value: result.vacA, show: true },
+            { label: 'Vacaciones año anterior no gozadas', detail: result.vaMDetail, value: result.vaM, show: va === 'n' },
+            { label: 'Trabajo no registrado', detail: result.noregDetail, value: result.noreg, show: result.noreg > 0 },
+          ].filter(r => r.show).map((row, i) => (
+            <div key={i} className="flex justify-between items-start py-1.5 border-b border-gray-100">
+              <div>
+                <p className="text-gray-700">{row.label}</p>
+                {row.detail && <p className="text-xs text-gray-400">{row.detail}</p>}
+              </div>
+              <p className="font-semibold text-[#2D4A6B] whitespace-nowrap ml-3">{formatARS(row.value)}</p>
+            </div>
+          ))}
+          <div className="bg-[#2D4A6B] text-white rounded-xl p-4 mt-3">
+            <p className="text-xs opacity-70 mb-1">TOTAL ESTIMADO</p>
+            <p className="text-2xl font-bold">{formatARS(result.total)}</p>
+            <p className="text-xs opacity-60 mt-1">Valores orientativos. Verificar con asesor.</p>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Panel pCosto (Costo Laboral) ─────────────────────────────────────────────
+function PanelCosto({ onClose }: { onClose: () => void }) {
+  const [bruto, setBruto] = useState('')
+  const [antig, setAntig] = useState('')
+  const [artRate, setArtRate] = useState('')
+  const [osAd, setOsAd] = useState('')
+  const [result, setResult] = useState<null | {
+    bruto: number; cargas: number; art: number; sac: number; vac: number; vacDetail: string; osAd: number; total: number; anual: number
+  }>(null)
+
+  function calcular() {
+    const b = parseFloat(bruto) || 0
+    const a = parseInt(antig) || 0
+    const ar = parseFloat(artRate) || 0
+    const oa = parseFloat(osAd) || 0
+    const cargas = Math.round(b * 0.2742)
+    const art = Math.round(b * ar / 100)
+    const sac = Math.round(b / 12)
+    const dias = dv(a)
+    const vac = Math.round((b / 25) * dias / 12)
+    const total = b + cargas + art + sac + vac + oa
+    const anual = Math.round(total * 13)
+    setResult({ bruto: b, cargas, art, sac, vac, vacDetail: `${dias} días/año ÷ 12 (ant. ${a} años)`, osAd: oa, total, anual })
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-semibold text-[#2D4A6B] text-sm">Costo Laboral Completo</h3>
+        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Sueldo bruto ($)</label>
+          <input type="number" value={bruto} onChange={e => setBruto(e.target.value)} placeholder="0"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Antigüedad (años)</label>
+          <input type="number" value={antig} onChange={e => setAntig(e.target.value)} placeholder="0"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Alícuota ART (%)</label>
+          <input type="number" value={artRate} onChange={e => setArtRate(e.target.value)} placeholder="2.5" step="0.1"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Obra social adicional ($)</label>
+          <input type="number" value={osAd} onChange={e => setOsAd(e.target.value)} placeholder="0"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
       </div>
-      <div className="bg-green-50 rounded-xl p-4 space-y-2">
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Monto base</span><span>{formatARS(montoBase)}</span>
+      <button onClick={calcular}
+        className="w-full bg-[#FF7043] text-white py-2.5 rounded-lg text-sm font-medium hover:bg-[#e64a19] mb-4">
+        Calcular
+      </button>
+      {result && (
+        <div className="space-y-1 text-sm">
+          {[
+            { label: 'Sueldo bruto', detail: '', value: result.bruto },
+            { label: 'Cargas sociales patronales (~27,42%)', detail: '', value: result.cargas },
+            { label: 'ART', detail: `${artRate}% del bruto`, value: result.art },
+            { label: 'SAC mensual (1/12)', detail: '', value: result.sac },
+            { label: 'Vacaciones (incidencia mensual)', detail: result.vacDetail, value: result.vac },
+            ...(result.osAd > 0 ? [{ label: 'Obra social adicional', detail: '', value: result.osAd }] : []),
+          ].map((row, i) => (
+            <div key={i} className="flex justify-between items-start py-1.5 border-b border-gray-100">
+              <div>
+                <p className="text-gray-700">{row.label}</p>
+                {row.detail && <p className="text-xs text-gray-400">{row.detail}</p>}
+              </div>
+              <p className="font-semibold text-[#2D4A6B] whitespace-nowrap ml-3">{formatARS(row.value)}</p>
+            </div>
+          ))}
+          <div className="bg-[#2D4A6B] text-white rounded-xl p-4 mt-3 space-y-2">
+            <div className="flex justify-between">
+              <p className="font-semibold">COSTO REAL / MES</p>
+              <p className="text-xl font-bold">{formatARS(result.total)}</p>
+            </div>
+            <div className="flex justify-between text-sm opacity-80">
+              <p>Costo anual (×13)</p>
+              <p>{formatARS(result.anual)}</p>
+            </div>
+          </div>
         </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Aumento ({variacion}% {indice})</span>
-          <span className="text-[#4CAF50]">+ {formatARS(aumento)}</span>
+      )}
+    </div>
+  )
+}
+
+// ─── Panel pAlquiler (Actualización Alquiler) ─────────────────────────────────
+function PanelAlquiler({ onClose }: { onClose: () => void }) {
+  const [base, setBase] = useState('')
+  const [indice, setIndice] = useState<'ICL — BCRA (Ley 27.551)' | 'IPC — INDEC' | 'RIPTE' | '% manual'>('ICL — BCRA (Ley 27.551)')
+  const [idxIni, setIdxIni] = useState('')
+  const [idxAct, setIdxAct] = useState('')
+  const [pctManual, setPctManual] = useState('')
+  const [result, setResult] = useState<null | { base: number; variacion: number; nuevo: number; aumento: number; varDetail: string }>(null)
+  const [histTab, setHistTab] = useState<'icl' | 'ipc' | 'ripte'>('icl')
+
+  function calcular() {
+    const b = parseFloat(base) || 0
+    let variacion = 0
+    let varDetail = ''
+    if (indice === '% manual') {
+      variacion = parseFloat(pctManual) || 0
+      varDetail = `${variacion}% manual`
+    } else {
+      const ini = parseFloat(idxIni) || 0
+      const act = parseFloat(idxAct) || 0
+      if (ini > 0) {
+        variacion = ((act - ini) / ini) * 100
+        varDetail = `De ${ini} a ${act} (${indice.split(' ')[0]})`
+      }
+    }
+    const nuevo = b * (1 + variacion / 100)
+    const aumento = nuevo - b
+    setResult({ base: b, variacion, nuevo, aumento, varDetail })
+  }
+
+  const histData = IDX_DATA[histTab]
+  const last24 = histData.slice(-24)
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-semibold text-[#2D4A6B] text-sm">Actualización de Alquiler</h3>
+        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Alquiler actual ($)</label>
+          <input type="number" value={base} onChange={e => setBase(e.target.value)} placeholder="0"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
-        <div className="flex justify-between font-bold border-t border-green-200 pt-2">
-          <span>Alquiler actualizado</span>
-          <span className="text-[#2D4A6B] text-lg">{formatARS(actualizado)}</span>
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Índice</label>
+          <select value={indice} onChange={e => setIndice(e.target.value as typeof indice)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+            <option>ICL — BCRA (Ley 27.551)</option>
+            <option>IPC — INDEC</option>
+            <option>RIPTE</option>
+            <option>% manual</option>
+          </select>
         </div>
+        {indice !== '% manual' ? (
+          <>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Índice al inicio</label>
+              <input type="number" value={idxIni} onChange={e => setIdxIni(e.target.value)} step="0.01"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0.00" />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Índice actual</label>
+              <input type="number" value={idxAct} onChange={e => setIdxAct(e.target.value)} step="0.01"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0.00" />
+            </div>
+          </>
+        ) : (
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Porcentaje (%)</label>
+            <input type="number" value={pctManual} onChange={e => setPctManual(e.target.value)} placeholder="0"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+          </div>
+        )}
+      </div>
+      <button onClick={calcular}
+        className="w-full bg-[#FF7043] text-white py-2.5 rounded-lg text-sm font-medium hover:bg-[#e64a19] mb-4">
+        Calcular actualización
+      </button>
+      {result && (
+        <div className="bg-green-50 rounded-lg p-4 space-y-2 text-sm mb-4">
+          <div className="flex justify-between">
+            <span className="text-gray-600">Alquiler actual</span>
+            <span>{formatARS(result.base)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600">Variación del índice</span>
+            <span className="text-[#FF7043]">{result.variacion.toFixed(2)}% <span className="text-xs text-gray-400">({result.varDetail})</span></span>
+          </div>
+          <div className="flex justify-between font-bold border-t border-green-200 pt-2">
+            <span>Nuevo alquiler actualizado</span>
+            <span className="text-[#2D4A6B] text-lg">{formatARS(result.nuevo)}</span>
+          </div>
+          <div className="flex justify-between text-sm text-gray-600">
+            <span>Aumento mensual</span>
+            <span className="text-[#4CAF50]">+ {formatARS(result.aumento)}</span>
+          </div>
+        </div>
+      )}
+      <p className="text-xs text-gray-400 mb-4">Ley 27.551 (ICL anual) · DNU 70/2023 (libre pacto). ICL en bcra.gob.ar</p>
+      {/* Tabla histórica */}
+      <div className="flex gap-2 mb-3">
+        {(['icl', 'ipc', 'ripte'] as const).map(t => (
+          <button key={t} onClick={() => setHistTab(t)}
+            className={`px-3 py-1 rounded text-xs font-medium ${histTab === t ? 'bg-[#2D4A6B] text-white' : 'bg-gray-100 text-gray-600'}`}>
+            {t.toUpperCase()}
+          </button>
+        ))}
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="bg-gray-50 text-gray-500">
+              <th className="text-left px-2 py-1.5">Período</th>
+              <th className="text-right px-2 py-1.5">Índice</th>
+              <th className="text-right px-2 py-1.5">Var. mensual</th>
+              <th className="text-right px-2 py-1.5">Var. anual</th>
+            </tr>
+          </thead>
+          <tbody>
+            {last24.map((row, i) => (
+              <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                <td className="px-2 py-1">{row[0]}</td>
+                <td className="px-2 py-1 text-right">{typeof row[1] === 'number' && row[1] > 1000 ? row[1].toLocaleString('es-AR') : row[1]}</td>
+                <td className="px-2 py-1 text-right text-[#FF7043]">{row[2]}%</td>
+                <td className="px-2 py-1 text-right text-[#4CAF50]">{row[3]}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )
 }
 
-// ─── Marketing ───────────────────────────────────────────────────────────────
-function ModuloMarketing({ modulo }: { modulo: typeof MODULOS[0] }) {
-  const [subTab, setSubTab] = useState<'diagnostico' | 'chat'>('diagnostico')
-  const [form, setForm] = useState<Record<string, string>>({})
+// ─── Panel pPatente (Consulta Multas) ─────────────────────────────────────────
+function PanelPatente({ onClose }: { onClose: () => void }) {
+  const [patente, setPatente] = useState('')
   const [nombre, setNombre] = useState('')
+  const [tel, setTel] = useState('')
   const [email, setEmail] = useState('')
-  const [telefono, setTelefono] = useState('')
   const [enviando, setEnviando] = useState(false)
-  const [enviado, setEnviado] = useState(false)
-  const [error, setError] = useState('')
-
-  const camposDiag = [
-    { id: 'rubro', label: 'Rubro / tipo de negocio', placeholder: 'Ej: Restaurante, Estudio contable...' },
-    { id: 'redes', label: '¿Tenés redes sociales?', options: ['No tengo', 'Instagram', 'Instagram + Facebook', 'Instagram + Facebook + TikTok', 'Otras'] },
-    { id: 'web', label: '¿Tenés sitio web?', options: ['No', 'Sí, pero desactualizado', 'Sí, activo'] },
-    { id: 'objetivo', label: '¿Qué querés lograr?', options: ['Conseguir más clientes', 'Mejorar presencia digital', 'Armar una estrategia', 'Capacitación del equipo', 'Otro'] },
-    { id: 'presupuesto', label: 'Presupuesto mensual estimado', options: ['No sé todavía', 'Hasta $50.000', '$50.000 – $150.000', 'Más de $150.000'] },
-    { id: 'comentarios', label: 'Comentarios adicionales', placeholder: 'Contanos más sobre tu negocio o qué problema querés resolver...', type: 'textarea' },
-  ]
+  const [ok, setOk] = useState(false)
+  const [err, setErr] = useState('')
 
   async function handleEnviar() {
-    if (!nombre || !email) { setError('Completá tu nombre y email.'); return }
-    setError('')
+    if (!patente || !nombre || !tel) { setErr('Completá los campos obligatorios (*)'); return }
+    setErr('')
     setEnviando(true)
     try {
       await fetch('/api/consulta', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tipo: 'Marketing & Tecnología', nombre, email, telefono, datos: form }),
+        body: JSON.stringify({ tipo: 'Vehículos & Fotomultas', nombre, email, telefono: tel, datos: { patente } }),
       })
-      setEnviado(true)
-    } catch { setError('Error al enviar. Intentá de nuevo.') }
+      setOk(true)
+    } catch { setErr('Error al enviar. Intentá de nuevo.') }
     finally { setEnviando(false) }
   }
 
-  if (enviado) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <CheckCircle2 size={48} className="text-[#4CAF50] mb-4" />
-        <h3 className="text-xl font-bold text-[#2D4A6B] mb-2">¡Consulta enviada!</h3>
-        <p className="text-gray-500 text-sm max-w-xs">
-          Te contactaremos a <strong>{email}</strong> en las próximas <strong>48 hs hábiles</strong> con una propuesta personalizada.
-        </p>
-        <button onClick={() => { setEnviado(false); setForm({}); setNombre(''); setEmail(''); setTelefono('') }}
-          className="mt-6 text-sm text-[#2D4A6B] underline">Hacer otra consulta</button>
-      </div>
-    )
-  }
+  const NULIDAD = [
+    'Lugar de infracción impreciso o incorrecto.',
+    'Falta de señalización de velocidad máxima o radar.',
+    'Radar sin acreditación de calibración vigente.',
+    'Falta de homologación del equipo utilizado.',
+    'Dos o más vehículos en la misma fotografía.',
+    'Imposibilidad de identificar qué vehículo generó la medición.',
+    'Dominio ilegible o dudoso.',
+    'Fotografía insuficiente o sin contexto vial.',
+    'Fecha u hora errónea o inconsistente.',
+    'Error en dominio, marca o modelo del vehículo.',
+    'Falta de firma digital verificable.',
+    'Falta de identificación de la autoridad actuante.',
+    'Defectos formales en el acta de infracción.',
+    'Notificación defectuosa o inexistente.',
+    'Falta de acceso al expediente o prueba técnica.',
+    'Falta de acreditación de velocidad máxima vigente.',
+    'Diferencia mínima respecto del límite sin prueba técnica suficiente.',
+    'Violación del debido proceso y derecho de defensa.',
+  ]
 
   return (
-    <div>
-      <div className="flex gap-2 mb-4">
-        {([['diagnostico', '📋 Diagnóstico Digital'], ['chat', '💬 Consultar con IA']] as const).map(([t, label]) => (
-          <button key={t} onClick={() => setSubTab(t)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium ${subTab === t ? 'bg-[#2D4A6B] text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>
-            {label}
-          </button>
-        ))}
+    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-semibold text-[#2D4A6B] text-sm">Consulta de Multas por Patente</h3>
+        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
-
-      {subTab === 'diagnostico' && (
-        <div className="space-y-4">
-          <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
-            <p className="text-sm text-purple-700 font-medium">📱 Diagnóstico de Presencia Digital</p>
-            <p className="text-xs text-purple-600 mt-1">Completá el formulario y te enviamos una propuesta de estrategia digital personalizada en 48 hs.</p>
+      {ok ? (
+        <p className="text-[#4CAF50] text-sm font-medium mb-4">✅ Consulta enviada. Un asesor te contactará en menos de 48 hs hábiles.</p>
+      ) : (
+        <div className="space-y-3 mb-4">
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Patente *</label>
+            <input value={patente} onChange={e => setPatente(e.target.value.toUpperCase())} maxLength={8}
+              placeholder="AA 123 BB"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-2xl font-bold tracking-widest text-center uppercase focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 p-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {camposDiag.map(c => (
-                <div key={c.id} className={c.type === 'textarea' ? 'md:col-span-2' : ''}>
-                  <label className="text-xs text-gray-500 block mb-1">{c.label}</label>
-                  {c.options ? (
-                    <select value={form[c.id] || ''} onChange={e => setForm(v => ({ ...v, [c.id]: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]">
-                      <option value="">Seleccioná...</option>
-                      {c.options.map(o => <option key={o}>{o}</option>)}
-                    </select>
-                  ) : c.type === 'textarea' ? (
-                    <textarea value={form[c.id] || ''} onChange={e => setForm(v => ({ ...v, [c.id]: e.target.value }))}
-                      rows={3} placeholder={c.placeholder}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B] resize-none" />
-                  ) : (
-                    <input value={form[c.id] || ''} onChange={e => setForm(v => ({ ...v, [c.id]: e.target.value }))}
-                      placeholder={c.placeholder}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-                  )}
-                </div>
-              ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Nombre y apellido *</label>
+              <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Juan Pérez"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Tel / WhatsApp *</label>
+              <input value={tel} onChange={e => setTel(e.target.value)} placeholder="11-1234-5678"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="juan@mail.com"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
             </div>
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
-            <h3 className="font-semibold text-[#2D4A6B] text-sm">Tus datos de contacto</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="text-xs text-gray-500 block mb-1">Nombre y apellido *</label>
-                <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Juan Pérez"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-              </div>
-              <div>
-                <label className="text-xs text-gray-500 block mb-1">Email *</label>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="juan@mail.com"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-              </div>
-              <div>
-                <label className="text-xs text-gray-500 block mb-1">Teléfono</label>
-                <input value={telefono} onChange={e => setTelefono(e.target.value)} placeholder="11-1234-5678"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-              </div>
-            </div>
-          </div>
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {err && <p className="text-xs text-red-500">{err}</p>}
           <button onClick={handleEnviar} disabled={enviando}
-            className="w-full bg-[#2D4A6B] text-white py-3 rounded-xl font-medium hover:bg-[#1e3350] disabled:opacity-50 transition-colors">
-            {enviando ? 'Enviando...' : '📨 Enviar diagnóstico'}
+            className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg text-sm font-medium hover:bg-[#1e3350] disabled:opacity-50">
+            {enviando ? 'Enviando...' : 'Enviar consulta'}
           </button>
-          <p className="text-xs text-gray-400 text-center">Te respondemos en 48 hs hábiles con una propuesta personalizada.</p>
         </div>
       )}
-
-      {subTab === 'chat' && <div className="flex flex-col"><ChatIA modulo={modulo} /></div>}
+      {/* Motivos de Nulidad */}
+      <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-3">
+        <h4 className="font-semibold text-[#FF7043] text-sm mb-2">Motivos de Nulidad de Fotomulta</h4>
+        <ol className="space-y-1">
+          {NULIDAD.map((item, i) => (
+            <li key={i} className="text-xs text-gray-700 flex gap-2">
+              <span className="text-[#FF7043] font-bold flex-shrink-0">{i + 1}.</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-600">
+        <strong>Prescripción (Pcia. Buenos Aires):</strong> Faltas leves: 2 años. Faltas graves: 5 años. Desde la fecha de infracción.
+      </div>
     </div>
   )
 }
 
-// ─── Page ────────────────────────────────────────────────────────────────────
+// ─── Panel pMkt (Marketing servicios) ─────────────────────────────────────────
+const MKT_SERVICIOS = [
+  { icon: '📱', nombre: 'Desarrollo de Apps', desc: 'Apps móviles y web a medida.' },
+  { icon: '🌐', nombre: 'Sitios Web', desc: 'Sitios, landing pages y tiendas online.' },
+  { icon: '📣', nombre: 'Community Management', desc: 'Gestión de redes y contenido.' },
+  { icon: '🎯', nombre: 'Publicidad Digital', desc: 'Meta Ads, Google Ads, TikTok Ads.' },
+  { icon: '🎨', nombre: 'Identidad de Marca', desc: 'Logo, paleta y manual de marca.' },
+  { icon: '📊', nombre: 'Estrategia Digital', desc: 'Planificación, métricas y optimización.' },
+]
+
+function PanelMkt({ onClose }: { onClose: () => void }) {
+  const [activeService, setActiveService] = useState<string | null>(null)
+  const [nombre, setNombre] = useState('')
+  const [tel, setTel] = useState('')
+  const [email, setEmail] = useState('')
+  const [desc, setDesc] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [ok, setOk] = useState(false)
+  const [err, setErr] = useState('')
+
+  async function handleEnviar() {
+    if (!nombre || !tel) { setErr('Completá nombre y teléfono.'); return }
+    setErr('')
+    setEnviando(true)
+    try {
+      await fetch('/api/consulta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tipo: 'Marketing', nombre, email, telefono: tel, datos: { servicio: activeService, descripcion: desc } }),
+      })
+      setOk(true)
+    } catch { setErr('Error al enviar.') }
+    finally { setEnviando(false) }
+  }
+
+  function resetForm() {
+    setNombre(''); setTel(''); setEmail(''); setDesc(''); setOk(false); setErr(''); setActiveService(null)
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-5 mt-3">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-semibold text-[#2D4A6B] text-sm">Servicios de Marketing</h3>
+        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+      </div>
+      {activeService ? (
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-[#2D4A6B]">Solicitar información — Servicio: <strong>{activeService}</strong></p>
+          {ok ? (
+            <div>
+              <p className="text-[#4CAF50] text-sm font-medium">¡Solicitud enviada! Te contactaremos en 48 hs hábiles...</p>
+              <button onClick={resetForm} className="mt-3 text-sm text-[#2D4A6B] underline">Volver</button>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">Nombre y apellido *</label>
+                  <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Juan Pérez"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">Tel / WhatsApp *</label>
+                  <input value={tel} onChange={e => setTel(e.target.value)} placeholder="11-1234-5678"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">Email</label>
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="juan@mail.com"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">Descripción del proyecto</label>
+                  <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2} placeholder="Contanos tu idea..."
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none" />
+                </div>
+              </div>
+              {err && <p className="text-xs text-red-500">{err}</p>}
+              <div className="flex gap-2">
+                <button onClick={handleEnviar} disabled={enviando}
+                  className="flex-1 bg-[#2D4A6B] text-white py-2 rounded-lg text-sm font-medium hover:bg-[#1e3350] disabled:opacity-50">
+                  {enviando ? 'Enviando...' : 'Enviar'}
+                </button>
+                <button onClick={resetForm}
+                  className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                  Cancelar
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3">
+          {MKT_SERVICIOS.map(s => (
+            <div key={s.nombre} className="border border-gray-200 rounded-xl p-3">
+              <p className="text-xl mb-1">{s.icon}</p>
+              <p className="text-sm font-semibold text-[#2D4A6B]">{s.nombre}</p>
+              <p className="text-xs text-gray-500 mb-2">{s.desc}</p>
+              <button onClick={() => setActiveService(s.nombre)}
+                className="w-full bg-[#FF7043] text-white py-1.5 rounded-lg text-xs font-medium hover:bg-[#e64a19]">
+                Solicitar info
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Ecosistema por módulo ─────────────────────────────────────────────────────
+type ModuleId = 'fiscal' | 'marcas' | 'inden' | 'costos' | 'autos' | 'mkt'
+
+interface EcoBtn {
+  label: string
+  action: 'chat' | 'directMsg' | 'panel'
+  chatMsg?: string
+  directMsg?: string
+  panelId?: string
+}
+
+const ECOSISTEMAS: Record<ModuleId, { titulo: string; btns: EcoBtn[] }> = {
+  fiscal: {
+    titulo: 'Consultas Fiscales',
+    btns: [
+      { label: '¿Cuánto puedo facturar?', action: 'chat', chatMsg: '¿Cuánto puedo facturar este mes en monotributo?' },
+      { label: '¿Cerca de recategorización?', action: 'chat', chatMsg: '¿Estoy cerca de cambiar de categoría de monotributo?' },
+      { label: '¿Cuándo vence AFIP?', action: 'chat', chatMsg: '¿Cuándo vence mi obligación mensual de AFIP?' },
+      { label: '¿Qué gastos cargar?', action: 'chat', chatMsg: '¿Qué gastos puedo cargar como deducibles en Argentina?' },
+      { label: 'Acreditaciones vs facturación', action: 'chat', chatMsg: '¿Por qué mis acreditaciones bancarias superan mi facturación?' },
+      { label: '¿Qué pasa si no presento?', action: 'chat', chatMsg: '¿Qué pasa si no presento la declaración jurada de monotributo a tiempo?' },
+    ],
+  },
+  marcas: {
+    titulo: 'Marcas Comerciales',
+    btns: [
+      { label: '¿Por qué registrar mi marca?', action: 'directMsg', directMsg: 'Registrar tu marca en Argentina te da la exclusividad legal para usarla en todo el país y te protege frente a terceros. Sin registro, otra persona podría solicitar la marca a su nombre. Además, la marca registrada prevalece sobre un dominio web o perfil en redes sociales — el titular puede exigir el cese del uso, transferencia de dominios y acciones legales. El trámite se realiza ante el INPI con vigencia de 10 años renovables. ¡Contactate con nosotros para asesorarte! 😊' },
+      { label: '¿Mi nombre está protegido?', action: 'panel', panelId: 'pNombre' },
+    ],
+  },
+  inden: {
+    titulo: 'Indemnización Laboral',
+    btns: [
+      { label: 'Calcular indemnización', action: 'panel', panelId: 'pInden' },
+      { label: '¿Qué incluye la liquidación?', action: 'chat', chatMsg: '¿Qué conceptos incluye una liquidación final por despido en Argentina?' },
+      { label: '¿Cuánto es el preaviso?', action: 'chat', chatMsg: '¿Cuánto es el preaviso según la antigüedad en Argentina?' },
+      { label: '¿Cómo se calcula el SAC?', action: 'chat', chatMsg: '¿Cómo se calcula el SAC en una liquidación final?' },
+    ],
+  },
+  costos: {
+    titulo: 'Alquileres & Costos',
+    btns: [
+      { label: 'Costo laboral completo', action: 'panel', panelId: 'pCosto' },
+      { label: 'Actualización de alquiler', action: 'panel', panelId: 'pAlquiler' },
+      { label: '¿Cómo funciona el ICL?', action: 'chat', chatMsg: '¿Cómo funciona el ICL para actualizar alquileres en Argentina?' },
+      { label: '¿Qué son las cargas patronales?', action: 'chat', chatMsg: '¿Cuáles son las cargas sociales patronales en Argentina?' },
+    ],
+  },
+  autos: {
+    titulo: 'Vehículos & Fotomultas',
+    btns: [
+      { label: 'Consultar multas por patente', action: 'panel', panelId: 'pPatente' },
+      { label: 'Motivos nulidad fotomulta', action: 'chat', chatMsg: '¿Cuáles son los motivos para pedir la nulidad de una fotomulta en Argentina?' },
+      { label: '¿Cómo apelar una multa?', action: 'chat', chatMsg: '¿Cómo se apela una fotomulta en la Provincia de Buenos Aires?' },
+      { label: '¿Cuándo prescribe?', action: 'chat', chatMsg: '¿Cuándo prescribe una infracción de tránsito en Buenos Aires?' },
+    ],
+  },
+  mkt: {
+    titulo: 'Marketing',
+    btns: [
+      { label: 'Ver servicios de Marketing', action: 'panel', panelId: 'pMkt' },
+      { label: '¿Por qué necesito una web?', action: 'chat', chatMsg: '¿Qué ventajas tiene tener una app o web para mi negocio?' },
+      { label: '¿Qué es Community Management?', action: 'chat', chatMsg: '¿Qué es el community management y por qué es importante?' },
+      { label: 'Meta Ads vs Google Ads', action: 'chat', chatMsg: '¿Qué diferencia hay entre Meta Ads y Google Ads para un negocio local?' },
+    ],
+  },
+}
+
+const MODULOS_GRID = [
+  { id: 'fiscal' as ModuleId, label: 'Fiscal', emoji: '📊' },
+  { id: 'marcas' as ModuleId, label: 'Marcas', emoji: '™️' },
+  { id: 'inden' as ModuleId, label: 'Indemnización', emoji: '⚖️' },
+  { id: 'costos' as ModuleId, label: 'Alquileres & Costos', emoji: '🏠' },
+  { id: 'autos' as ModuleId, label: 'Vehículos & Fotomultas', emoji: '🚗' },
+  { id: 'mkt' as ModuleId, label: 'Marketing', emoji: '📱' },
+]
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 export default function IApoyoPage() {
-  const [modulo, setModulo] = useState<typeof MODULOS[0] | null>(null)
+  const [modulo, setModulo] = useState<ModuleId | null>(null)
+  const [openPanels, setOpenPanels] = useState<Set<string>>(new Set())
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [chatInput, setChatInput] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
+  const endRef = useRef<HTMLDivElement>(null)
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
+
+  function togglePanel(panelId: string) {
+    setOpenPanels(prev => {
+      const next = new Set(prev)
+      if (next.has(panelId)) next.delete(panelId)
+      else next.add(panelId)
+      return next
+    })
+  }
+
+  function closePanel(panelId: string) {
+    setOpenPanels(prev => { const n = new Set(prev); n.delete(panelId); return n })
+  }
+
+  async function sendChat(overrideMsg?: string) {
+    const msg = overrideMsg ?? chatInput
+    if (!msg.trim() || chatLoading) return
+    setMessages(prev => [...prev, { role: 'user', content: msg }])
+    if (!overrideMsg) setChatInput('')
+    setChatLoading(true)
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg, module: modulo ?? 'general', history: messages.slice(-10) }),
+      })
+      const { response } = await res.json()
+      setMessages(prev => [...prev, { role: 'assistant', content: response }])
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Error al conectar. Intentá de nuevo.' }])
+    } finally { setChatLoading(false) }
+  }
+
+  function addDirectMsg(msg: string) {
+    setMessages(prev => [...prev, { role: 'assistant', content: msg }])
+  }
+
+  function handleEcoBtn(btn: EcoBtn) {
+    if (btn.action === 'chat' && btn.chatMsg) {
+      sendChat(btn.chatMsg)
+    } else if (btn.action === 'directMsg' && btn.directMsg) {
+      addDirectMsg(btn.directMsg)
+    } else if (btn.action === 'panel' && btn.panelId) {
+      togglePanel(btn.panelId)
+    }
+  }
+
+  function selectModulo(id: ModuleId) {
+    setModulo(id)
+    setOpenPanels(new Set())
+    setMessages([])
+    setChatInput('')
+  }
+
+  function goBack() {
+    setModulo(null)
+    setOpenPanels(new Set())
+    setMessages([])
+  }
+
+  const eco = modulo ? ECOSISTEMAS[modulo] : null
 
   return (
     <AuthGuard>
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
-        <main className="flex-1 flex flex-col p-4 md:p-6 overflow-auto">
-          <h1 className="text-2xl font-bold text-[#2D4A6B] mb-4">IApoyo — Asistente IA</h1>
+        <main className="flex-1 flex flex-col overflow-auto">
+          {/* Header Banner */}
+          <div className="bg-gradient-to-r from-[#2D4A6B] to-[#3d6a9e] px-6 py-5 flex items-center gap-4">
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-xl">🤖</span>
+            </div>
+            <div>
+              <h1 className="text-white font-bold text-xl">IApoyo</h1>
+              <p className="text-blue-200 text-sm">Seleccioná un módulo</p>
+            </div>
+          </div>
 
-          {/* Grid de módulos */}
-          {!modulo && (
-            <>
-              <p className="text-sm text-gray-500 mb-3">Seleccioná un módulo para comenzar:</p>
+          <div className="flex-1 flex flex-col p-4 md:p-6">
+            {/* Module Grid */}
+            {!modulo && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {MODULOS.map(m => (
-                  <button key={m.id} onClick={() => setModulo(m)}
-                    className="bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-[#4CAF50] hover:shadow-sm transition-all">
-                    <span className="text-2xl block mb-1">{m.emoji}</span>
-                    <span className="text-sm font-medium text-gray-700 block">{m.label}</span>
-                    <span className="text-xs text-gray-400">{m.desc}</span>
+                {MODULOS_GRID.map(m => (
+                  <button key={m.id} onClick={() => selectModulo(m.id)}
+                    className="bg-white border-2 border-gray-200 rounded-xl p-5 text-left hover:border-[#4CAF50] hover:shadow-sm transition-all flex flex-col items-center text-center gap-2">
+                    <span className="text-3xl">{m.emoji}</span>
+                    <span className="text-sm font-semibold text-[#2D4A6B]">{m.label}</span>
                   </button>
                 ))}
               </div>
-            </>
-          )}
+            )}
 
-          {/* Módulo activo */}
-          {modulo && (
-            <div className="flex flex-col flex-1">
-              <div className="flex items-center gap-2 mb-4">
-                <button onClick={() => setModulo(null)} className="text-gray-400 hover:text-gray-600">
-                  <ArrowLeft size={18} />
-                </button>
-                <span className="text-sm font-medium text-[#2D4A6B]">{modulo.emoji} {modulo.label}</span>
+            {/* Ecosistema */}
+            {modulo && eco && (
+              <div className="space-y-4 flex-1 flex flex-col">
+                {/* Back + title */}
+                <div className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3">
+                  <button onClick={goBack} className="text-[#2D4A6B] hover:text-[#1e3350]">
+                    <ArrowLeft size={20} />
+                  </button>
+                  <span className="font-semibold text-[#2D4A6B]">{MODULOS_GRID.find(m => m.id === modulo)?.emoji} {eco.titulo}</span>
+                </div>
+
+                {/* Quick question buttons */}
+                <div className="flex flex-wrap gap-2">
+                  {eco.btns.map((btn, i) => (
+                    <button key={i} onClick={() => handleEcoBtn(btn)}
+                      className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                        btn.action === 'panel' && openPanels.has(btn.panelId!)
+                          ? 'border-[#FF7043] bg-orange-50 text-[#FF7043]'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-[#2D4A6B] hover:text-[#2D4A6B]'
+                      }`}>
+                      {btn.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Panels */}
+                {openPanels.has('pNombre') && <PanelNombre onClose={() => closePanel('pNombre')} />}
+                {openPanels.has('pInden') && <PanelInden onClose={() => closePanel('pInden')} />}
+                {openPanels.has('pCosto') && <PanelCosto onClose={() => closePanel('pCosto')} />}
+                {openPanels.has('pAlquiler') && <PanelAlquiler onClose={() => closePanel('pAlquiler')} />}
+                {openPanels.has('pPatente') && <PanelPatente onClose={() => closePanel('pPatente')} />}
+                {openPanels.has('pMkt') && <PanelMkt onClose={() => closePanel('pMkt')} />}
+
+                {/* Chat always visible */}
+                <div className="flex-1 flex flex-col mt-2">
+                  <div className="flex-1 bg-white rounded-xl border border-gray-100 overflow-y-auto p-4 mb-3 min-h-[200px] max-h-[380px]">
+                    {messages.length === 0 && (
+                      <div className="flex flex-col items-center justify-center h-full text-gray-400 py-8">
+                        <Bot size={28} className="mb-2 text-[#2D4A6B] opacity-30" />
+                        <p className="text-sm text-center">Usá los botones de arriba o escribí tu consulta</p>
+                      </div>
+                    )}
+                    {messages.map((m, i) => (
+                      <div key={i} className={`flex gap-2 mb-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        {m.role === 'assistant' && (
+                          <div className="w-7 h-7 rounded-full bg-[#2D4A6B] flex items-center justify-center flex-shrink-0">
+                            <Bot size={14} className="text-white" />
+                          </div>
+                        )}
+                        <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
+                          m.role === 'user' ? 'bg-[#2D4A6B] text-white rounded-tr-sm' : 'bg-gray-100 text-gray-800 rounded-tl-sm'
+                        }`}>{m.content}</div>
+                        {m.role === 'user' && (
+                          <div className="w-7 h-7 rounded-full bg-[#4CAF50] flex items-center justify-center flex-shrink-0">
+                            <User size={14} className="text-white" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {chatLoading && (
+                      <div className="flex gap-2">
+                        <div className="w-7 h-7 rounded-full bg-[#2D4A6B] flex items-center justify-center">
+                          <Bot size={14} className="text-white" />
+                        </div>
+                        <div className="bg-gray-100 rounded-2xl px-4 py-2.5 text-sm text-gray-400">Consultando...</div>
+                      </div>
+                    )}
+                    <div ref={endRef} />
+                  </div>
+                  <div className="flex gap-2">
+                    <input value={chatInput} onChange={e => setChatInput(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendChat()}
+                      placeholder="Escribí tu consulta..."
+                      className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+                    <button onClick={() => sendChat()} disabled={chatLoading || !chatInput.trim()}
+                      className="bg-[#2D4A6B] text-white px-4 py-2.5 rounded-xl hover:bg-[#1e3350] disabled:opacity-40">
+                      <Send size={16} />
+                    </button>
+                  </div>
+                </div>
               </div>
+            )}
 
-              {/* ── Marcas ── */}
-              {modulo.id === 'marcas' && <ModuloMarcas />}
-
-              {/* ── Vehículos ── */}
-              {modulo.id === 'vehiculos' && (
-                <FormConsulta
-                  tipo="Vehículos & Fotomultas"
-                  titulo="Consulta sobre Infracción de Tránsito"
-                  subtitulo="Completá los datos y un especialista de IApoyo te contactará en 48 hs hábiles con el presupuesto y los pasos a seguir."
-                  emoji="🚗"
-                  campos={[
-                    { id: 'dominio', label: 'Dominio / Patente', placeholder: 'Ej: AA 123 BB', required: true },
-                    { id: 'dni', label: 'DNI del titular', placeholder: 'Ej: 28.123.456', required: true },
-                    { id: 'descripcion', label: '¿Cuál es la situación?', placeholder: 'Describí brevemente la infracción o consulta...', type: 'textarea' },
-                  ]}
-                />
-              )}
-
-              {/* ── Indemnización ── con calculadora */}
-              {modulo.id === 'indemnizacion' && (
-                <div className="space-y-6">
-                  <CalcIndemnizacion />
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-                    <p className="text-sm text-yellow-700 font-medium">⚖️ ¿Necesitás asesoramiento legal?</p>
-                    <p className="text-xs text-yellow-600 mt-1">Podés consultar con el asistente IA para orientación general, o contactar a IApoyo Consultora para una revisión profesional.</p>
-                  </div>
-                  <ChatIA modulo={modulo} />
+            {/* Chat also visible on main grid (no module selected) */}
+            {!modulo && (
+              <div className="flex flex-col mt-4">
+                <div className="bg-white rounded-xl border border-gray-100 overflow-y-auto p-4 mb-3 min-h-[160px] max-h-[300px]">
+                  {messages.length === 0 && (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400 py-6">
+                      <Bot size={28} className="mb-2 text-[#2D4A6B] opacity-30" />
+                      <p className="text-sm">Seleccioná un módulo o escribí tu consulta</p>
+                    </div>
+                  )}
+                  {messages.map((m, i) => (
+                    <div key={i} className={`flex gap-2 mb-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      {m.role === 'assistant' && (
+                        <div className="w-7 h-7 rounded-full bg-[#2D4A6B] flex items-center justify-center flex-shrink-0">
+                          <Bot size={14} className="text-white" />
+                        </div>
+                      )}
+                      <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
+                        m.role === 'user' ? 'bg-[#2D4A6B] text-white rounded-tr-sm' : 'bg-gray-100 text-gray-800 rounded-tl-sm'
+                      }`}>{m.content}</div>
+                      {m.role === 'user' && (
+                        <div className="w-7 h-7 rounded-full bg-[#4CAF50] flex items-center justify-center flex-shrink-0">
+                          <User size={14} className="text-white" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {chatLoading && (
+                    <div className="flex gap-2">
+                      <div className="w-7 h-7 rounded-full bg-[#2D4A6B] flex items-center justify-center">
+                        <Bot size={14} className="text-white" />
+                      </div>
+                      <div className="bg-gray-100 rounded-2xl px-4 py-2.5 text-sm text-gray-400">Consultando...</div>
+                    </div>
+                  )}
+                  <div ref={endRef} />
                 </div>
-              )}
-
-              {/* ── Alquileres ── con calculadora */}
-              {modulo.id === 'alquileres' && (
-                <div className="space-y-6">
-                  <CalcAlquiler />
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                    <p className="text-sm text-green-700 font-medium">🏠 ¿Tenés dudas sobre tu contrato?</p>
-                    <p className="text-xs text-green-600 mt-1">Consultá con el asistente IA sobre índices de actualización, rescisión, expensas y más.</p>
-                  </div>
-                  <ChatIA modulo={modulo} />
+                <div className="flex gap-2">
+                  <input value={chatInput} onChange={e => setChatInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendChat()}
+                    placeholder="Escribí tu consulta general..."
+                    className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+                  <button onClick={() => sendChat()} disabled={chatLoading || !chatInput.trim()}
+                    className="bg-[#2D4A6B] text-white px-4 py-2.5 rounded-xl hover:bg-[#1e3350] disabled:opacity-40">
+                    <Send size={16} />
+                  </button>
                 </div>
-              )}
-
-              {/* ── Marketing ── */}
-              {modulo.id === 'marketing' && <ModuloMarketing modulo={modulo} />}
-
-              {/* ── Fiscal ── solo chat */}
-              {modulo.id === 'fiscal' && (
-                <div className="flex flex-col flex-1">
-                  <ChatIA modulo={modulo} />
-                </div>
-              )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </main>
       </div>
     </AuthGuard>
