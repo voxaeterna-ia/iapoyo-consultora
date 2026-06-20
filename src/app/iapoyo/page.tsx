@@ -250,9 +250,10 @@ function PanelInden({ onClose }: { onClose: () => void }) {
     const sacProp = Math.round((rem / 2) * (dSem / diasSem))
     const sacPropDetail = `${formatARS(rem)}/2 × ${dSem} días del semestre`
 
-    // SAC sobre conceptos de la liquidación (preaviso + integración + vacaciones)
-    const sacConc = Math.round((mp + integ + vacA + vaM) / 12)
+    // SAC sobre conceptos de la liquidación (indemnización + preaviso + integración + vacaciones)
+    const sacConc = Math.round((art + mp + integ + vacA + vaM) / 12)
     const sacConcParts = [
+      art > 0 ? 'indemnización' : '',
       mp > 0 ? 'preaviso' : '',
       integ > 0 ? 'integración' : '',
       vacA > 0 ? 'vacaciones' : '',
