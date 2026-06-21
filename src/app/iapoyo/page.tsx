@@ -27,13 +27,13 @@ function PanelNombre({ onClose }: { onClose: () => void }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-sm">™️ Protección de Marca Comercial</h3>
-        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+        <h3 className="font-semibold text-[#2D4A6B] text-base">™️ Protección de Marca Comercial</h3>
+        <button onClick={onClose} className="text-sm text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
       <div className="space-y-3">
         <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-          <p className="text-sm font-semibold text-[#2D4A6B] mb-2">¿Tu nombre está protegido?</p>
-          <p className="text-xs text-gray-600 leading-relaxed">El registro de marca ante el INPI te da exclusividad legal por 10 años. Una marca registrada prevalece sobre dominios web y usuarios de Instagram y Facebook.</p>
+          <p className="text-base font-semibold text-[#2D4A6B] mb-2">¿Tu nombre está protegido?</p>
+          <p className="text-sm text-gray-600 leading-relaxed">El registro de marca ante el INPI te da exclusividad legal por 10 años. Una marca registrada prevalece sobre dominios web y usuarios de Instagram y Facebook.</p>
         </div>
         <div className="grid grid-cols-1 gap-2">
           {[
@@ -44,11 +44,11 @@ function PanelNombre({ onClose }: { onClose: () => void }) {
           ].map(({ icon, text }) => (
             <div key={text} className="flex items-center gap-3 bg-gray-50 rounded-lg px-3 py-2">
               <span className="text-lg">{icon}</span>
-              <p className="text-xs text-gray-700">{text}</p>
+              <p className="text-sm text-gray-700">{text}</p>
             </div>
           ))}
         </div>
-        <p className="text-xs text-gray-500 text-center pt-1">Usá el chat de abajo para hacer tu consulta</p>
+        <p className="text-sm text-gray-500 text-center pt-1">Usá el chat de abajo para hacer tu consulta</p>
       </div>
     </div>
   )
@@ -165,32 +165,32 @@ function PanelInden({ onClose }: { onClose: () => void }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-sm">Calculadora Indemnización</h3>
-        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+        <h3 className="font-semibold text-[#2D4A6B] text-base">Calculadora Indemnización</h3>
+        <button onClick={onClose} className="text-sm text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Fecha de ingreso</label>
+          <label className="text-sm text-gray-500 block mb-1">Fecha de ingreso</label>
           <input type="date" value={ingreso} onChange={e => setIngreso(e.target.value)}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Fecha de egreso</label>
+          <label className="text-sm text-gray-500 block mb-1">Fecha de egreso</label>
           <input type="date" value={egreso} onChange={e => setEgreso(e.target.value)}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Mejor remuneración ($)</label>
+          <label className="text-sm text-gray-500 block mb-1">Mejor remuneración ($)</label>
           <input type="number" value={suel} onChange={e => setSuel(e.target.value)} placeholder="0"
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Rem. no registrada ($)</label>
+          <label className="text-sm text-gray-500 block mb-1">Rem. no registrada ($)</label>
           <input type="number" value={nr} onChange={e => setNr(e.target.value)} placeholder="0"
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Tipo de despido</label>
+          <label className="text-sm text-gray-500 block mb-1">Tipo de despido</label>
           <select value={tipo} onChange={e => setTipo(e.target.value as 's' | 'c')}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
             <option value="s">Sin causa (Art.245)</option>
@@ -198,7 +198,7 @@ function PanelInden({ onClose }: { onClose: () => void }) {
           </select>
         </div>
         <div>
-          <label className="text-xs text-gray-500 block mb-1">¿Se otorgó preaviso?</label>
+          <label className="text-sm text-gray-500 block mb-1">¿Se otorgó preaviso?</label>
           <select value={prev} onChange={e => setPrev(e.target.value as 'n' | 's')}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
             <option value="n">No</option>
@@ -206,7 +206,7 @@ function PanelInden({ onClose }: { onClose: () => void }) {
           </select>
         </div>
         <div>
-          <label className="text-xs text-gray-500 block mb-1">¿Vacaciones año anterior tomadas?</label>
+          <label className="text-sm text-gray-500 block mb-1">¿Vacaciones año anterior tomadas?</label>
           <select value={va} onChange={e => setVa(e.target.value as 's' | 'n')}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
             <option value="s">Sí</option>
@@ -215,7 +215,7 @@ function PanelInden({ onClose }: { onClose: () => void }) {
         </div>
         {va === 'n' && (
           <div>
-            <label className="text-xs text-gray-500 block mb-1">Meses trabajados ese año</label>
+            <label className="text-sm text-gray-500 block mb-1">Meses trabajados ese año</label>
             <input type="number" value={mesesAnioAnterior} onChange={e => setMesesAnioAnterior(e.target.value)} placeholder="12"
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
           </div>
@@ -244,15 +244,15 @@ function PanelInden({ onClose }: { onClose: () => void }) {
             <div key={i} className="flex justify-between items-start py-1.5 border-b border-gray-100">
               <div>
                 <p className="text-gray-700">{row.label}</p>
-                {row.detail && <p className="text-xs text-gray-400">{row.detail}</p>}
+                {row.detail && <p className="text-sm text-gray-400">{row.detail}</p>}
               </div>
               <p className="font-semibold text-[#2D4A6B] whitespace-nowrap ml-3">{formatARS(row.value)}</p>
             </div>
           ))}
           <div className="bg-[#2D4A6B] text-white rounded-xl p-4 mt-3">
-            <p className="text-xs opacity-70 mb-1">TOTAL ESTIMADO</p>
+            <p className="text-sm opacity-70 mb-1">TOTAL ESTIMADO</p>
             <p className="text-2xl font-bold">{formatARS(result.total)}</p>
-            <p className="text-xs opacity-60 mt-1">Valores orientativos. Verificar con asesor.</p>
+            <p className="text-sm opacity-60 mt-1">Valores orientativos. Verificar con asesor.</p>
           </div>
         </div>
       )}
@@ -288,27 +288,27 @@ function PanelCosto({ onClose }: { onClose: () => void }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-sm">Costo Laboral Completo</h3>
-        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+        <h3 className="font-semibold text-[#2D4A6B] text-base">Costo Laboral Completo</h3>
+        <button onClick={onClose} className="text-sm text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Sueldo bruto ($)</label>
+          <label className="text-sm text-gray-500 block mb-1">Sueldo bruto ($)</label>
           <input type="number" value={bruto} onChange={e => setBruto(e.target.value)} placeholder="0"
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Antigüedad (años)</label>
+          <label className="text-sm text-gray-500 block mb-1">Antigüedad (años)</label>
           <input type="number" value={antig} onChange={e => setAntig(e.target.value)} placeholder="0"
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Alícuota ART (%)</label>
+          <label className="text-sm text-gray-500 block mb-1">Alícuota ART (%)</label>
           <input type="number" value={artRate} onChange={e => setArtRate(e.target.value)} placeholder="2.5" step="0.1"
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Obra social adicional ($)</label>
+          <label className="text-sm text-gray-500 block mb-1">Obra social adicional ($)</label>
           <input type="number" value={osAd} onChange={e => setOsAd(e.target.value)} placeholder="0"
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
@@ -330,7 +330,7 @@ function PanelCosto({ onClose }: { onClose: () => void }) {
             <div key={i} className="flex justify-between items-start py-1.5 border-b border-gray-100">
               <div>
                 <p className="text-gray-700">{row.label}</p>
-                {row.detail && <p className="text-xs text-gray-400">{row.detail}</p>}
+                {row.detail && <p className="text-sm text-gray-400">{row.detail}</p>}
               </div>
               <p className="font-semibold text-[#2D4A6B] whitespace-nowrap ml-3">{formatARS(row.value)}</p>
             </div>
@@ -387,17 +387,17 @@ function PanelAlquiler({ onClose }: { onClose: () => void }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-sm">Actualización de Alquiler</h3>
-        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+        <h3 className="font-semibold text-[#2D4A6B] text-base">Actualización de Alquiler</h3>
+        <button onClick={onClose} className="text-sm text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Alquiler actual ($)</label>
+          <label className="text-sm text-gray-500 block mb-1">Alquiler actual ($)</label>
           <input type="number" value={base} onChange={e => setBase(e.target.value)} placeholder="0"
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Índice</label>
+          <label className="text-sm text-gray-500 block mb-1">Índice</label>
           <select value={indice} onChange={e => setIndice(e.target.value as typeof indice)}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
             <option>ICL — BCRA (Ley 27.551)</option>
@@ -409,19 +409,19 @@ function PanelAlquiler({ onClose }: { onClose: () => void }) {
         {indice !== '% manual' ? (
           <>
             <div>
-              <label className="text-xs text-gray-500 block mb-1">Índice al inicio</label>
+              <label className="text-sm text-gray-500 block mb-1">Índice al inicio</label>
               <input type="number" value={idxIni} onChange={e => setIdxIni(e.target.value)} step="0.01"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0.00" />
             </div>
             <div>
-              <label className="text-xs text-gray-500 block mb-1">Índice actual</label>
+              <label className="text-sm text-gray-500 block mb-1">Índice actual</label>
               <input type="number" value={idxAct} onChange={e => setIdxAct(e.target.value)} step="0.01"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0.00" />
             </div>
           </>
         ) : (
           <div>
-            <label className="text-xs text-gray-500 block mb-1">Porcentaje (%)</label>
+            <label className="text-sm text-gray-500 block mb-1">Porcentaje (%)</label>
             <input type="number" value={pctManual} onChange={e => setPctManual(e.target.value)} placeholder="0"
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
           </div>
@@ -439,7 +439,7 @@ function PanelAlquiler({ onClose }: { onClose: () => void }) {
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Variación del índice</span>
-            <span className="text-[#FF7043]">{result.variacion.toFixed(2)}% <span className="text-xs text-gray-400">({result.varDetail})</span></span>
+            <span className="text-[#FF7043]">{result.variacion.toFixed(2)}% <span className="text-sm text-gray-400">({result.varDetail})</span></span>
           </div>
           <div className="flex justify-between font-bold border-t border-green-200 pt-2">
             <span>Nuevo alquiler actualizado</span>
@@ -451,18 +451,18 @@ function PanelAlquiler({ onClose }: { onClose: () => void }) {
           </div>
         </div>
       )}
-      <p className="text-xs text-gray-400 mb-4">Ley 27.551 (ICL anual) · DNU 70/2023 (libre pacto). ICL en bcra.gob.ar</p>
+      <p className="text-sm text-gray-400 mb-4">Ley 27.551 (ICL anual) · DNU 70/2023 (libre pacto). ICL en bcra.gob.ar</p>
       {/* Tabla histórica */}
       <div className="flex gap-2 mb-3">
         {(['icl', 'ipc', 'ripte'] as const).map(t => (
           <button key={t} onClick={() => setHistTab(t)}
-            className={`px-3 py-1 rounded text-xs font-medium ${histTab === t ? 'bg-[#2D4A6B] text-white' : 'bg-gray-100 text-gray-600'}`}>
+            className={`px-3 py-1 rounded text-sm font-medium ${histTab === t ? 'bg-[#2D4A6B] text-white' : 'bg-gray-100 text-gray-600'}`}>
             {t.toUpperCase()}
           </button>
         ))}
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-xs">
+        <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 text-gray-500">
               <th className="text-left px-2 py-1.5">Período</th>
@@ -513,23 +513,23 @@ function PanelPatente({ onClose }: { onClose: () => void }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-sm">🚗 Multas & Fotomultas</h3>
-        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+        <h3 className="font-semibold text-[#2D4A6B] text-base">🚗 Multas & Fotomultas</h3>
+        <button onClick={onClose} className="text-sm text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
-      <p className="text-xs text-gray-500 mb-4">Usá el chat de abajo para hacer tu consulta sobre una infracción específica.</p>
+      <p className="text-sm text-gray-500 mb-4">Usá el chat de abajo para hacer tu consulta sobre una infracción específica.</p>
       {/* Motivos de Nulidad */}
       <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-3">
-        <h4 className="font-semibold text-[#FF7043] text-sm mb-2">Motivos de Nulidad de Fotomulta</h4>
+        <h4 className="font-semibold text-[#FF7043] text-base mb-2">Motivos de Nulidad de Fotomulta</h4>
         <ol className="space-y-1">
           {NULIDAD.map((item, i) => (
-            <li key={i} className="text-xs text-gray-700 flex gap-2">
+            <li key={i} className="text-sm text-gray-700 flex gap-2">
               <span className="text-[#FF7043] font-bold flex-shrink-0">{i + 1}.</span>
               <span>{item}</span>
             </li>
           ))}
         </ol>
       </div>
-      <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-600">
+      <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
         <strong>Prescripción (Pcia. Buenos Aires):</strong> Faltas leves: 2 años. Faltas graves: 5 años. Desde la fecha de infracción.
       </div>
     </div>
@@ -550,19 +550,19 @@ function PanelMkt({ onClose }: { onClose: () => void }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-sm">📱 Servicios de Marketing</h3>
-        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+        <h3 className="font-semibold text-[#2D4A6B] text-base">📱 Servicios de Marketing</h3>
+        <button onClick={onClose} className="text-sm text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
       <div className="grid grid-cols-2 gap-3">
         {MKT_SERVICIOS.map(s => (
           <div key={s.nombre} className="border border-gray-200 rounded-xl p-3">
             <p className="text-xl mb-1">{s.icon}</p>
-            <p className="text-sm font-semibold text-[#2D4A6B]">{s.nombre}</p>
-            <p className="text-xs text-gray-500">{s.desc}</p>
+            <p className="text-base font-semibold text-[#2D4A6B]">{s.nombre}</p>
+            <p className="text-sm text-gray-500">{s.desc}</p>
           </div>
         ))}
       </div>
-      <p className="text-xs text-gray-500 text-center mt-4">Usá el chat de abajo para consultar sobre cualquier servicio</p>
+      <p className="text-sm text-gray-500 text-center mt-4">Usá el chat de abajo para consultar sobre cualquier servicio</p>
     </div>
   )
 }
@@ -745,31 +745,31 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 space-y-4 w-full overflow-hidden">
       <div className="flex justify-between items-center">
-        <h3 className="font-semibold text-[#2D4A6B] text-sm">💰 Mi Plata</h3>
-        <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+        <h3 className="font-semibold text-[#2D4A6B] text-base">💰 Mi Plata</h3>
+        <button onClick={onClose} className="text-sm text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
 
       {/* Tarjeta valor hora */}
       <div className="bg-gray-900 rounded-xl p-4 text-white">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs uppercase tracking-widest text-yellow-400 font-semibold">⏰ Tu valor hora</span>
-          {configurado && <button onClick={() => setConfigurado(false)} className="text-xs bg-white/10 text-yellow-300 px-3 py-1 rounded-full">editar</button>}
+          <span className="text-sm uppercase tracking-widest text-yellow-400 font-semibold">⏰ Tu valor hora</span>
+          {configurado && <button onClick={() => setConfigurado(false)} className="text-sm bg-white/10 text-yellow-300 px-3 py-1 rounded-full">editar</button>}
         </div>
         {configurado ? (
           <>
             <p className="text-2xl font-bold mb-1">{formatARS(valorHora)} <span className="text-sm text-gray-400">/hora</span></p>
-            <p className="text-xs text-gray-400">
+            <p className="text-sm text-gray-400">
               {formatARS(ingresoTotal)} · {formatHoras(horasTotal)} · {tipoIngreso === 'dependencia' ? 'Relación de dependencia' : 'Actividad independiente'}
             </p>
           </>
         ) : (
           <div className="space-y-3">
             <div>
-              <p className="text-xs text-gray-400 mb-2">Tipo de ingreso</p>
+              <p className="text-sm text-gray-400 mb-2">Tipo de ingreso</p>
               <div className="flex gap-2">
                 {([['dependencia', '👔 En relación de dependencia'], ['independiente', '🧾 Actividad independiente']] as const).map(([val, lbl]) => (
                   <button key={val} onClick={() => setTipoIngreso(val)}
-                    className={`flex-1 text-xs py-2 px-2 rounded-lg border transition-colors ${tipoIngreso === val ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300' : 'border-white/20 text-gray-400 hover:border-white/40'}`}>
+                    className={`flex-1 text-sm py-2 px-2 rounded-lg border transition-colors ${tipoIngreso === val ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300' : 'border-white/20 text-gray-400 hover:border-white/40'}`}>
                     {lbl}
                   </button>
                 ))}
@@ -779,17 +779,17 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
             {tipoIngreso === 'dependencia' && (
               <>
                 <div>
-                  <p className="text-xs text-gray-400 mb-1">Sueldo neto mensual ($)</p>
+                  <p className="text-sm text-gray-400 mb-1">Sueldo neto mensual ($)</p>
                   <input type="number" value={ingreso} onChange={e => setIngreso(e.target.value)} placeholder="Ej: 850000"
                     className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400 mb-2">¿Cuántas horas trabajás por mes?</p>
+                  <p className="text-sm text-gray-400 mb-2">¿Cuántas horas trabajás por mes?</p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
                     {[['80','medio turno'],['120','6h × día'],['160','full time'],['200','+ extras']].map(([h, sub]) => (
                       <button key={h} onClick={() => setHoras(h)}
-                        className={`py-2 rounded-lg text-xs border transition-colors ${horas === h ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300' : 'border-white/20 text-gray-400 hover:border-white/40'}`}>
-                        <span className="font-bold">{h} h</span><br /><span className="text-[10px]">{sub}</span>
+                        className={`py-2 rounded-lg text-sm border transition-colors ${horas === h ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300' : 'border-white/20 text-gray-400 hover:border-white/40'}`}>
+                        <span className="font-bold">{h} h</span><br /><span className="text-xs">{sub}</span>
                       </button>
                     ))}
                   </div>
@@ -801,33 +801,33 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
 
             {tipoIngreso === 'independiente' && (
               <div className="space-y-2">
-                <p className="text-xs text-gray-400">Cargá cada ingreso con las horas que dedicaste</p>
+                <p className="text-sm text-gray-400">Cargá cada ingreso con las horas que dedicaste</p>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <p className="text-[10px] text-gray-500 mb-1">Monto ($)</p>
+                    <p className="text-xs text-gray-500 mb-1">Monto ($)</p>
                     <input type="number" value={montoIng} onChange={e => setMontoIng(e.target.value)} placeholder="Ej: 80000"
                       className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-gray-500 mb-1">Horas afectadas</p>
+                    <p className="text-xs text-gray-500 mb-1">Horas afectadas</p>
                     <input type="number" value={horasIng} onChange={e => setHorasIng(e.target.value)} placeholder="Ej: 4"
                       className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <p className="text-[10px] text-gray-500 mb-1">Fecha</p>
+                    <p className="text-xs text-gray-500 mb-1">Fecha</p>
                     <input type="date" value={fechaIng} onChange={e => setFechaIng(e.target.value)}
                       className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-400" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-gray-500 mb-1">Descripción</p>
+                    <p className="text-xs text-gray-500 mb-1">Descripción</p>
                     <input type="text" value={descIng} onChange={e => setDescIng(e.target.value)} placeholder="Servicio..."
                       className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
                   </div>
                 </div>
                 <button onClick={agregarIng} disabled={!montoIng || !horasIng}
-                  className="w-full bg-yellow-400/20 text-yellow-300 border border-yellow-400/40 py-2 rounded-lg text-xs font-medium disabled:opacity-40">
+                  className="w-full bg-yellow-400/20 text-yellow-300 border border-yellow-400/40 py-2 rounded-lg text-sm font-medium disabled:opacity-40">
                   + Agregar ingreso
                 </button>
                 {ingresosDiarios.length > 0 && (
@@ -835,16 +835,16 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                     {ingresosDiarios.map(i => (
                       <div key={i.id} className="flex justify-between items-center bg-white/5 rounded-lg px-3 py-1.5">
                         <div>
-                          <p className="text-xs text-white">{i.desc || 'Servicio'} <span className="text-gray-400">· {i.fecha}</span></p>
-                          <p className="text-[10px] text-gray-400">{formatARS(i.monto)} · {formatHoras(i.horas)} afectadas → {formatARS(i.horas > 0 ? Math.round(i.monto / i.horas) : 0)}/h</p>
+                          <p className="text-sm text-white">{i.desc || 'Servicio'} <span className="text-gray-400">· {i.fecha}</span></p>
+                          <p className="text-xs text-gray-400">{formatARS(i.monto)} · {formatHoras(i.horas)} afectadas → {formatARS(i.horas > 0 ? Math.round(i.monto / i.horas) : 0)}/h</p>
                         </div>
                         <button onClick={() => setIngresosDiarios(prev => prev.filter(x => x.id !== i.id))} className="text-gray-500 hover:text-red-400 text-lg ml-2">×</button>
                       </div>
                     ))}
                     <div className="grid grid-cols-3 gap-1 px-3 py-2 border-t border-white/10 text-center">
-                      <div><p className="text-[10px] text-gray-400">Total ingresos</p><p className="text-xs font-bold text-yellow-300">{formatARS(totalIngDiarios)}</p></div>
-                      <div><p className="text-[10px] text-gray-400">Horas totales</p><p className="text-xs font-bold text-yellow-300">{formatHoras(totalHorasInd)}</p></div>
-                      <div><p className="text-[10px] text-gray-400">Valor/hora</p><p className="text-xs font-bold text-yellow-300">{totalHorasInd > 0 ? formatARS(Math.round(totalIngDiarios / totalHorasInd)) : '—'}</p></div>
+                      <div><p className="text-xs text-gray-400">Total ingresos</p><p className="text-sm font-bold text-yellow-300">{formatARS(totalIngDiarios)}</p></div>
+                      <div><p className="text-xs text-gray-400">Horas totales</p><p className="text-sm font-bold text-yellow-300">{formatHoras(totalHorasInd)}</p></div>
+                      <div><p className="text-xs text-gray-400">Valor/hora</p><p className="text-sm font-bold text-yellow-300">{totalHorasInd > 0 ? formatARS(Math.round(totalIngDiarios / totalHorasInd)) : '—'}</p></div>
                     </div>
                   </div>
                 )}
@@ -853,7 +853,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
 
             {puedoConfigurar && (
               <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-lg p-3 text-center">
-                <p className="text-xs text-yellow-300 mb-1">tu valor hora será</p>
+                <p className="text-sm text-yellow-300 mb-1">tu valor hora será</p>
                 <p className="text-2xl font-bold text-yellow-300">{formatARS(Math.round(ingresoTotal / horasTotal))}</p>
               </div>
             )}
@@ -868,8 +868,8 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
       {/* Desglose gastos */}
       {configurado && gastos.length > 0 && (
         <div className="bg-gray-50 rounded-xl p-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">🕒 Tu vida este mes se fue así</p>
-          <p className="text-xs text-gray-400 mb-3">Cada gasto traducido a horas de trabajo</p>
+          <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">🕒 Tu vida este mes se fue así</p>
+          <p className="text-sm text-gray-400 mb-3">Cada gasto traducido a horas de trabajo</p>
           <div className="space-y-2">
             {gastos.map(g => (
               <div key={g.id} className="flex items-center justify-between bg-red-50 rounded-lg px-3 py-2.5">
@@ -877,13 +877,13 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                   <span className="text-lg">{g.emoji}</span>
                   <div>
                     <p className="text-sm font-medium text-gray-800">{g.cat}{g.desc ? ` · ${g.desc}` : ''}</p>
-                    <p className="text-xs text-gray-500">{formatARS(g.monto)} · {g.fecha}</p>
+                    <p className="text-sm text-gray-500">{formatARS(g.monto)} · {g.fecha}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
                     <p className="text-sm font-bold text-red-500">{formatHoras(g.monto / valorHora)}</p>
-                    <p className="text-[10px] text-gray-400">{g.monto / valorHora < 24 ? 'menos de un día' : `${(g.monto / valorHora / 24).toFixed(1)} días`}</p>
+                    <p className="text-xs text-gray-400">{g.monto / valorHora < 24 ? 'menos de un día' : `${(g.monto / valorHora / 24).toFixed(1)} días`}</p>
                   </div>
                   <button onClick={() => setGastos(prev => prev.filter(x => x.id !== g.id))} className="text-gray-300 hover:text-red-400 text-lg leading-none">×</button>
                 </div>
@@ -892,11 +892,11 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
           </div>
           <div className="mt-3 bg-green-50 border border-green-100 rounded-lg px-4 py-3 flex justify-between items-center">
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Te quedan en el mes</p>
+              <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold">Te quedan en el mes</p>
               <p className="text-2xl font-bold text-green-700">{formatHoras(horasRestantes)}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-500">o sea</p>
+              <p className="text-sm text-gray-500">o sea</p>
               <p className="text-lg font-bold text-green-700">{formatARS(Math.max(pesoRestante, 0))}</p>
             </div>
           </div>
@@ -906,7 +906,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
       {/* Categorías de gasto */}
       {configurado && (
         <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">⚡ Tocá una categoría para cargar gasto</p>
+          <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">⚡ Tocá una categoría para cargar gasto</p>
           {catActiva ? (
             <div className="bg-gray-50 rounded-xl p-4 space-y-3">
               <div className="flex items-center gap-2">
@@ -918,11 +918,11 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
               {/* Subcategorías */}
               {catActiva.subs.length > 0 && (
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Subcategoría</p>
+                  <p className="text-sm text-gray-500 mb-1">Subcategoría</p>
                   <div className="flex flex-wrap gap-2">
                     {catActiva.subs.map(s => (
                       <button key={s} onClick={() => setSubActiva(s)}
-                        className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${subActiva === s ? 'border-[#2D4A6B] bg-[#2D4A6B] text-white' : 'border-gray-200 text-gray-600 hover:border-[#2D4A6B]'}`}>
+                        className={`px-3 py-1.5 rounded-lg text-sm border transition-colors ${subActiva === s ? 'border-[#2D4A6B] bg-[#2D4A6B] text-white' : 'border-gray-200 text-gray-600 hover:border-[#2D4A6B]'}`}>
                         {s}
                       </button>
                     ))}
@@ -936,12 +936,12 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Monto ($)</p>
+                  <p className="text-sm text-gray-500 mb-1">Monto ($)</p>
                   <input type="number" value={montoGasto} onChange={e => setMontoGasto(e.target.value)} placeholder="0"
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2D4A6B]" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Fecha</p>
+                  <p className="text-sm text-gray-500 mb-1">Fecha</p>
                   <input type="date" value={fechaGasto} onChange={e => setFechaGasto(e.target.value)}
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2D4A6B]" />
                 </div>
@@ -950,7 +950,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2D4A6B]" />
               {montoGasto && valorHora > 0 && (
                 <div className="bg-orange-50 rounded-lg p-2 text-center">
-                  <p className="text-xs text-gray-500">Este gasto equivale a</p>
+                  <p className="text-sm text-gray-500">Este gasto equivale a</p>
                   <p className="text-lg font-bold text-[#FF7043]">{formatHoras(parseFloat(montoGasto) / valorHora)} de trabajo</p>
                 </div>
               )}
@@ -965,7 +965,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                 <button key={cat.key} onClick={() => seleccionarCat(cat)}
                   className="flex flex-col items-center justify-center gap-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl py-3 px-2 transition-colors">
                   <span className="text-2xl">{cat.emoji}</span>
-                  <span className="text-xs text-gray-700 font-medium text-center leading-tight">{cat.label}</span>
+                  <span className="text-sm text-gray-700 font-medium text-center leading-tight">{cat.label}</span>
                 </button>
               ))}
             </div>
@@ -974,7 +974,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
       )}
 
       {!configurado && (
-        <p className="text-xs text-gray-400 text-center">Configurá tu valor hora para empezar a cargar gastos</p>
+        <p className="text-sm text-gray-400 text-center">Configurá tu valor hora para empezar a cargar gastos</p>
       )}
 
       {/* Informe del período */}
@@ -1036,14 +1036,14 @@ function InformePlata({ tipoIngreso, ingresoTotal, horasTotal, valorHora, ingres
 
           {/* Encabezado */}
           <div className="text-center border-b border-gray-100 pb-3">
-            <p className="text-xs text-gray-400 uppercase tracking-wider">IApoyo Consultora · Mi Plata</p>
+            <p className="text-sm text-gray-400 uppercase tracking-wider">IApoyo Consultora · Mi Plata</p>
             <p className="font-bold text-[#2D4A6B] text-base capitalize">{periodo}</p>
-            <p className="text-xs text-gray-500">{tipoIngreso === 'dependencia' ? 'Relación de dependencia' : 'Actividad independiente'}</p>
+            <p className="text-sm text-gray-500">{tipoIngreso === 'dependencia' ? 'Relación de dependencia' : 'Actividad independiente'}</p>
           </div>
 
           {/* Ingresos */}
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">💰 Ingresos</p>
+            <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">💰 Ingresos</p>
             {tipoIngreso === 'dependencia' ? (
               <div className="flex justify-between bg-green-50 rounded-lg px-3 py-2">
                 <span className="text-gray-700">Sueldo neto</span>
@@ -1054,10 +1054,10 @@ function InformePlata({ tipoIngreso, ingresoTotal, horasTotal, valorHora, ingres
                 {ingresosDiarios.map(i => (
                   <div key={i.id} className="flex justify-between items-center bg-green-50 rounded-lg px-3 py-1.5">
                     <div>
-                      <p className="text-gray-700 text-xs">{i.desc || 'Servicio'}</p>
-                      <p className="text-[10px] text-gray-400">{i.fecha} · {formatHoras(i.horas)}</p>
+                      <p className="text-gray-700 text-sm">{i.desc || 'Servicio'}</p>
+                      <p className="text-xs text-gray-400">{i.fecha} · {formatHoras(i.horas)}</p>
                     </div>
-                    <span className="font-bold text-green-700 text-xs">{formatARS(i.monto)}</span>
+                    <span className="font-bold text-green-700 text-sm">{formatARS(i.monto)}</span>
                   </div>
                 ))}
                 <div className="flex justify-between px-3 py-1.5 border-t border-green-100 font-bold">
@@ -1075,12 +1075,12 @@ function InformePlata({ tipoIngreso, ingresoTotal, horasTotal, valorHora, ingres
           {/* Gastos por categoría */}
           {gastos.length > 0 && (
             <div>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">💸 Gastos por categoría</p>
+              <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">💸 Gastos por categoría</p>
               <div className="space-y-1">
                 {Object.entries(porCategoria).sort((a, b) => b[1] - a[1]).map(([cat, total]) => (
                   <div key={cat} className="flex justify-between bg-red-50 rounded-lg px-3 py-1.5">
-                    <span className="text-gray-700 text-xs">{cat}</span>
-                    <span className="font-semibold text-red-600 text-xs">{formatARS(total)}</span>
+                    <span className="text-gray-700 text-sm">{cat}</span>
+                    <span className="font-semibold text-red-600 text-sm">{formatARS(total)}</span>
                   </div>
                 ))}
               </div>
@@ -1090,18 +1090,18 @@ function InformePlata({ tipoIngreso, ingresoTotal, horasTotal, valorHora, ingres
           {/* Gastos detallados */}
           {gastos.length > 0 && (
             <div>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">🧾 Detalle de gastos</p>
+              <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">🧾 Detalle de gastos</p>
               <div className="space-y-1">
                 {[...gastos].sort((a, b) => a.fecha.localeCompare(b.fecha)).map(g => (
                   <div key={g.id} className="flex justify-between items-center border-b border-gray-50 px-1 py-1">
                     <div className="flex items-center gap-2">
                       <span className="text-base">{g.emoji}</span>
                       <div>
-                        <p className="text-xs text-gray-700">{g.cat}{g.desc ? ` · ${g.desc}` : ''}</p>
-                        <p className="text-[10px] text-gray-400">{g.fecha}</p>
+                        <p className="text-sm text-gray-700">{g.cat}{g.desc ? ` · ${g.desc}` : ''}</p>
+                        <p className="text-xs text-gray-400">{g.fecha}</p>
                       </div>
                     </div>
-                    <span className="text-xs font-semibold text-gray-700">{formatARS(g.monto)}</span>
+                    <span className="text-sm font-semibold text-gray-700">{formatARS(g.monto)}</span>
                   </div>
                 ))}
               </div>
@@ -1125,7 +1125,7 @@ function InformePlata({ tipoIngreso, ingresoTotal, horasTotal, valorHora, ingres
               </span>
             </div>
             {ingresoTotal > 0 && totalGastos > 0 && (
-              <p className="text-[10px] text-white/50 text-center pt-1">
+              <p className="text-xs text-white/50 text-center pt-1">
                 Gastaste el {Math.round((totalGastos / ingresoTotal) * 100)}% de tus ingresos
               </p>
             )}
