@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Link from 'next/link'
 import Sidebar from '@/components/Sidebar'
 import AuthGuard from '@/components/AuthGuard'
 import { ChatMessage, formatARS } from '@/types'
@@ -1223,7 +1224,7 @@ export default function IApoyoPage() {
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col p-3 md:p-6">
+          <div className="flex-1 flex flex-col p-3 md:p-6 pb-20 md:pb-6">
             {/* Module Grid */}
             {!modulo && (
               <div className="grid grid-cols-3 md:grid-cols-3 gap-2">
@@ -1321,58 +1322,25 @@ export default function IApoyoPage() {
               </div>
             )}
 
-            {/* Chat also visible on main grid (no module selected) */}
-            {!modulo && (
-              <div className="flex flex-col mt-2">
-                <div className="bg-white rounded-xl border border-gray-100 overflow-y-auto p-3 mb-2 min-h-[160px] max-h-[300px]">
-                  {messages.length === 0 && (
-                    <div className="flex flex-col items-center justify-center h-full text-gray-400 py-6">
-                      <Bot size={22} className="mb-1 text-[#2D4A6B] opacity-30" />
-                      <p className="text-xs">Seleccioná un módulo para comenzar</p>
-                    </div>
-                  )}
-                  {messages.map((m, i) => (
-                    <div key={i} className={`flex gap-1.5 mb-2 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      {m.role === 'assistant' && (
-                        <div className="w-6 h-6 rounded-full bg-[#2D4A6B] flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Bot size={12} className="text-white" />
-                        </div>
-                      )}
-                      <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs whitespace-pre-wrap ${
-                        m.role === 'user' ? 'bg-[#2D4A6B] text-white rounded-tr-sm' : 'bg-gray-100 text-gray-800 rounded-tl-sm'
-                      }`}>{m.content}</div>
-                      {m.role === 'user' && (
-                        <div className="w-6 h-6 rounded-full bg-[#4CAF50] flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <User size={12} className="text-white" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  {chatLoading && (
-                    <div className="flex gap-1.5">
-                      <div className="w-6 h-6 rounded-full bg-[#2D4A6B] flex items-center justify-center">
-                        <Bot size={12} className="text-white" />
-                      </div>
-                      <div className="bg-gray-100 rounded-2xl px-3 py-2 text-xs text-gray-400">Consultando...</div>
-                    </div>
-                  )}
-                  <div ref={endRef} />
-                </div>
-                <div className="flex gap-2">
-                  <input value={chatInput} onChange={e => setChatInput(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendChat()}
-                    placeholder="Escribí tu consulta general..."
-                    className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-                  <button onClick={() => sendChat()} disabled={chatLoading || !chatInput.trim()}
-                    className="bg-[#2D4A6B] text-white px-3 py-2 rounded-xl hover:bg-[#1e3350] disabled:opacity-40">
-                    <Send size={14} />
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </main>
       </div>
+
+      {/* Mobile bottom nav */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#2D4A6B] flex justify-around items-center py-2 z-50 border-t border-white/10">
+        {[
+          { href: '/dashboard', emoji: '🏠', label: 'Panel' },
+          { href: '/negocio', emoji: '🏢', label: 'Negocio' },
+          { href: '/fiscal', emoji: '⚖️', label: 'Fiscal' },
+          { href: '/iapoyo', emoji: '🤖', label: 'IApoyo', active: true },
+          { href: '/acreditaciones', emoji: '🏦', label: 'Banco' },
+        ].map(({ href, emoji, label, active }) => (
+          <Link key={href} href={href} className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg ${active ? 'text-[#4CAF50]' : 'text-white/60'}`}>
+            <span className="text-lg">{emoji}</span>
+            <span className="text-[10px]">{label}</span>
+          </Link>
+        ))}
+      </nav>
     </AuthGuard>
   )
 }
