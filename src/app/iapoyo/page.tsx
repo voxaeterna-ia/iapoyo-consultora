@@ -1223,7 +1223,7 @@ export default function IApoyoPage() {
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col p-3 md:p-6 pb-20 md:pb-6">
+          <div className="flex-1 flex flex-col p-3 md:p-6 pb-24 md:pb-6">
             {/* Module Grid */}
             {!modulo && (
               <div className="grid grid-cols-3 md:grid-cols-3 gap-2">

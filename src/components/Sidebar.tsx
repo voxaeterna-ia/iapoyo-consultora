@@ -35,19 +35,19 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile bottom nav — fixed, always visible */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#2D4A6B] z-50 flex justify-around items-center py-1.5 border-t border-white/10">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#2D4A6B] z-50 flex justify-around items-center py-2.5 border-t border-white/10">
         {nav.map(({ href, label, icon: Icon }) => (
           <Link key={href} href={href}
-            className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-colors ${
+            className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
               pathname === href ? 'text-[#4CAF50]' : 'text-white/60 hover:text-white'
             }`}>
-            <Icon size={20} />
-            <span className="text-[9px]">{label}</span>
+            <Icon size={24} />
+            <span className="text-[11px]">{label}</span>
           </Link>
         ))}
-        <button onClick={handleLogout} className="flex flex-col items-center gap-0.5 px-2 py-1 text-white/40">
-          <LogOut size={20} />
-          <span className="text-[9px]">Salir</span>
+        <button onClick={handleLogout} className="flex flex-col items-center gap-1 px-2 py-1 text-white/40">
+          <LogOut size={24} />
+          <span className="text-[11px]">Salir</span>
         </button>
       </nav>
 

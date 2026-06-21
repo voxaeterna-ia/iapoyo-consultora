@@ -94,7 +94,7 @@ export default function AcreditacionesPage() {
     <AuthGuard>
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
-        <main className="flex-1 p-4 md:p-6 overflow-auto pb-20 md:pb-6">
+        <main className="flex-1 p-4 md:p-6 overflow-auto pb-24 md:pb-6">
           <h1 className="text-2xl font-bold text-[#2D4A6B] mb-6">Acreditaciones Bancarias</h1>
 
           <div className="flex gap-3 mb-6">
