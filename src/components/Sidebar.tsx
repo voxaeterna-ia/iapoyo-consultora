@@ -22,7 +22,7 @@ const nav = [
   { href: '/admin', label: 'Admin', icon: ShieldCheck },
 ]
 
-export default function Sidebar({ hideMobile: _ = false }: { hideMobile?: boolean }) {
+export default function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
 
