@@ -95,7 +95,7 @@ export default function AcreditacionesPage() {
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
         <main className="flex-1 p-4 md:p-6 overflow-auto pb-24 md:pb-6">
-          <h1 className="text-2xl font-bold text-[#2D4A6B] mb-6">Acreditaciones Bancarias</h1>
+          <h1 className="text-3xl font-bold text-[#2D4A6B] mb-6">Acreditaciones Bancarias</h1>
 
           <div className="flex gap-3 mb-6">
             <select value={mes} onChange={e => setMes(Number(e.target.value))} className="border border-gray-200 rounded-lg px-3 py-2 text-sm">
@@ -112,7 +112,7 @@ export default function AcreditacionesPage() {
               <button
                 onClick={syncFromNegocio}
                 disabled={syncing}
-                className="flex items-center gap-1.5 text-xs text-[#4CAF50] border border-[#4CAF50] px-3 py-1.5 rounded-lg hover:bg-green-50"
+                className="flex items-center gap-1.5 text-sm text-[#4CAF50] border border-[#4CAF50] px-3 py-1.5 rounded-lg hover:bg-green-50"
               >
                 <RefreshCw size={12} className={syncing ? 'animate-spin' : ''} />
                 Sincronizar con Mi Negocio
@@ -130,7 +130,7 @@ export default function AcreditacionesPage() {
                 { field: 'otras', label: 'Otras no computables ($)', type: 'number' },
               ].map(({ field, label, type }) => (
                 <div key={field}>
-                  <label className="text-xs text-gray-500 block mb-1">{label}</label>
+                  <label className="text-sm text-gray-500 block mb-1">{label}</label>
                   <input
                     type={type}
                     value={(data as unknown as Record<string, string | number>)[field] || ''}
@@ -144,17 +144,17 @@ export default function AcreditacionesPage() {
 
             <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="bg-blue-50 rounded-lg p-3">
-                <p className="text-xs text-gray-500">Acreditaciones depuradas</p>
-                <p className="text-xl font-bold text-[#2D4A6B]">{formatARS(depuradas)}</p>
+                <p className="text-sm text-gray-500">Acreditaciones depuradas</p>
+                <p className="text-2xl font-bold text-[#2D4A6B]">{formatARS(depuradas)}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-xs text-gray-500">Facturación declarada</p>
-                <p className="text-xl font-bold text-gray-700">{formatARS(data.facturacion)}</p>
+                <p className="text-sm text-gray-500">Facturación declarada</p>
+                <p className="text-2xl font-bold text-gray-700">{formatARS(data.facturacion)}</p>
               </div>
               <div className="rounded-lg p-3" style={{ backgroundColor: semaforoColor + '20' }}>
-                <p className="text-xs text-gray-500">Estado</p>
-                <p className="text-xl font-bold" style={{ color: semaforoColor }}>{semaforoLabel}</p>
-                <p className="text-xs" style={{ color: semaforoColor }}>
+                <p className="text-sm text-gray-500">Estado</p>
+                <p className="text-2xl font-bold" style={{ color: semaforoColor }}>{semaforoLabel}</p>
+                <p className="text-sm" style={{ color: semaforoColor }}>
                   {diferencia > 0 ? '+' : ''}{diferencia.toFixed(1)}% diferencia
                 </p>
               </div>
@@ -173,11 +173,11 @@ export default function AcreditacionesPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="px-4 py-2 text-left text-xs text-gray-500 font-medium">Período</th>
-                  <th className="px-3 py-2 text-right text-xs text-gray-500 font-medium">Total acred.</th>
-                  <th className="px-3 py-2 text-right text-xs text-gray-500 font-medium">Depuradas</th>
-                  <th className="px-3 py-2 text-right text-xs text-gray-500 font-medium">Facturación</th>
-                  <th className="px-3 py-2 text-center text-xs text-gray-500 font-medium">Estado</th>
+                  <th className="px-4 py-2 text-left text-sm text-gray-500 font-medium">Período</th>
+                  <th className="px-3 py-2 text-right text-sm text-gray-500 font-medium">Total acred.</th>
+                  <th className="px-3 py-2 text-right text-sm text-gray-500 font-medium">Depuradas</th>
+                  <th className="px-3 py-2 text-right text-sm text-gray-500 font-medium">Facturación</th>
+                  <th className="px-3 py-2 text-center text-sm text-gray-500 font-medium">Estado</th>
                 </tr>
               </thead>
               <tbody>
@@ -192,7 +192,7 @@ export default function AcreditacionesPage() {
                       <td className="px-3 py-2 text-right">{formatARS(dep)}</td>
                       <td className="px-3 py-2 text-right">{formatARS(h.facturacion)}</td>
                       <td className="px-3 py-2 text-center">
-                        <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ color, backgroundColor: color + '20' }}>
+                        <span className="text-sm font-medium px-2 py-0.5 rounded-full" style={{ color, backgroundColor: color + '20' }}>
                           {dif > 0 ? '+' : ''}{dif.toFixed(0)}%
                         </span>
                       </td>

@@ -76,14 +76,14 @@ export default function FiscalPage() {
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
         <main className="flex-1 p-4 md:p-6 overflow-auto pb-24 md:pb-6">
-          <h1 className="text-2xl font-bold text-[#2D4A6B] mb-6">Categoría Fiscal</h1>
+          <h1 className="text-3xl font-bold text-[#2D4A6B] mb-6">Categoría Fiscal</h1>
 
           {/* Datos generales */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
             <h2 className="font-semibold text-[#2D4A6B] mb-4">Datos Fiscales</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs text-gray-500 block mb-1">CUIT</label>
+                <label className="text-sm text-gray-500 block mb-1">CUIT</label>
                 <input
                   value={data.cuit}
                   onChange={e => setData(d => ({ ...d, cuit: e.target.value }))}
@@ -92,7 +92,7 @@ export default function FiscalPage() {
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500 block mb-1">Condición fiscal</label>
+                <label className="text-sm text-gray-500 block mb-1">Condición fiscal</label>
                 <select
                   value={data.condicion}
                   onChange={e => setData(d => ({ ...d, condicion: e.target.value as CategoriaFiscal['condicion'] }))}
@@ -103,7 +103,7 @@ export default function FiscalPage() {
                 </select>
               </div>
               <div>
-                <label className="text-xs text-gray-500 block mb-1">Actividad principal</label>
+                <label className="text-sm text-gray-500 block mb-1">Actividad principal</label>
                 <input
                   value={data.actividad_principal}
                   onChange={e => setData(d => ({ ...d, actividad_principal: e.target.value }))}
@@ -111,7 +111,7 @@ export default function FiscalPage() {
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500 block mb-1">Actividad secundaria</label>
+                <label className="text-sm text-gray-500 block mb-1">Actividad secundaria</label>
                 <input
                   value={data.actividad_secundaria}
                   onChange={e => setData(d => ({ ...d, actividad_secundaria: e.target.value }))}
@@ -134,7 +134,7 @@ export default function FiscalPage() {
                 <h2 className="font-semibold text-[#2D4A6B] mb-4">Estado de Categoría</h2>
                 <div className="flex items-center gap-4 mb-4">
                   <div>
-                    <label className="text-xs text-gray-500 block mb-1">Categoría actual</label>
+                    <label className="text-sm text-gray-500 block mb-1">Categoría actual</label>
                     <select
                       value={data.categoria}
                       onChange={e => setData(d => ({ ...d, categoria: e.target.value }))}
@@ -149,7 +149,7 @@ export default function FiscalPage() {
                     <div className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl" style={{ backgroundColor: semaforoColor }}>
                       {data.categoria}
                     </div>
-                    <span className="text-xs font-medium mt-1 block" style={{ color: semaforoColor }}>{semaforoLabel}</span>
+                    <span className="text-sm font-medium mt-1 block" style={{ color: semaforoColor }}>{semaforoLabel}</span>
                   </div>
                 </div>
 
@@ -163,31 +163,31 @@ export default function FiscalPage() {
                     style={{ width: `${progreso}%`, backgroundColor: semaforoColor }}
                   />
                 </div>
-                <p className="text-xs text-gray-400 mt-1">{progreso.toFixed(1)}% del límite de categoría</p>
+                <p className="text-sm text-gray-400 mt-1">{progreso.toFixed(1)}% del límite de categoría</p>
               </div>
 
               {/* Recategorización */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
                 <h2 className="font-semibold text-[#2D4A6B] mb-1">Calculadora de Recategorización</h2>
-                <p className="text-xs text-gray-500 mb-4">Parámetros ARCA vigentes Feb–Jul 2026</p>
+                <p className="text-sm text-gray-500 mb-4">Parámetros ARCA vigentes Feb–Jul 2026</p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                   <div>
-                    <label className="text-xs text-gray-500 block mb-1">Facturación anual ($)</label>
+                    <label className="text-sm text-gray-500 block mb-1">Facturación anual ($)</label>
                     <input type="number" value={recatFact || ''} onChange={e => setRecatFact(Number(e.target.value))}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 block mb-1">Superficie (m²)</label>
+                    <label className="text-sm text-gray-500 block mb-1">Superficie (m²)</label>
                     <input type="number" value={recatSup || ''} onChange={e => setRecatSup(Number(e.target.value))}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 block mb-1">Energía eléctrica (kWh)</label>
+                    <label className="text-sm text-gray-500 block mb-1">Energía eléctrica (kWh)</label>
                     <input type="number" value={recatEnergia || ''} onChange={e => setRecatEnergia(Number(e.target.value))}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 block mb-1">Alquileres anuales ($)</label>
+                    <label className="text-sm text-gray-500 block mb-1">Alquileres anuales ($)</label>
                     <input type="number" value={recatAlquiler || ''} onChange={e => setRecatAlquiler(Number(e.target.value))}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
                   </div>
@@ -199,7 +199,7 @@ export default function FiscalPage() {
                       <>
                         <p className="text-sm text-gray-600">Categoría sugerida</p>
                         <p className="text-3xl font-bold text-[#4CAF50]">{catSugerida.cat}</p>
-                        <p className="text-xs text-gray-500 mt-1">Límite: {formatARS(catSugerida.fact)} / año</p>
+                        <p className="text-sm text-gray-500 mt-1">Límite: {formatARS(catSugerida.fact)} / año</p>
                       </>
                     ) : (
                       <p className="text-red-600 font-medium">Los parámetros superan la categoría K — Excluido de Monotributo</p>
@@ -232,8 +232,8 @@ export default function FiscalPage() {
                               <td className="px-2 py-1.5">
                                 <span className="flex items-center gap-1">
                                   {c.cat}
-                                  {esCatActual && <span className="text-yellow-600 text-[10px]">← actual</span>}
-                                  {esCatSugerida && !esCatActual && <span className="text-blue-600 text-[10px]">← sugerida</span>}
+                                  {esCatActual && <span className="text-yellow-600 text-xs">← actual</span>}
+                                  {esCatSugerida && !esCatActual && <span className="text-blue-600 text-xs">← sugerida</span>}
                                 </span>
                               </td>
                               <td className="px-2 py-1.5 text-right">{formatARS(c.fact)}</td>
@@ -275,8 +275,8 @@ export default function FiscalPage() {
                               <td className="px-2 py-1.5">
                                 <span className="flex items-center gap-1">
                                   {c.cat}
-                                  {esCatActual && <span className="text-yellow-600 text-[10px]">← actual</span>}
-                                  {esCatSugerida && !esCatActual && <span className="text-blue-600 text-[10px]">← sugerida</span>}
+                                  {esCatActual && <span className="text-yellow-600 text-xs">← actual</span>}
+                                  {esCatSugerida && !esCatActual && <span className="text-blue-600 text-xs">← sugerida</span>}
                                 </span>
                               </td>
                               <td className="px-2 py-1.5 text-right">{formatARS(c.fact)}</td>
@@ -294,7 +294,7 @@ export default function FiscalPage() {
                 </div>
 
                 <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                  <p className="text-xs text-yellow-800">⚠️ Los valores de cuota, obra social y ART son orientativos y pueden variar. Verificá los valores exactos vigentes en ARCA antes de recategorizarte. Consultá con tu contador.</p>
+                  <p className="text-sm text-yellow-800">⚠️ Los valores de cuota, obra social y ART son orientativos y pueden variar. Verificá los valores exactos vigentes en ARCA antes de recategorizarte. Consultá con tu contador.</p>
                 </div>
               </div>
             </>
@@ -306,19 +306,19 @@ export default function FiscalPage() {
               <h2 className="font-semibold text-[#2D4A6B] mb-4">Calculadora IVA</h2>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="text-xs text-gray-500 block mb-1">Débito fiscal (IVA ventas)</label>
+                  <label className="text-sm text-gray-500 block mb-1">Débito fiscal (IVA ventas)</label>
                   <input type="number" value={debito || ''} onChange={e => setDebito(Number(e.target.value))}
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 block mb-1">Crédito fiscal (IVA compras)</label>
+                  <label className="text-sm text-gray-500 block mb-1">Crédito fiscal (IVA compras)</label>
                   <input type="number" value={credito || ''} onChange={e => setCredito(Number(e.target.value))}
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
                 </div>
               </div>
               <div className={`rounded-lg p-4 text-center ${ivaResultado > 0 ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
                 <p className="text-sm text-gray-600">{ivaResultado > 0 ? 'IVA a pagar' : 'Saldo a favor'}</p>
-                <p className="text-2xl font-bold" style={{ color: ivaResultado > 0 ? '#f44336' : '#4CAF50' }}>
+                <p className="text-3xl font-bold" style={{ color: ivaResultado > 0 ? '#f44336' : '#4CAF50' }}>
                   {formatARS(Math.abs(ivaResultado))}
                 </p>
               </div>

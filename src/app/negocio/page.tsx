@@ -109,7 +109,7 @@ export default function NegocioPage() {
         <Sidebar />
         <main className="flex-1 p-4 md:p-6 overflow-auto pb-24 md:pb-6">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-[#2D4A6B]">Mi Negocio</h1>
+            <h1 className="text-3xl font-bold text-[#2D4A6B]">Mi Negocio</h1>
             <select
               value={anio}
               onChange={e => setAnio(Number(e.target.value))}
@@ -158,11 +158,11 @@ export default function NegocioPage() {
                 ))}
                 <tr className="border-t-2 border-[#2D4A6B] bg-blue-50 font-bold">
                   <td className="px-4 py-2 text-[#2D4A6B]">TOTAL</td>
-                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-xs">{formatARS(totals.facturacion)}</td>
-                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-xs">{formatARS(totals.compras)}</td>
-                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-xs">{formatARS(totals.gastos)}</td>
-                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-xs">{formatARS(totals.sueldos_cs)}</td>
-                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-xs">{formatARS(totals.acreditaciones)}</td>
+                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-sm">{formatARS(totals.facturacion)}</td>
+                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-sm">{formatARS(totals.compras)}</td>
+                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-sm">{formatARS(totals.gastos)}</td>
+                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-sm">{formatARS(totals.sueldos_cs)}</td>
+                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-sm">{formatARS(totals.acreditaciones)}</td>
                   <td></td>
                 </tr>
               </tbody>
@@ -174,8 +174,8 @@ export default function NegocioPage() {
             <h2 className="font-semibold text-[#2D4A6B] mb-4">Facturación vs Gastos {anio}</h2>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={chartData}>
-                <XAxis dataKey="mes" tick={{ fontSize: 11 }} />
-                <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
+                <XAxis dataKey="mes" tick={{ fontSize: 12 }} />
+                <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 12 }} />
                 <Tooltip formatter={(v) => formatARS(Number(v))} />
                 <Legend />
                 <Bar dataKey="Facturación" fill="#4CAF50" radius={[3, 3, 0, 0]} />
@@ -224,7 +224,7 @@ export default function NegocioPage() {
                   { field: 'concepto', label: 'Concepto', type: 'text' },
                 ].map(({ field, label, type }) => (
                   <div key={field}>
-                    <label className="text-xs text-gray-500 block mb-1">{label}</label>
+                    <label className="text-sm text-gray-500 block mb-1">{label}</label>
                     <input
                       type={type}
                       value={(newCheque as Record<string, string>)[field] || ''}
@@ -244,13 +244,13 @@ export default function NegocioPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="px-4 py-2 text-left text-xs text-gray-500 font-medium">N°</th>
-                    <th className="px-3 py-2 text-left text-xs text-gray-500 font-medium">Banco</th>
-                    <th className="px-3 py-2 text-right text-xs text-gray-500 font-medium">Importe</th>
-                    <th className="px-3 py-2 text-left text-xs text-gray-500 font-medium">Fecha</th>
-                    <th className="px-3 py-2 text-left text-xs text-gray-500 font-medium">Beneficiario</th>
-                    <th className="px-3 py-2 text-left text-xs text-gray-500 font-medium">Concepto</th>
-                    <th className="px-3 py-2 text-center text-xs text-gray-500 font-medium">Estado</th>
+                    <th className="px-4 py-2 text-left text-sm text-gray-500 font-medium">N°</th>
+                    <th className="px-3 py-2 text-left text-sm text-gray-500 font-medium">Banco</th>
+                    <th className="px-3 py-2 text-right text-sm text-gray-500 font-medium">Importe</th>
+                    <th className="px-3 py-2 text-left text-sm text-gray-500 font-medium">Fecha</th>
+                    <th className="px-3 py-2 text-left text-sm text-gray-500 font-medium">Beneficiario</th>
+                    <th className="px-3 py-2 text-left text-sm text-gray-500 font-medium">Concepto</th>
+                    <th className="px-3 py-2 text-center text-sm text-gray-500 font-medium">Estado</th>
                     <th className="px-2 py-2"></th>
                   </tr>
                 </thead>
@@ -259,12 +259,12 @@ export default function NegocioPage() {
                     <tr><td colSpan={8} className="text-center text-gray-400 py-8">Sin cheques registrados</td></tr>
                   ) : cheques.map(c => (
                     <tr key={c.id} className="border-t border-gray-50 hover:bg-gray-50">
-                      <td className="px-4 py-2 font-mono text-xs">{c.nro}</td>
+                      <td className="px-4 py-2 font-mono text-sm">{c.nro}</td>
                       <td className="px-3 py-2">{c.banco}</td>
                       <td className="px-3 py-2 text-right font-medium">{formatARS(c.importe)}</td>
-                      <td className="px-3 py-2 text-xs">{c.fecha_pago ? new Date(c.fecha_pago + 'T00:00:00').toLocaleDateString('es-AR') : '-'}</td>
-                      <td className="px-3 py-2 text-xs">{c.beneficiario}</td>
-                      <td className="px-3 py-2 text-xs text-gray-500">{c.concepto}</td>
+                      <td className="px-3 py-2 text-sm">{c.fecha_pago ? new Date(c.fecha_pago + 'T00:00:00').toLocaleDateString('es-AR') : '-'}</td>
+                      <td className="px-3 py-2 text-sm">{c.beneficiario}</td>
+                      <td className="px-3 py-2 text-sm text-gray-500">{c.concepto}</td>
                       <td className="px-3 py-2 text-center">
                         <button onClick={() => toggleEstado(c)} className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${
                           c.estado === 'cobrado' ? 'bg-green-100 text-green-700' :
