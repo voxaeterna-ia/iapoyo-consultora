@@ -33,8 +33,15 @@ export default function LoginPage() {
         setError(error.message)
         setLoading(false)
       } else {
-        setRegistered(true)
-        setLoading(false)
+        // Try to sign in immediately (works when email confirmation is disabled)
+        const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
+        if (loginError) {
+          // Confirmation required
+          setRegistered(true)
+          setLoading(false)
+        } else {
+          router.push('/dashboard')
+        }
       }
     }
   }
