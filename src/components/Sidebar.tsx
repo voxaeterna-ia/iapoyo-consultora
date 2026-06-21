@@ -41,12 +41,12 @@ export default function Sidebar() {
             className={`flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
               pathname === href ? 'text-[#4CAF50]' : 'text-white/60 hover:text-white'
             }`}>
-            <Icon size={26} />
+            <Icon size={28} />
             <span className="text-xs">{label}</span>
           </Link>
         ))}
         <button onClick={handleLogout} className="flex flex-col items-center gap-1 px-2 py-1 text-white/40">
-          <LogOut size={26} />
+          <LogOut size={28} />
           <span className="text-xs">Salir</span>
         </button>
       </nav>
