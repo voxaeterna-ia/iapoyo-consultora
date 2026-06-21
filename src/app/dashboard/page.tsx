@@ -118,7 +118,7 @@ export default function Dashboard() {
     <AuthGuard>
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
-        <main className="flex-1 p-4 md:p-6 overflow-auto">
+        <main className="flex-1 p-4 md:p-6 overflow-auto pb-20 md:pb-6">
           <h1 className="text-2xl font-bold text-[#2D4A6B] mb-1">Panel de Control</h1>
           <p className="text-gray-500 text-sm mb-6">Acumulado al {MESES[(stats?.mesCierre ?? 1) - 1]} {stats?.anioCierre} · Actualizado al {now.toLocaleDateString('es-AR')}</p>
 

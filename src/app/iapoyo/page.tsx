@@ -1272,42 +1272,38 @@ export default function IApoyoPage() {
                 {openPanels.has('pMkt') && <PanelMkt onClose={() => closePanel('pMkt')} />}
                 {openPanels.has('pPlata') && <PanelMiPlata onClose={() => closePanel('pPlata')} />}
 
-                {/* Chat always visible */}
+                {/* Chat — solo visible cuando hay mensajes o está escribiendo */}
                 <div className="flex-1 flex flex-col mt-1">
-                  <div className="flex-1 bg-white rounded-xl border border-gray-100 overflow-y-auto p-3 mb-2 min-h-[160px] max-h-[300px]">
-                    {messages.length === 0 && (
-                      <div className="flex flex-col items-center justify-center h-full text-gray-400 py-6">
-                        <Bot size={22} className="mb-1 text-[#2D4A6B] opacity-30" />
-                        <p className="text-xs text-center">Seleccioná un botón de arriba para obtener información</p>
-                      </div>
-                    )}
-                    {messages.map((m, i) => (
-                      <div key={i} className={`flex gap-1.5 mb-2 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        {m.role === 'assistant' && (
-                          <div className="w-6 h-6 rounded-full bg-[#2D4A6B] flex items-center justify-center flex-shrink-0 mt-0.5">
+                  {(messages.length > 0 || chatLoading) && (
+                    <div className="flex-1 bg-white rounded-xl border border-gray-100 overflow-y-auto p-3 mb-2 min-h-[160px] max-h-[300px]">
+                      {messages.map((m, i) => (
+                        <div key={i} className={`flex gap-1.5 mb-2 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                          {m.role === 'assistant' && (
+                            <div className="w-6 h-6 rounded-full bg-[#2D4A6B] flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <Bot size={12} className="text-white" />
+                            </div>
+                          )}
+                          <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs whitespace-pre-wrap ${
+                            m.role === 'user' ? 'bg-[#2D4A6B] text-white rounded-tr-sm' : 'bg-gray-100 text-gray-800 rounded-tl-sm'
+                          }`}>{m.content}</div>
+                          {m.role === 'user' && (
+                            <div className="w-6 h-6 rounded-full bg-[#4CAF50] flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <User size={12} className="text-white" />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      {chatLoading && (
+                        <div className="flex gap-1.5">
+                          <div className="w-6 h-6 rounded-full bg-[#2D4A6B] flex items-center justify-center">
                             <Bot size={12} className="text-white" />
                           </div>
-                        )}
-                        <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs whitespace-pre-wrap ${
-                          m.role === 'user' ? 'bg-[#2D4A6B] text-white rounded-tr-sm' : 'bg-gray-100 text-gray-800 rounded-tl-sm'
-                        }`}>{m.content}</div>
-                        {m.role === 'user' && (
-                          <div className="w-6 h-6 rounded-full bg-[#4CAF50] flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <User size={12} className="text-white" />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                    {chatLoading && (
-                      <div className="flex gap-1.5">
-                        <div className="w-6 h-6 rounded-full bg-[#2D4A6B] flex items-center justify-center">
-                          <Bot size={12} className="text-white" />
+                          <div className="bg-gray-100 rounded-2xl px-3 py-2 text-xs text-gray-400">Consultando...</div>
                         </div>
-                        <div className="bg-gray-100 rounded-2xl px-3 py-2 text-xs text-gray-400">Consultando...</div>
-                      </div>
-                    )}
-                    <div ref={endRef} />
-                  </div>
+                      )}
+                      <div ref={endRef} />
+                    </div>
+                  )}
                   <div className="flex gap-2">
                     <input value={chatInput} onChange={e => setChatInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendChat()}
@@ -1326,21 +1322,6 @@ export default function IApoyoPage() {
         </main>
       </div>
 
-      {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#2D4A6B] flex justify-around items-center py-2 z-50 border-t border-white/10">
-        {[
-          { href: '/dashboard', emoji: '🏠', label: 'Panel' },
-          { href: '/negocio', emoji: '🏢', label: 'Negocio' },
-          { href: '/fiscal', emoji: '⚖️', label: 'Fiscal' },
-          { href: '/iapoyo', emoji: '🤖', label: 'IApoyo', active: true },
-          { href: '/acreditaciones', emoji: '🏦', label: 'Banco' },
-        ].map(({ href, emoji, label, active }) => (
-          <Link key={href} href={href} className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg ${active ? 'text-[#4CAF50]' : 'text-white/60'}`}>
-            <span className="text-lg">{emoji}</span>
-            <span className="text-[10px]">{label}</span>
-          </Link>
-        ))}
-      </nav>
     </AuthGuard>
   )
 }
