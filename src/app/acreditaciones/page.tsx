@@ -98,21 +98,21 @@ export default function AcreditacionesPage() {
           <h1 className="text-3xl font-bold text-[#2D4A6B] mb-6">Acreditaciones Bancarias</h1>
 
           <div className="flex gap-3 mb-6">
-            <select value={mes} onChange={e => setMes(Number(e.target.value))} className="border border-gray-200 rounded-lg px-3 py-2 text-sm">
+            <select value={mes} onChange={e => setMes(Number(e.target.value))} className="border border-gray-200 rounded-lg px-3 py-2 text-base">
               {MESES.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
             </select>
-            <select value={anio} onChange={e => setAnio(Number(e.target.value))} className="border border-gray-200 rounded-lg px-3 py-2 text-sm">
+            <select value={anio} onChange={e => setAnio(Number(e.target.value))} className="border border-gray-200 rounded-lg px-3 py-2 text-base">
               {[CURRENT_YEAR - 1, CURRENT_YEAR].map(y => <option key={y} value={y}>{y}</option>)}
             </select>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-[#2D4A6B]">{MESES[mes - 1]} {anio}</h2>
+              <h2 className="font-semibold text-[#2D4A6B] text-lg">{MESES[mes - 1]} {anio}</h2>
               <button
                 onClick={syncFromNegocio}
                 disabled={syncing}
-                className="flex items-center gap-1.5 text-sm text-[#4CAF50] border border-[#4CAF50] px-3 py-1.5 rounded-lg hover:bg-green-50"
+                className="flex items-center gap-1.5 text-base text-[#4CAF50] border border-[#4CAF50] px-3 py-1.5 rounded-lg hover:bg-green-50"
               >
                 <RefreshCw size={12} className={syncing ? 'animate-spin' : ''} />
                 Sincronizar con Mi Negocio
@@ -130,12 +130,12 @@ export default function AcreditacionesPage() {
                 { field: 'otras', label: 'Otras no computables ($)', type: 'number' },
               ].map(({ field, label, type }) => (
                 <div key={field}>
-                  <label className="text-sm text-gray-500 block mb-1">{label}</label>
+                  <label className="text-base text-gray-500 block mb-1">{label}</label>
                   <input
                     type={type}
                     value={(data as unknown as Record<string, string | number>)[field] || ''}
                     onChange={e => setData(prev => ({ ...prev, [field]: type === 'number' ? Number(e.target.value) : e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base"
                     placeholder={type === 'number' ? '0' : ''}
                   />
                 </div>
@@ -144,23 +144,23 @@ export default function AcreditacionesPage() {
 
             <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="bg-blue-50 rounded-lg p-3">
-                <p className="text-sm text-gray-500">Acreditaciones depuradas</p>
+                <p className="text-base text-gray-500">Acreditaciones depuradas</p>
                 <p className="text-2xl font-bold text-[#2D4A6B]">{formatARS(depuradas)}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-sm text-gray-500">Facturación declarada</p>
+                <p className="text-base text-gray-500">Facturación declarada</p>
                 <p className="text-2xl font-bold text-gray-700">{formatARS(data.facturacion)}</p>
               </div>
               <div className="rounded-lg p-3" style={{ backgroundColor: semaforoColor + '20' }}>
-                <p className="text-sm text-gray-500">Estado</p>
+                <p className="text-base text-gray-500">Estado</p>
                 <p className="text-2xl font-bold" style={{ color: semaforoColor }}>{semaforoLabel}</p>
-                <p className="text-sm" style={{ color: semaforoColor }}>
+                <p className="text-base" style={{ color: semaforoColor }}>
                   {diferencia > 0 ? '+' : ''}{diferencia.toFixed(1)}% diferencia
                 </p>
               </div>
             </div>
 
-            <button onClick={save} className="mt-4 bg-[#2D4A6B] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#1e3350]">
+            <button onClick={save} className="mt-4 bg-[#2D4A6B] text-white px-5 py-2 rounded-lg text-base font-medium hover:bg-[#1e3350]">
               {saved ? '✓ Guardado' : 'Guardar'}
             </button>
           </div>
@@ -168,16 +168,16 @@ export default function AcreditacionesPage() {
           {/* Historial */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
             <div className="px-4 py-3 border-b border-gray-100">
-              <h2 className="font-semibold text-[#2D4A6B]">Historial</h2>
+              <h2 className="font-semibold text-[#2D4A6B] text-lg">Historial</h2>
             </div>
-            <table className="w-full text-sm">
+            <table className="w-full text-base">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="px-4 py-2 text-left text-sm text-gray-500 font-medium">Período</th>
-                  <th className="px-3 py-2 text-right text-sm text-gray-500 font-medium">Total acred.</th>
-                  <th className="px-3 py-2 text-right text-sm text-gray-500 font-medium">Depuradas</th>
-                  <th className="px-3 py-2 text-right text-sm text-gray-500 font-medium">Facturación</th>
-                  <th className="px-3 py-2 text-center text-sm text-gray-500 font-medium">Estado</th>
+                  <th className="px-4 py-2 text-left text-base text-gray-500 font-medium">Período</th>
+                  <th className="px-3 py-2 text-right text-base text-gray-500 font-medium">Total acred.</th>
+                  <th className="px-3 py-2 text-right text-base text-gray-500 font-medium">Depuradas</th>
+                  <th className="px-3 py-2 text-right text-base text-gray-500 font-medium">Facturación</th>
+                  <th className="px-3 py-2 text-center text-base text-gray-500 font-medium">Estado</th>
                 </tr>
               </thead>
               <tbody>
@@ -192,7 +192,7 @@ export default function AcreditacionesPage() {
                       <td className="px-3 py-2 text-right">{formatARS(dep)}</td>
                       <td className="px-3 py-2 text-right">{formatARS(h.facturacion)}</td>
                       <td className="px-3 py-2 text-center">
-                        <span className="text-sm font-medium px-2 py-0.5 rounded-full" style={{ color, backgroundColor: color + '20' }}>
+                        <span className="text-base font-medium px-2 py-0.5 rounded-full" style={{ color, backgroundColor: color + '20' }}>
                           {dif > 0 ? '+' : ''}{dif.toFixed(0)}%
                         </span>
                       </td>

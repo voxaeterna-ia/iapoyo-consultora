@@ -80,48 +80,48 @@ export default function FiscalPage() {
 
           {/* Datos generales */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
-            <h2 className="font-semibold text-[#2D4A6B] mb-4">Datos Fiscales</h2>
+            <h2 className="font-semibold text-[#2D4A6B] text-lg mb-4">Datos Fiscales</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-gray-500 block mb-1">CUIT</label>
+                <label className="text-base text-gray-500 block mb-1">CUIT</label>
                 <input
                   value={data.cuit}
                   onChange={e => setData(d => ({ ...d, cuit: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base"
                   placeholder="20-12345678-9"
                 />
               </div>
               <div>
-                <label className="text-sm text-gray-500 block mb-1">Condición fiscal</label>
+                <label className="text-base text-gray-500 block mb-1">Condición fiscal</label>
                 <select
                   value={data.condicion}
                   onChange={e => setData(d => ({ ...d, condicion: e.target.value as CategoriaFiscal['condicion'] }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base"
                 >
                   <option value="monotributista">Monotributista</option>
                   <option value="responsable_inscripto">Responsable Inscripto</option>
                 </select>
               </div>
               <div>
-                <label className="text-sm text-gray-500 block mb-1">Actividad principal</label>
+                <label className="text-base text-gray-500 block mb-1">Actividad principal</label>
                 <input
                   value={data.actividad_principal}
                   onChange={e => setData(d => ({ ...d, actividad_principal: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base"
                 />
               </div>
               <div>
-                <label className="text-sm text-gray-500 block mb-1">Actividad secundaria</label>
+                <label className="text-base text-gray-500 block mb-1">Actividad secundaria</label>
                 <input
                   value={data.actividad_secundaria}
                   onChange={e => setData(d => ({ ...d, actividad_secundaria: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base"
                 />
               </div>
             </div>
             <button
               onClick={save}
-              className="mt-4 bg-[#2D4A6B] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#1e3350]"
+              className="mt-4 bg-[#2D4A6B] text-white px-5 py-2 rounded-lg text-base font-medium hover:bg-[#1e3350]"
             >
               {saved ? '✓ Guardado' : 'Guardar'}
             </button>
@@ -131,14 +131,14 @@ export default function FiscalPage() {
           {data.condicion === 'monotributista' && (
             <>
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
-                <h2 className="font-semibold text-[#2D4A6B] mb-4">Estado de Categoría</h2>
+                <h2 className="font-semibold text-[#2D4A6B] text-lg mb-4">Estado de Categoría</h2>
                 <div className="flex items-center gap-4 mb-4">
                   <div>
-                    <label className="text-sm text-gray-500 block mb-1">Categoría actual</label>
+                    <label className="text-base text-gray-500 block mb-1">Categoría actual</label>
                     <select
                       value={data.categoria}
                       onChange={e => setData(d => ({ ...d, categoria: e.target.value }))}
-                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                      className="border border-gray-200 rounded-lg px-3 py-2 text-base"
                     >
                       {MONOTRIBUTO_CATEGORIAS.map(c => (
                         <option key={c.cat} value={c.cat}>Categoría {c.cat} — hasta {formatARS(c.fact)}</option>
@@ -149,11 +149,11 @@ export default function FiscalPage() {
                     <div className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl" style={{ backgroundColor: semaforoColor }}>
                       {data.categoria}
                     </div>
-                    <span className="text-sm font-medium mt-1 block" style={{ color: semaforoColor }}>{semaforoLabel}</span>
+                    <span className="text-base font-medium mt-1 block" style={{ color: semaforoColor }}>{semaforoLabel}</span>
                   </div>
                 </div>
 
-                <div className="mb-2 flex justify-between text-sm">
+                <div className="mb-2 flex justify-between text-base">
                   <span>Facturación anual acumulada</span>
                   <span className="font-medium">{formatARS(facturacionAnual)} / {catActual ? formatARS(catActual.fact) : '-'}</span>
                 </div>
@@ -163,33 +163,33 @@ export default function FiscalPage() {
                     style={{ width: `${progreso}%`, backgroundColor: semaforoColor }}
                   />
                 </div>
-                <p className="text-sm text-gray-400 mt-1">{progreso.toFixed(1)}% del límite de categoría</p>
+                <p className="text-base text-gray-400 mt-1">{progreso.toFixed(1)}% del límite de categoría</p>
               </div>
 
               {/* Recategorización */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
-                <h2 className="font-semibold text-[#2D4A6B] mb-1">Calculadora de Recategorización</h2>
-                <p className="text-sm text-gray-500 mb-4">Parámetros ARCA vigentes Feb–Jul 2026</p>
+                <h2 className="font-semibold text-[#2D4A6B] text-lg mb-1">Calculadora de Recategorización</h2>
+                <p className="text-base text-gray-500 mb-4">Parámetros ARCA vigentes Feb–Jul 2026</p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                   <div>
-                    <label className="text-sm text-gray-500 block mb-1">Facturación anual ($)</label>
+                    <label className="text-base text-gray-500 block mb-1">Facturación anual ($)</label>
                     <input type="number" value={recatFact || ''} onChange={e => setRecatFact(Number(e.target.value))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base" placeholder="0" />
                   </div>
                   <div>
-                    <label className="text-sm text-gray-500 block mb-1">Superficie (m²)</label>
+                    <label className="text-base text-gray-500 block mb-1">Superficie (m²)</label>
                     <input type="number" value={recatSup || ''} onChange={e => setRecatSup(Number(e.target.value))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base" placeholder="0" />
                   </div>
                   <div>
-                    <label className="text-sm text-gray-500 block mb-1">Energía eléctrica (kWh)</label>
+                    <label className="text-base text-gray-500 block mb-1">Energía eléctrica (kWh)</label>
                     <input type="number" value={recatEnergia || ''} onChange={e => setRecatEnergia(Number(e.target.value))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base" placeholder="0" />
                   </div>
                   <div>
-                    <label className="text-sm text-gray-500 block mb-1">Alquileres anuales ($)</label>
+                    <label className="text-base text-gray-500 block mb-1">Alquileres anuales ($)</label>
                     <input type="number" value={recatAlquiler || ''} onChange={e => setRecatAlquiler(Number(e.target.value))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base" placeholder="0" />
                   </div>
                 </div>
 
@@ -197,9 +197,9 @@ export default function FiscalPage() {
                   <div className={`rounded-lg p-4 text-center ${catSugerida ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
                     {catSugerida ? (
                       <>
-                        <p className="text-sm text-gray-600">Categoría sugerida</p>
+                        <p className="text-base text-gray-600">Categoría sugerida</p>
                         <p className="text-3xl font-bold text-[#4CAF50]">{catSugerida.cat}</p>
-                        <p className="text-sm text-gray-500 mt-1">Límite: {formatARS(catSugerida.fact)} / año</p>
+                        <p className="text-base text-gray-500 mt-1">Límite: {formatARS(catSugerida.fact)} / año</p>
                       </>
                     ) : (
                       <p className="text-red-600 font-medium">Los parámetros superan la categoría K — Excluido de Monotributo</p>
@@ -209,9 +209,9 @@ export default function FiscalPage() {
 
                 {/* Tabla cuotas — Servicios */}
                 <div className="mt-5">
-                  <h3 className="text-xs font-semibold text-[#2D4A6B] mb-2 uppercase tracking-wide">Cuotas mensuales — Locación / Prestación de Servicios (Feb–Jul 2026)</h3>
+                  <h3 className="text-sm font-semibold text-[#2D4A6B] mb-2 uppercase tracking-wide">Cuotas mensuales — Locación / Prestación de Servicios (Feb–Jul 2026)</h3>
                   <div className="overflow-x-auto">
-                    <table className="w-full text-xs">
+                    <table className="w-full text-sm">
                       <thead>
                         <tr className="bg-[#2D4A6B] text-white">
                           <th className="px-2 py-1.5 text-left font-medium">Cat</th>
@@ -232,8 +232,8 @@ export default function FiscalPage() {
                               <td className="px-2 py-1.5">
                                 <span className="flex items-center gap-1">
                                   {c.cat}
-                                  {esCatActual && <span className="text-yellow-600 text-xs">← actual</span>}
-                                  {esCatSugerida && !esCatActual && <span className="text-blue-600 text-xs">← sugerida</span>}
+                                  {esCatActual && <span className="text-yellow-600 text-sm">← actual</span>}
+                                  {esCatSugerida && !esCatActual && <span className="text-blue-600 text-sm">← sugerida</span>}
                                 </span>
                               </td>
                               <td className="px-2 py-1.5 text-right">{formatARS(c.fact)}</td>
@@ -251,9 +251,9 @@ export default function FiscalPage() {
 
                 {/* Tabla cuotas — Comercio */}
                 <div className="mt-5">
-                  <h3 className="text-xs font-semibold text-[#2D4A6B] mb-2 uppercase tracking-wide">Cuotas mensuales — Venta de Cosas Muebles (Feb–Jul 2026)</h3>
+                  <h3 className="text-sm font-semibold text-[#2D4A6B] mb-2 uppercase tracking-wide">Cuotas mensuales — Venta de Cosas Muebles (Feb–Jul 2026)</h3>
                   <div className="overflow-x-auto">
-                    <table className="w-full text-xs">
+                    <table className="w-full text-sm">
                       <thead>
                         <tr className="bg-[#4CAF50] text-white">
                           <th className="px-2 py-1.5 text-left font-medium">Cat</th>
@@ -275,8 +275,8 @@ export default function FiscalPage() {
                               <td className="px-2 py-1.5">
                                 <span className="flex items-center gap-1">
                                   {c.cat}
-                                  {esCatActual && <span className="text-yellow-600 text-xs">← actual</span>}
-                                  {esCatSugerida && !esCatActual && <span className="text-blue-600 text-xs">← sugerida</span>}
+                                  {esCatActual && <span className="text-yellow-600 text-sm">← actual</span>}
+                                  {esCatSugerida && !esCatActual && <span className="text-blue-600 text-sm">← sugerida</span>}
                                 </span>
                               </td>
                               <td className="px-2 py-1.5 text-right">{formatARS(c.fact)}</td>
@@ -294,7 +294,7 @@ export default function FiscalPage() {
                 </div>
 
                 <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                  <p className="text-sm text-yellow-800">⚠️ Los valores de cuota, obra social y ART son orientativos y pueden variar. Verificá los valores exactos vigentes en ARCA antes de recategorizarte. Consultá con tu contador.</p>
+                  <p className="text-base text-yellow-800">⚠️ Los valores de cuota, obra social y ART son orientativos y pueden variar. Verificá los valores exactos vigentes en ARCA antes de recategorizarte. Consultá con tu contador.</p>
                 </div>
               </div>
             </>
@@ -303,21 +303,21 @@ export default function FiscalPage() {
           {/* Responsable Inscripto */}
           {data.condicion === 'responsable_inscripto' && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-              <h2 className="font-semibold text-[#2D4A6B] mb-4">Calculadora IVA</h2>
+              <h2 className="font-semibold text-[#2D4A6B] text-lg mb-4">Calculadora IVA</h2>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="text-sm text-gray-500 block mb-1">Débito fiscal (IVA ventas)</label>
+                  <label className="text-base text-gray-500 block mb-1">Débito fiscal (IVA ventas)</label>
                   <input type="number" value={debito || ''} onChange={e => setDebito(Number(e.target.value))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base" placeholder="0" />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500 block mb-1">Crédito fiscal (IVA compras)</label>
+                  <label className="text-base text-gray-500 block mb-1">Crédito fiscal (IVA compras)</label>
                   <input type="number" value={credito || ''} onChange={e => setCredito(Number(e.target.value))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="0" />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base" placeholder="0" />
                 </div>
               </div>
               <div className={`rounded-lg p-4 text-center ${ivaResultado > 0 ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
-                <p className="text-sm text-gray-600">{ivaResultado > 0 ? 'IVA a pagar' : 'Saldo a favor'}</p>
+                <p className="text-base text-gray-600">{ivaResultado > 0 ? 'IVA a pagar' : 'Saldo a favor'}</p>
                 <p className="text-3xl font-bold" style={{ color: ivaResultado > 0 ? '#f44336' : '#4CAF50' }}>
                   {formatARS(Math.abs(ivaResultado))}
                 </p>

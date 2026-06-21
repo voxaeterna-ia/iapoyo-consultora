@@ -113,7 +113,7 @@ export default function NegocioPage() {
             <select
               value={anio}
               onChange={e => setAnio(Number(e.target.value))}
-              className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+              className="border border-gray-300 rounded-lg px-3 py-1.5 text-base"
             >
               {[CURRENT_YEAR - 1, CURRENT_YEAR, CURRENT_YEAR + 1].map(y => (
                 <option key={y} value={y}>{y}</option>
@@ -123,7 +123,7 @@ export default function NegocioPage() {
 
           {/* Tabla registros */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto mb-6">
-            <table className="w-full text-sm">
+            <table className="w-full text-base">
               <thead>
                 <tr className="bg-[#2D4A6B] text-white">
                   <th className="px-4 py-3 text-left font-medium">Mes</th>
@@ -146,23 +146,23 @@ export default function NegocioPage() {
                           value={row[field] || ''}
                           onChange={e => updateCell(row.mes, field, e.target.value)}
                           onBlur={() => saveRow(row)}
-                          className="w-full text-right bg-transparent border-b border-transparent focus:border-[#4CAF50] focus:outline-none text-sm py-1"
+                          className="w-full text-right bg-transparent border-b border-transparent focus:border-[#4CAF50] focus:outline-none text-base py-1"
                           placeholder="0"
                         />
                       </td>
                     ))}
-                    <td className="px-2 py-2 text-xs text-gray-400">
+                    <td className="px-2 py-2 text-sm text-gray-400">
                       {saving === String(row.mes) ? '...' : ''}
                     </td>
                   </tr>
                 ))}
                 <tr className="border-t-2 border-[#2D4A6B] bg-blue-50 font-bold">
                   <td className="px-4 py-2 text-[#2D4A6B]">TOTAL</td>
-                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-sm">{formatARS(totals.facturacion)}</td>
-                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-sm">{formatARS(totals.compras)}</td>
-                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-sm">{formatARS(totals.gastos)}</td>
-                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-sm">{formatARS(totals.sueldos_cs)}</td>
-                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-sm">{formatARS(totals.acreditaciones)}</td>
+                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-base">{formatARS(totals.facturacion)}</td>
+                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-base">{formatARS(totals.compras)}</td>
+                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-base">{formatARS(totals.gastos)}</td>
+                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-base">{formatARS(totals.sueldos_cs)}</td>
+                  <td className="px-3 py-2 text-right text-[#2D4A6B] text-base">{formatARS(totals.acreditaciones)}</td>
                   <td></td>
                 </tr>
               </tbody>
@@ -171,7 +171,7 @@ export default function NegocioPage() {
 
           {/* Gráfico */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
-            <h2 className="font-semibold text-[#2D4A6B] mb-4">Facturación vs Gastos {anio}</h2>
+            <h2 className="font-semibold text-[#2D4A6B] text-lg mb-4">Facturación vs Gastos {anio}</h2>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={chartData}>
                 <XAxis dataKey="mes" tick={{ fontSize: 12 }} />
@@ -187,12 +187,12 @@ export default function NegocioPage() {
           {/* Próximos vencimientos */}
           {proximosMes.length > 0 && (
             <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
-              <h2 className="font-semibold text-orange-700 mb-2 flex items-center gap-2">
+              <h2 className="font-semibold text-orange-700 text-lg mb-2 flex items-center gap-2">
                 <AlertTriangle size={16} /> Próximos vencimientos (30 días)
               </h2>
               <div className="space-y-1">
                 {proximosMes.map(c => (
-                  <div key={c.id} className="flex justify-between text-sm">
+                  <div key={c.id} className="flex justify-between text-base">
                     <span>{c.beneficiario} — {c.banco} #{c.nro}</span>
                     <span className="font-medium">{formatARS(c.importe)} — {new Date(c.fecha_pago + 'T00:00:00').toLocaleDateString('es-AR')}</span>
                   </div>
@@ -204,10 +204,10 @@ export default function NegocioPage() {
           {/* Cheques */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-              <h2 className="font-semibold text-[#2D4A6B]">Cartera de Cheques</h2>
+              <h2 className="font-semibold text-[#2D4A6B] text-lg">Cartera de Cheques</h2>
               <button
                 onClick={() => setShowAddCheque(!showAddCheque)}
-                className="flex items-center gap-1 bg-[#4CAF50] text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-green-600"
+                className="flex items-center gap-1 bg-[#4CAF50] text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600"
               >
                 <Plus size={14} /> Agregar
               </button>
@@ -224,49 +224,49 @@ export default function NegocioPage() {
                   { field: 'concepto', label: 'Concepto', type: 'text' },
                 ].map(({ field, label, type }) => (
                   <div key={field}>
-                    <label className="text-sm text-gray-500 block mb-1">{label}</label>
+                    <label className="text-base text-gray-500 block mb-1">{label}</label>
                     <input
                       type={type}
                       value={(newCheque as Record<string, string>)[field] || ''}
                       onChange={e => setNewCheque(prev => ({ ...prev, [field]: e.target.value }))}
-                      className="w-full border border-gray-200 rounded px-2 py-1.5 text-sm"
+                      className="w-full border border-gray-200 rounded px-2 py-1.5 text-base"
                     />
                   </div>
                 ))}
                 <div className="col-span-2 md:col-span-4 flex gap-2">
-                  <button onClick={addCheque} className="bg-[#2D4A6B] text-white px-4 py-1.5 rounded text-sm">Guardar</button>
-                  <button onClick={() => setShowAddCheque(false)} className="text-gray-500 px-4 py-1.5 rounded text-sm border">Cancelar</button>
+                  <button onClick={addCheque} className="bg-[#2D4A6B] text-white px-4 py-1.5 rounded text-base">Guardar</button>
+                  <button onClick={() => setShowAddCheque(false)} className="text-gray-500 px-4 py-1.5 rounded text-base border">Cancelar</button>
                 </div>
               </div>
             )}
 
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-base">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="px-4 py-2 text-left text-sm text-gray-500 font-medium">N°</th>
-                    <th className="px-3 py-2 text-left text-sm text-gray-500 font-medium">Banco</th>
-                    <th className="px-3 py-2 text-right text-sm text-gray-500 font-medium">Importe</th>
-                    <th className="px-3 py-2 text-left text-sm text-gray-500 font-medium">Fecha</th>
-                    <th className="px-3 py-2 text-left text-sm text-gray-500 font-medium">Beneficiario</th>
-                    <th className="px-3 py-2 text-left text-sm text-gray-500 font-medium">Concepto</th>
-                    <th className="px-3 py-2 text-center text-sm text-gray-500 font-medium">Estado</th>
+                    <th className="px-4 py-2 text-left text-base text-gray-500 font-medium">N°</th>
+                    <th className="px-3 py-2 text-left text-base text-gray-500 font-medium">Banco</th>
+                    <th className="px-3 py-2 text-right text-base text-gray-500 font-medium">Importe</th>
+                    <th className="px-3 py-2 text-left text-base text-gray-500 font-medium">Fecha</th>
+                    <th className="px-3 py-2 text-left text-base text-gray-500 font-medium">Beneficiario</th>
+                    <th className="px-3 py-2 text-left text-base text-gray-500 font-medium">Concepto</th>
+                    <th className="px-3 py-2 text-center text-base text-gray-500 font-medium">Estado</th>
                     <th className="px-2 py-2"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {cheques.length === 0 ? (
-                    <tr><td colSpan={8} className="text-center text-gray-400 py-8">Sin cheques registrados</td></tr>
+                    <tr><td colSpan={8} className="text-center text-gray-400 py-8 text-base">Sin cheques registrados</td></tr>
                   ) : cheques.map(c => (
                     <tr key={c.id} className="border-t border-gray-50 hover:bg-gray-50">
-                      <td className="px-4 py-2 font-mono text-sm">{c.nro}</td>
+                      <td className="px-4 py-2 font-mono text-base">{c.nro}</td>
                       <td className="px-3 py-2">{c.banco}</td>
                       <td className="px-3 py-2 text-right font-medium">{formatARS(c.importe)}</td>
-                      <td className="px-3 py-2 text-sm">{c.fecha_pago ? new Date(c.fecha_pago + 'T00:00:00').toLocaleDateString('es-AR') : '-'}</td>
-                      <td className="px-3 py-2 text-sm">{c.beneficiario}</td>
-                      <td className="px-3 py-2 text-sm text-gray-500">{c.concepto}</td>
+                      <td className="px-3 py-2 text-base">{c.fecha_pago ? new Date(c.fecha_pago + 'T00:00:00').toLocaleDateString('es-AR') : '-'}</td>
+                      <td className="px-3 py-2 text-base">{c.beneficiario}</td>
+                      <td className="px-3 py-2 text-base text-gray-500">{c.concepto}</td>
                       <td className="px-3 py-2 text-center">
-                        <button onClick={() => toggleEstado(c)} className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${
+                        <button onClick={() => toggleEstado(c)} className={`inline-flex items-center gap-1 text-sm px-2 py-0.5 rounded-full font-medium ${
                           c.estado === 'cobrado' ? 'bg-green-100 text-green-700' :
                           c.estado === 'vencido' ? 'bg-red-100 text-red-700' :
                           'bg-yellow-100 text-yellow-700'

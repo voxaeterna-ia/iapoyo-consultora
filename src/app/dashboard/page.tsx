@@ -129,12 +129,12 @@ export default function Dashboard() {
             <div className="bg-white rounded-xl border border-gray-100 p-5">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp size={16} className="text-[#4CAF50]" />
-                <span className="text-sm text-gray-500 font-medium">Facturación acumulada</span>
+                <span className="text-base text-gray-500 font-medium">Facturación acumulada</span>
               </div>
-              <p className="text-sm text-gray-400 mb-2">{mesCierreLabel}</p>
+              <p className="text-base text-gray-400 mb-2">{mesCierreLabel}</p>
               <p className="text-2xl font-bold text-gray-800">{formatARS(stats?.facturacionAcumulada || 0)}</p>
               {catData && (
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-base text-gray-400 mt-1">
                   {((stats?.facturacionAcumulada || 0) / catData.fact * 100).toFixed(1)}% del límite cat. {stats?.categoriaActual}
                 </p>
               )}
@@ -144,9 +144,9 @@ export default function Dashboard() {
             <div className="bg-white rounded-xl border border-gray-100 p-5">
               <div className="flex items-center gap-2 mb-1">
                 <Landmark size={16} className="text-[#2D4A6B]" />
-                <span className="text-sm text-gray-500 font-medium">Acreditaciones acumuladas</span>
+                <span className="text-base text-gray-500 font-medium">Acreditaciones acumuladas</span>
               </div>
-              <p className="text-sm text-gray-400 mb-2">{mesCierreLabel}</p>
+              <p className="text-base text-gray-400 mb-2">{mesCierreLabel}</p>
               <p className="text-2xl font-bold text-gray-800">{formatARS(stats?.acreditacionesAcumuladas || 0)}</p>
             </div>
 
@@ -154,15 +154,15 @@ export default function Dashboard() {
             <div className="bg-white rounded-xl border border-gray-100 p-5">
               <div className="flex items-center gap-2 mb-1">
                 <Scale size={16} className="text-[#FF7043]" />
-                <span className="text-sm text-gray-500 font-medium">Categoría Monotributo</span>
+                <span className="text-base text-gray-500 font-medium">Categoría Monotributo</span>
               </div>
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl flex-shrink-0" style={{ backgroundColor: progresoColor }}>
                   {stats?.categoriaActual}
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-500">Límite: {catData ? formatARS(catData.fact) : '-'}</p>
-                  <p className="text-sm font-medium mt-0.5" style={{ color: progresoColor }}>
+                  <p className="text-base text-gray-500">Límite: {catData ? formatARS(catData.fact) : '-'}</p>
+                  <p className="text-base font-medium mt-0.5" style={{ color: progresoColor }}>
                     {progreso < 75 ? 'En regla ✓' : progreso < 90 ? '⚠️ Atención' : '🔴 Riesgo'}
                   </p>
                 </div>
@@ -170,10 +170,10 @@ export default function Dashboard() {
               <div className="w-full bg-gray-100 rounded-full h-2.5">
                 <div className="h-2.5 rounded-full transition-all" style={{ width: `${progreso}%`, backgroundColor: progresoColor }} />
               </div>
-              <p className="text-sm text-gray-400 mt-1">{progreso.toFixed(1)}% del límite</p>
+              <p className="text-base text-gray-400 mt-1">{progreso.toFixed(1)}% del límite</p>
               {progreso >= 90 && (
                 <div className="mt-2 bg-red-50 border border-red-200 rounded-lg p-2">
-                  <p className="text-sm text-red-600 font-medium">⚠️ Cerca del límite — considerá recategorizarte</p>
+                  <p className="text-base text-red-600 font-medium">⚠️ Cerca del límite — considerá recategorizarte</p>
                 </div>
               )}
             </div>
@@ -184,9 +184,9 @@ export default function Dashboard() {
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
               <div className="flex items-center gap-2">
                 <AlertCircle size={16} className="text-[#FF7043]" />
-                <h2 className="font-semibold text-[#2D4A6B]">Cheques pendientes</h2>
+                <h2 className="font-semibold text-[#2D4A6B] text-lg">Cheques pendientes</h2>
               </div>
-              <div className="flex gap-3 text-sm text-gray-500">
+              <div className="flex gap-3 text-base text-gray-500">
                 <span>{stats?.chequesPendientes.length || 0} cheques</span>
                 <span className="font-medium text-gray-700">
                   {formatARS((stats?.chequesPendientes || []).reduce((a, c) => a + c.importe, 0))}
@@ -197,7 +197,7 @@ export default function Dashboard() {
             {(!stats?.chequesPendientes || stats.chequesPendientes.length === 0) ? (
               <div className="flex items-center gap-2 px-5 py-6 text-gray-400">
                 <CheckCircle2 size={16} />
-                <span className="text-sm">Sin cheques pendientes</span>
+                <span className="text-base">Sin cheques pendientes</span>
               </div>
             ) : (
               <div className="divide-y divide-gray-50">
@@ -220,12 +220,12 @@ export default function Dashboard() {
                     <div key={c.id} className="flex items-center gap-3 px-5 py-3">
                       <span className="text-lg">{urgencia}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-700 truncate">{c.beneficiario}</p>
-                        <p className="text-sm text-gray-400">{c.banco} #{c.nro}</p>
+                        <p className="text-base font-medium text-gray-700 truncate">{c.beneficiario}</p>
+                        <p className="text-base text-gray-400">{c.banco} #{c.nro}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="text-sm font-bold text-gray-800">{formatARS(c.importe)}</p>
-                        <p className="text-sm font-medium" style={{ color: urgenciaColor }}>
+                        <p className="text-base font-bold text-gray-800">{formatARS(c.importe)}</p>
+                        <p className="text-base font-medium" style={{ color: urgenciaColor }}>
                           {venc ? venc.toLocaleDateString('es-AR') : '-'} · {urgenciaLabel}
                         </p>
                       </div>
