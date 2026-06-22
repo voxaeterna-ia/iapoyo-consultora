@@ -51,7 +51,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#2D4A6B] flex items-center justify-center px-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
-          <Image src="/logo.svg" alt="IApoyo Consultora" width={120} height={132} className="mb-1" />
+          <Image src="/logo.png" alt="IApoyo Consultora" width={120} height={132} className="mb-1" />
           <p className="text-xs text-gray-500 mt-1">Gestión Fiscal · Legal · Marketing</p>
         </div>
 

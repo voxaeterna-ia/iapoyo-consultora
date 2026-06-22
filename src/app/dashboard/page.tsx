@@ -121,7 +121,7 @@ export default function Dashboard() {
         <main className="flex-1 overflow-auto pb-24 md:pb-6">
           {/* Mobile header con logo */}
           <div className="md:hidden bg-gradient-to-r from-[#2D4A6B] to-[#3d6a9e] px-4 py-3 flex items-center gap-3 mb-4">
-            <Image src="/logo-white.svg" alt="IApoyo" width={44} height={48} className="flex-shrink-0" />
+            <Image src="/logo.png" alt="IApoyo" width={44} height={48} className="flex-shrink-0" />
             <div>
               <p className="text-white font-bold text-base leading-tight">IApoyo Consultora</p>
               <p className="text-blue-200 text-xs">Panel de Control</p>

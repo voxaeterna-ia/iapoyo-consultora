@@ -1215,7 +1215,7 @@ export default function IApoyoPage() {
         <main className="flex-1 flex flex-col overflow-auto min-w-0">
           {/* Header Banner */}
           <div className="bg-gradient-to-r from-[#2D4A6B] to-[#3d6a9e] px-4 py-3 flex items-center gap-3">
-            <Image src="/logo-white.svg" alt="IApoyo" width={44} height={48} className="flex-shrink-0" />
+            <Image src="/logo.png" alt="IApoyo" width={44} height={48} className="flex-shrink-0" />
             <div className="flex-1">
               <h1 className="text-white font-bold text-base leading-tight">IApoyo Consultora</h1>
               <p className="text-blue-200 text-xs">Seleccioná un módulo</p>
