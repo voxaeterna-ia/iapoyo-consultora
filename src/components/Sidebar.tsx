@@ -19,7 +19,6 @@ const nav = [
   { href: '/fiscal', label: 'Fiscal', icon: Scale },
   { href: '/iapoyo', label: 'IApoyo', icon: Bot },
   { href: '/acreditaciones', label: 'Banco', icon: Landmark },
-  { href: '/admin', label: 'Admin', icon: ShieldCheck },
 ]
 
 export default function Sidebar() {
