@@ -53,7 +53,7 @@ export default function Sidebar() {
       {/* Desktop sidebar */}
       <aside className="hidden md:flex flex-col w-60 min-h-screen bg-[#2D4A6B] text-white">
         <div className="flex flex-col items-center px-5 py-5 border-b border-white/10">
-          <Image src="/logo.svg" alt="IApoyo Consultora" width={90} height={99} className="brightness-0 invert mb-1" />
+          <Image src="/logo-white.svg" alt="IApoyo Consultora" width={90} height={99} className="mb-1" />
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1">

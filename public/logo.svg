@@ -1,41 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" fill="none">
-  <!-- Left hand -->
-  <path d="M30 140 C20 130 15 115 25 105 C35 95 50 100 55 115 L65 145" stroke="#4CAF50" stroke-width="3" fill="#4CAF50" opacity="0.85"
-    d="M28 155 C15 145 8 125 18 110 C28 95 48 100 55 118 L70 150 C65 158 50 165 38 160 Z"/>
-  <path d="M28 158 C14 147 7 126 18 110 C29 94 50 100 56 119 L72 152 C66 161 50 167 37 162 Z" fill="#4CAF50"/>
-  <!-- Right hand -->
-  <path d="M172 158 C186 147 193 126 182 110 C171 94 150 100 144 119 L128 152 C134 161 150 167 163 162 Z" fill="#4CAF50"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230" fill="none">
+  <!-- Left hand (green, curved upward) -->
+  <path d="M52 170 C35 158 22 138 30 118 C38 98 62 102 70 122 L85 158 C78 168 62 175 52 170Z" fill="#4CAF50"/>
+  <path d="M52 170 C40 162 30 148 32 132" stroke="#3d9640" stroke-width="1" fill="none"/>
 
-  <!-- Brain outline -->
-  <path d="M100 30 C78 30 62 44 60 60 C52 62 44 70 44 82 C44 90 48 96 54 100 C50 105 48 112 50 120 C52 132 62 140 74 140 L126 140 C138 140 148 132 150 120 C152 112 150 105 146 100 C152 96 156 90 156 82 C156 70 148 62 140 60 C138 44 122 30 100 30Z"
-    stroke="#2D4A6B" stroke-width="4" fill="white"/>
+  <!-- Right hand (green, curved upward) -->
+  <path d="M148 170 C165 158 178 138 170 118 C162 98 138 102 130 122 L115 158 C122 168 138 175 148 170Z" fill="#4CAF50"/>
+  <path d="M148 170 C160 162 170 148 168 132" stroke="#3d9640" stroke-width="1" fill="none"/>
 
-  <!-- Brain lobes detail -->
-  <path d="M100 32 C88 32 78 38 74 48" stroke="#2D4A6B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <path d="M100 32 C112 32 122 38 126 48" stroke="#2D4A6B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <path d="M60 75 C56 68 58 60 64 57" stroke="#2D4A6B" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <path d="M140 75 C144 68 142 60 136 57" stroke="#2D4A6B" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Brain shape - cloud-like outline, white fill, dark blue stroke -->
+  <path d="M100 28
+    C86 28 75 36 72 48
+    C64 48 56 55 55 64
+    C48 66 42 73 42 82
+    C42 90 47 97 54 100
+    C50 106 49 114 52 121
+    C55 130 63 136 72 136
+    L128 136
+    C137 136 145 130 148 121
+    C151 114 150 106 146 100
+    C153 97 158 90 158 82
+    C158 73 152 66 145 64
+    C144 55 136 48 128 48
+    C125 36 114 28 100 28Z"
+    fill="white" stroke="#2D4A6B" stroke-width="4" stroke-linejoin="round"/>
 
-  <!-- Circuit lines inside brain -->
-  <line x1="100" y1="58" x2="100" y2="120" stroke="#2D4A6B" stroke-width="2.5"/>
-  <line x1="100" y1="80" x2="76" y2="80" stroke="#2D4A6B" stroke-width="2.5"/>
-  <line x1="100" y1="80" x2="124" y2="80" stroke="#2D4A6B" stroke-width="2.5"/>
-  <line x1="100" y1="100" x2="80" y2="100" stroke="#2D4A6B" stroke-width="2.5"/>
-  <line x1="100" y1="100" x2="120" y2="100" stroke="#2D4A6B" stroke-width="2.5"/>
-  <line x1="80" y1="100" x2="72" y2="92" stroke="#2D4A6B" stroke-width="2.5"/>
-  <line x1="120" y1="100" x2="128" y2="92" stroke="#2D4A6B" stroke-width="2.5"/>
+  <!-- Brain center divider line -->
+  <path d="M100 38 C100 50 100 120 100 134" stroke="#2D4A6B" stroke-width="2" stroke-dasharray="3,3"/>
 
-  <!-- Circuit dots -->
-  <circle cx="76" cy="80" r="4" fill="#2D4A6B"/>
-  <circle cx="124" cy="80" r="4" fill="#2D4A6B"/>
-  <circle cx="80" cy="100" r="3.5" fill="#2D4A6B"/>
-  <circle cx="120" cy="100" r="3.5" fill="#2D4A6B"/>
-  <circle cx="72" cy="92" r="3.5" fill="#2D4A6B"/>
-  <circle cx="128" cy="92" r="3.5" fill="#2D4A6B"/>
-  <circle cx="100" cy="58" r="3.5" fill="#2D4A6B"/>
+  <!-- Circuit hub center -->
+  <circle cx="100" cy="82" r="5" fill="#2D4A6B"/>
+
+  <!-- Circuit lines from center -->
+  <line x1="100" y1="82" x2="70" y2="82" stroke="#2D4A6B" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="100" y1="82" x2="130" y2="82" stroke="#2D4A6B" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="100" y1="82" x2="100" y2="55" stroke="#2D4A6B" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="100" y1="82" x2="100" y2="110" stroke="#2D4A6B" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="100" y1="82" x2="76" y2="60" stroke="#2D4A6B" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="100" y1="82" x2="124" y2="60" stroke="#2D4A6B" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Circuit endpoint dots -->
+  <circle cx="70" cy="82" r="4.5" fill="#2D4A6B"/>
+  <circle cx="130" cy="82" r="4.5" fill="#2D4A6B"/>
+  <circle cx="100" cy="55" r="4.5" fill="#2D4A6B"/>
+  <circle cx="76" cy="60" r="4" fill="#2D4A6B"/>
+  <circle cx="124" cy="60" r="4" fill="#2D4A6B"/>
 
   <!-- Text: IApoyo -->
-  <text x="100" y="178" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#2D4A6B" text-anchor="middle" letter-spacing="-0.5">IApoyo</text>
+  <text x="100" y="188" font-family="Arial Black, Arial, sans-serif" font-size="32" font-weight="900" fill="#2D4A6B" text-anchor="middle">IApoyo</text>
   <!-- Text: Consultora -->
-  <text x="100" y="205" font-family="Arial, sans-serif" font-size="18" fill="#3d5a6b" text-anchor="middle">Consultora</text>
+  <text x="100" y="215" font-family="Arial, sans-serif" font-size="19" font-weight="500" fill="#3d5a6b" text-anchor="middle">Consultora</text>
 </svg>

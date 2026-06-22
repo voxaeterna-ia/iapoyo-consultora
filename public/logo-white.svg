@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230" fill="none">
+  <!-- Left hand -->
+  <path d="M52 170 C35 158 22 138 30 118 C38 98 62 102 70 122 L85 158 C78 168 62 175 52 170Z" fill="#4CAF50"/>
+  <!-- Right hand -->
+  <path d="M148 170 C165 158 178 138 170 118 C162 98 138 102 130 122 L115 158 C122 168 138 175 148 170Z" fill="#4CAF50"/>
+
+  <!-- Brain shape - white outline on dark -->
+  <path d="M100 28 C86 28 75 36 72 48 C64 48 56 55 55 64 C48 66 42 73 42 82 C42 90 47 97 54 100 C50 106 49 114 52 121 C55 130 63 136 72 136 L128 136 C137 136 145 130 148 121 C151 114 150 106 146 100 C153 97 158 90 158 82 C158 73 152 66 145 64 C144 55 136 48 128 48 C125 36 114 28 100 28Z"
+    fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Circuit hub -->
+  <circle cx="100" cy="82" r="5" fill="white"/>
+  <line x1="100" y1="82" x2="70" y2="82" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="100" y1="82" x2="130" y2="82" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="100" y1="82" x2="100" y2="55" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="100" y1="82" x2="100" y2="110" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="100" y1="82" x2="76" y2="60" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="100" y1="82" x2="124" y2="60" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="70" cy="82" r="4.5" fill="white"/>
+  <circle cx="130" cy="82" r="4.5" fill="white"/>
+  <circle cx="100" cy="55" r="4.5" fill="white"/>
+  <circle cx="76" cy="60" r="4" fill="white"/>
+  <circle cx="124" cy="60" r="4" fill="white"/>
+
+  <!-- Text -->
+  <text x="100" y="188" font-family="Arial Black, Arial, sans-serif" font-size="32" font-weight="900" fill="white" text-anchor="middle">IApoyo</text>
+  <text x="100" y="215" font-family="Arial, sans-serif" font-size="19" font-weight="500" fill="rgba(255,255,255,0.7)" text-anchor="middle">Consultora</text>
+</svg>
