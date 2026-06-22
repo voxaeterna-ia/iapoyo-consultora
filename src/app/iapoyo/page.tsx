@@ -25,9 +25,9 @@ function dv(p: number): number {
 // ─── Panel pNombre (Marcas) ───────────────────────────────────────────────────
 function PanelNombre({ onClose }: { onClose: () => void }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-base">™️ Protección de Marca Comercial</h3>
+        <h3 className="font-semibold text-[#2D4A6B] text-lg">™️ Protección de Marca Comercial</h3>
         <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
       <div className="space-y-3">
@@ -163,7 +163,7 @@ function PanelInden({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-[#2D4A6B] text-lg">Calculadora Indemnización</h3>
         <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
@@ -286,7 +286,7 @@ function PanelCosto({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-[#2D4A6B] text-lg">Costo Laboral Completo</h3>
         <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
@@ -385,7 +385,7 @@ function PanelAlquiler({ onClose }: { onClose: () => void }) {
   const last24 = histData.slice(-24)
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-[#2D4A6B] text-lg">Actualización de Alquiler</h3>
         <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
@@ -511,7 +511,7 @@ function PanelPatente({ onClose }: { onClose: () => void }) {
   ]
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-[#2D4A6B] text-lg">🚗 Multas & Fotomultas</h3>
         <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
@@ -548,7 +548,7 @@ const MKT_SERVICIOS = [
 
 function PanelMkt({ onClose }: { onClose: () => void }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 w-full overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-[#2D4A6B] text-lg">📱 Servicios de Marketing</h3>
         <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
@@ -743,7 +743,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
   const puedeAgregarGasto = !!montoGasto && (!catActiva?.subs.length || !!subActiva)
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-5 mt-3 space-y-4 w-full overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mt-3 space-y-4 w-full overflow-hidden">
       <div className="flex justify-between items-center">
         <h3 className="font-semibold text-[#2D4A6B] text-lg">💰 Mi Plata</h3>
         <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
@@ -789,7 +789,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                     {[['80','medio turno'],['120','6h × día'],['160','full time'],['200','+ extras']].map(([h, sub]) => (
                       <button key={h} onClick={() => setHoras(h)}
                         className={`py-2 rounded-lg text-base border transition-colors ${horas === h ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300' : 'border-white/20 text-gray-400 hover:border-white/40'}`}>
-                        <span className="font-bold">{h} h</span><br /><span className="text-sm">{sub}</span>
+                        <span className="font-bold">{h} h</span><br /><span className="text-base">{sub}</span>
                       </button>
                     ))}
                   </div>
@@ -804,24 +804,24 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                 <p className="text-base text-gray-400">Cargá cada ingreso con las horas que dedicaste</p>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">Monto ($)</p>
+                    <p className="text-base text-gray-500 mb-1">Monto ($)</p>
                     <input type="number" value={montoIng} onChange={e => setMontoIng(e.target.value)} placeholder="Ej: 80000"
                       className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-base text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">Horas afectadas</p>
+                    <p className="text-base text-gray-500 mb-1">Horas afectadas</p>
                     <input type="number" value={horasIng} onChange={e => setHorasIng(e.target.value)} placeholder="Ej: 4"
                       className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-base text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">Fecha</p>
+                    <p className="text-base text-gray-500 mb-1">Fecha</p>
                     <input type="date" value={fechaIng} onChange={e => setFechaIng(e.target.value)}
                       className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-base text-white focus:outline-none focus:border-yellow-400" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">Descripción</p>
+                    <p className="text-base text-gray-500 mb-1">Descripción</p>
                     <input type="text" value={descIng} onChange={e => setDescIng(e.target.value)} placeholder="Servicio..."
                       className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-base text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400" />
                   </div>
@@ -836,15 +836,15 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                       <div key={i.id} className="flex justify-between items-center bg-white/5 rounded-lg px-3 py-1.5">
                         <div>
                           <p className="text-base text-white">{i.desc || 'Servicio'} <span className="text-gray-400">· {i.fecha}</span></p>
-                          <p className="text-sm text-gray-400">{formatARS(i.monto)} · {formatHoras(i.horas)} afectadas → {formatARS(i.horas > 0 ? Math.round(i.monto / i.horas) : 0)}/h</p>
+                          <p className="text-base text-gray-400">{formatARS(i.monto)} · {formatHoras(i.horas)} afectadas → {formatARS(i.horas > 0 ? Math.round(i.monto / i.horas) : 0)}/h</p>
                         </div>
                         <button onClick={() => setIngresosDiarios(prev => prev.filter(x => x.id !== i.id))} className="text-gray-500 hover:text-red-400 text-lg ml-2">×</button>
                       </div>
                     ))}
                     <div className="grid grid-cols-3 gap-1 px-3 py-2 border-t border-white/10 text-center">
-                      <div><p className="text-sm text-gray-400">Total ingresos</p><p className="text-base font-bold text-yellow-300">{formatARS(totalIngDiarios)}</p></div>
-                      <div><p className="text-sm text-gray-400">Horas totales</p><p className="text-base font-bold text-yellow-300">{formatHoras(totalHorasInd)}</p></div>
-                      <div><p className="text-sm text-gray-400">Valor/hora</p><p className="text-base font-bold text-yellow-300">{totalHorasInd > 0 ? formatARS(Math.round(totalIngDiarios / totalHorasInd)) : '—'}</p></div>
+                      <div><p className="text-base text-gray-400">Total ingresos</p><p className="text-base font-bold text-yellow-300">{formatARS(totalIngDiarios)}</p></div>
+                      <div><p className="text-base text-gray-400">Horas totales</p><p className="text-base font-bold text-yellow-300">{formatHoras(totalHorasInd)}</p></div>
+                      <div><p className="text-base text-gray-400">Valor/hora</p><p className="text-base font-bold text-yellow-300">{totalHorasInd > 0 ? formatARS(Math.round(totalIngDiarios / totalHorasInd)) : '—'}</p></div>
                     </div>
                   </div>
                 )}
@@ -883,7 +883,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
                 <div className="flex items-center gap-3">
                   <div className="text-right">
                     <p className="text-base font-bold text-red-500">{formatHoras(g.monto / valorHora)}</p>
-                    <p className="text-sm text-gray-400">{g.monto / valorHora < 24 ? 'menos de un día' : `${(g.monto / valorHora / 24).toFixed(1)} días`}</p>
+                    <p className="text-base text-gray-400">{g.monto / valorHora < 24 ? 'menos de un día' : `${(g.monto / valorHora / 24).toFixed(1)} días`}</p>
                   </div>
                   <button onClick={() => setGastos(prev => prev.filter(x => x.id !== g.id))} className="text-gray-300 hover:text-red-400 text-lg leading-none">×</button>
                 </div>
@@ -912,7 +912,7 @@ function PanelMiPlata({ onClose }: { onClose: () => void }) {
               <div className="flex items-center gap-2">
                 <span className="text-2xl">{catActiva.emoji}</span>
                 <p className="font-medium text-gray-800">{catActiva.label}</p>
-                <button onClick={() => setCatActiva(null)} className="ml-auto text-sm text-gray-400 hover:text-gray-600">✕ cancelar</button>
+                <button onClick={() => setCatActiva(null)} className="ml-auto text-base text-gray-400 hover:text-gray-600">✕ cancelar</button>
               </div>
 
               {/* Subcategorías */}
@@ -1055,7 +1055,7 @@ function InformePlata({ tipoIngreso, ingresoTotal, horasTotal, valorHora, ingres
                   <div key={i.id} className="flex justify-between items-center bg-green-50 rounded-lg px-3 py-1.5">
                     <div>
                       <p className="text-gray-700 text-base">{i.desc || 'Servicio'}</p>
-                      <p className="text-sm text-gray-400">{i.fecha} · {formatHoras(i.horas)}</p>
+                      <p className="text-base text-gray-400">{i.fecha} · {formatHoras(i.horas)}</p>
                     </div>
                     <span className="font-bold text-green-700 text-base">{formatARS(i.monto)}</span>
                   </div>
@@ -1066,7 +1066,7 @@ function InformePlata({ tipoIngreso, ingresoTotal, horasTotal, valorHora, ingres
                 </div>
               </div>
             )}
-            <div className="flex justify-between px-3 py-1 mt-1 text-sm text-gray-500">
+            <div className="flex justify-between px-3 py-1 mt-1 text-base text-gray-500">
               <span>Horas trabajadas</span>
               <span>{formatHoras(horasTotal)} · {formatARS(valorHora)}/h</span>
             </div>
@@ -1098,7 +1098,7 @@ function InformePlata({ tipoIngreso, ingresoTotal, horasTotal, valorHora, ingres
                       <span className="text-base">{g.emoji}</span>
                       <div>
                         <p className="text-base text-gray-700">{g.cat}{g.desc ? ` · ${g.desc}` : ''}</p>
-                        <p className="text-sm text-gray-400">{g.fecha}</p>
+                        <p className="text-base text-gray-400">{g.fecha}</p>
                       </div>
                     </div>
                     <span className="text-base font-semibold text-gray-700">{formatARS(g.monto)}</span>
@@ -1125,7 +1125,7 @@ function InformePlata({ tipoIngreso, ingresoTotal, horasTotal, valorHora, ingres
               </span>
             </div>
             {ingresoTotal > 0 && totalGastos > 0 && (
-              <p className="text-sm text-white/50 text-center pt-1">
+              <p className="text-base text-white/50 text-center pt-1">
                 Gastaste el {Math.round((totalGastos / ingresoTotal) * 100)}% de tus ingresos
               </p>
             )}
@@ -1226,12 +1226,12 @@ export default function IApoyoPage() {
           <div className="flex-1 flex flex-col p-3 md:p-6 pb-24 md:pb-6">
             {/* Module Grid */}
             {!modulo && (
-              <div className="grid grid-cols-3 md:grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 md:grid-cols-3 gap-3">
                 {MODULOS_GRID.map(m => (
                   <button key={m.id} onClick={() => selectModulo(m.id)}
-                    className="bg-white border-2 border-gray-200 rounded-xl p-3 text-left hover:border-[#4CAF50] hover:shadow-sm transition-all flex flex-col items-center text-center gap-1">
+                    className="bg-white border-2 border-gray-200 rounded-xl p-4 text-left hover:border-[#4CAF50] hover:shadow-sm transition-all flex flex-col items-center text-center gap-1">
                     <span className="text-3xl">{m.emoji}</span>
-                    <span className="text-sm font-semibold text-[#2D4A6B] leading-tight">{m.label}</span>
+                    <span className="text-base font-semibold text-[#2D4A6B] leading-tight">{m.label}</span>
                   </button>
                 ))}
               </div>
@@ -1241,18 +1241,18 @@ export default function IApoyoPage() {
             {modulo && eco && (
               <div className="space-y-2 flex-1 flex flex-col">
                 {/* Back + title */}
-                <div className="flex items-center gap-2 bg-white rounded-xl border border-gray-200 px-3 py-2">
+                <div className="flex items-center gap-2 bg-white rounded-xl border border-gray-200 px-4 py-3">
                   <button onClick={goBack} className="text-[#2D4A6B] hover:text-[#1e3350]">
                     <ArrowLeft size={18} />
                   </button>
-                  <span className="font-semibold text-[#2D4A6B] text-sm">{MODULOS_GRID.find(m => m.id === modulo)?.emoji} {eco.titulo}</span>
+                  <span className="font-semibold text-[#2D4A6B] text-base">{MODULOS_GRID.find(m => m.id === modulo)?.emoji} {eco.titulo}</span>
                 </div>
 
                 {/* Quick question buttons */}
                 <div className="flex flex-wrap gap-1.5">
                   {eco.btns.map((btn, i) => (
                     <button key={i} onClick={() => handleEcoBtn(btn)}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                      className={`px-3 py-2.5 rounded-lg text-base font-medium border transition-colors ${
                         btn.action === 'panel' && openPanels.has(btn.panelId!)
                           ? 'border-[#FF7043] bg-orange-50 text-[#FF7043]'
                           : 'border-gray-200 bg-white text-gray-700 hover:border-[#2D4A6B] hover:text-[#2D4A6B]'
@@ -1307,7 +1307,7 @@ export default function IApoyoPage() {
                     <input value={chatInput} onChange={e => setChatInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendChat()}
                       placeholder="Escribí tu consulta..."
-                      className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+                      className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
                     <button onClick={() => sendChat()} disabled={chatLoading || !chatInput.trim()}
                       className="bg-[#2D4A6B] text-white px-3 py-2 rounded-xl hover:bg-[#1e3350] disabled:opacity-40">
                       <Send size={14} />

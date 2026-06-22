@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import {
@@ -51,12 +52,8 @@ export default function Sidebar() {
 
       {/* Desktop sidebar */}
       <aside className="hidden md:flex flex-col w-60 min-h-screen bg-[#2D4A6B] text-white">
-        <div className="flex items-center gap-3 px-5 py-6 border-b border-white/10">
-          <BrainLogo size={36} />
-          <div>
-            <div className="font-bold text-sm leading-tight">IApoyo</div>
-            <div className="text-[10px] text-white/60 leading-tight">Gestión Fiscal · Legal · Marketing</div>
-          </div>
+        <div className="flex flex-col items-center px-5 py-5 border-b border-white/10">
+          <Image src="/logo.svg" alt="IApoyo Consultora" width={90} height={99} className="brightness-0 invert mb-1" />
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1">
@@ -82,18 +79,3 @@ export default function Sidebar() {
   )
 }
 
-function BrainLogo({ size = 32 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
-      <circle cx="20" cy="20" r="18" fill="#4CAF50" opacity="0.2" />
-      <circle cx="20" cy="20" r="14" fill="#4CAF50" opacity="0.3" />
-      <path d="M14 16 C14 12 18 10 20 10 C22 10 26 12 26 16 C28 16 30 18 30 20 C30 23 28 25 26 25 L14 25 C12 25 10 23 10 20 C10 18 12 16 14 16Z" fill="#4CAF50" />
-      <line x1="20" y1="25" x2="20" y2="30" stroke="#FF7043" strokeWidth="1.5" />
-      <line x1="15" y1="28" x2="25" y2="28" stroke="#FF7043" strokeWidth="1.5" />
-      <circle cx="15" cy="28" r="1.5" fill="#FF7043" />
-      <circle cx="25" cy="28" r="1.5" fill="#FF7043" />
-      <line x1="16" y1="18" x2="24" y2="18" stroke="white" strokeWidth="1" opacity="0.7" />
-      <line x1="17" y1="21" x2="23" y2="21" stroke="white" strokeWidth="1" opacity="0.7" />
-    </svg>
-  )
-}
