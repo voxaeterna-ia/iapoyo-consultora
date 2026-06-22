@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import Sidebar from '@/components/Sidebar'
 import AuthGuard from '@/components/AuthGuard'
-import Link from 'next/link'
-import { Building2, Scale, Bot, Landmark, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { TrendingUp, AlertCircle, CheckCircle2, Share2, Gift, Landmark, Scale } from 'lucide-react'
 import { formatARS, MESES, MONOTRIBUTO_CATEGORIAS } from '@/types'
 import { Cheque } from '@/types'
 
@@ -236,24 +235,55 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Links rápidos */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { href: '/negocio', label: 'Mi Negocio', icon: Building2, color: '#2D4A6B' },
-              { href: '/fiscal', label: 'Categoría Fiscal', icon: Scale, color: '#4CAF50' },
-              { href: '/iapoyo', label: 'IApoyo IA', icon: Bot, color: '#FF7043' },
-              { href: '/acreditaciones', label: 'Acreditaciones', icon: Landmark, color: '#2D4A6B' },
-            ].map(({ href, label, icon: Icon, color }) => (
-              <Link key={href} href={href} className="bg-white rounded-xl p-4 border border-gray-100 hover:shadow-md transition-shadow flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: color + '20' }}>
-                  <Icon size={16} style={{ color }} />
-                </div>
-                <span className="font-medium text-gray-700 text-base">{label}</span>
-              </Link>
-            ))}
-          </div>
+          {/* Invitar amigos */}
+          <InvitarAmigos />
         </main>
       </div>
     </AuthGuard>
+  )
+}
+
+function InvitarAmigos() {
+  const [copiado, setCopiado] = useState(false)
+  const link = 'https://iapoyo-consultora.vercel.app'
+
+  function compartir() {
+    if (navigator.share) {
+      navigator.share({ title: 'IApoyo Consultora', text: '¡Te invito a usar IApoyo, la app de gestión fiscal y legal para monotributistas!', url: link })
+    } else {
+      navigator.clipboard.writeText(link)
+      setCopiado(true)
+      setTimeout(() => setCopiado(false), 2500)
+    }
+  }
+
+  return (
+    <div className="bg-gradient-to-r from-[#2D4A6B] to-[#3d6a9e] rounded-xl p-5 text-white">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0">
+          <Gift size={20} className="text-yellow-300" />
+        </div>
+        <div>
+          <p className="font-bold text-base">1 mes gratis por invitar amigos</p>
+          <p className="text-blue-200 text-sm">Invitá 3 amigos y obtenés 1 mes sin costo</p>
+        </div>
+      </div>
+
+      <div className="flex gap-1.5 mb-4">
+        {[1, 2, 3].map(n => (
+          <div key={n} className="flex-1 bg-white/10 rounded-lg py-2 text-center">
+            <span className="text-lg">👤</span>
+            <p className="text-xs text-blue-200 mt-0.5">Amigo {n}</p>
+          </div>
+        ))}
+      </div>
+
+      <button onClick={compartir}
+        className="w-full flex items-center justify-center gap-2 bg-[#4CAF50] hover:bg-[#43a047] text-white font-semibold py-3 rounded-xl transition-colors text-base">
+        <Share2 size={18} />
+        {copiado ? '¡Link copiado!' : 'Compartir IApoyo'}
+      </button>
+      <p className="text-center text-xs text-blue-200 mt-2">{link}</p>
+    </div>
   )
 }
