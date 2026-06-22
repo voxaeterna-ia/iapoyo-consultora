@@ -9,7 +9,6 @@ import {
   Scale,
   Bot,
   Landmark,
-  ShieldCheck,
   LogOut,
 } from 'lucide-react'
 
