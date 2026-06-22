@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import Sidebar from '@/components/Sidebar'
 import AuthGuard from '@/components/AuthGuard'
 import { ChatMessage, formatARS } from '@/types'
@@ -1214,11 +1215,9 @@ export default function IApoyoPage() {
         <main className="flex-1 flex flex-col overflow-auto min-w-0">
           {/* Header Banner */}
           <div className="bg-gradient-to-r from-[#2D4A6B] to-[#3d6a9e] px-4 py-3 flex items-center gap-3">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-base">🤖</span>
-            </div>
+            <Image src="/logo-white.svg" alt="IApoyo" width={44} height={48} className="flex-shrink-0" />
             <div className="flex-1">
-              <h1 className="text-white font-bold text-base leading-tight">IApoyo</h1>
+              <h1 className="text-white font-bold text-base leading-tight">IApoyo Consultora</h1>
               <p className="text-blue-200 text-xs">Seleccioná un módulo</p>
             </div>
           </div>

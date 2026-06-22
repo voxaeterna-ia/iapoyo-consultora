@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import Sidebar from '@/components/Sidebar'
 import AuthGuard from '@/components/AuthGuard'
@@ -117,7 +118,16 @@ export default function Dashboard() {
     <AuthGuard>
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
-        <main className="flex-1 p-4 md:p-6 overflow-auto pb-24 md:pb-6">
+        <main className="flex-1 overflow-auto pb-24 md:pb-6">
+          {/* Mobile header con logo */}
+          <div className="md:hidden bg-gradient-to-r from-[#2D4A6B] to-[#3d6a9e] px-4 py-3 flex items-center gap-3 mb-4">
+            <Image src="/logo-white.svg" alt="IApoyo" width={44} height={48} className="flex-shrink-0" />
+            <div>
+              <p className="text-white font-bold text-base leading-tight">IApoyo Consultora</p>
+              <p className="text-blue-200 text-xs">Panel de Control</p>
+            </div>
+          </div>
+          <div className="p-4 md:p-6">
           <h1 className="text-3xl font-bold text-[#2D4A6B] mb-1">Panel de Control</h1>
           <p className="text-gray-500 text-base mb-6">Acumulado al {MESES[(stats?.mesCierre ?? 1) - 1]} {stats?.anioCierre} · Actualizado al {now.toLocaleDateString('es-AR')}</p>
 
@@ -237,6 +247,7 @@ export default function Dashboard() {
 
           {/* Invitar amigos */}
           <InvitarAmigos />
+          </div>
         </main>
       </div>
     </AuthGuard>
