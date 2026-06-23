@@ -28,7 +28,7 @@ function PanelNombre({ onClose }: { onClose: () => void }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mt-3 w-full overflow-hidden">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-[#2D4A6B] text-lg">™️ Protección de Marca Comercial</h3>
+        <h3 className="font-semibold text-[#2D4A6B] text-lg flex items-center gap-1"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/RegisteredTM.svg" alt="®" className="w-5 h-5" /> Protección de Marca Comercial</h3>
         <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
       <div className="space-y-3">
@@ -644,7 +644,7 @@ const ECOSISTEMAS: Record<ModuleId, { titulo: string; btns: EcoBtn[] }> = {
 
 const MODULOS_GRID = [
   { id: 'fiscal' as ModuleId, label: 'Fiscal', emoji: '📊' },
-  { id: 'marcas' as ModuleId, label: 'Marcas', emoji: '™️' },
+  { id: 'marcas' as ModuleId, label: 'Marcas', emoji: '®' },
   { id: 'inden' as ModuleId, label: 'Indemnización', emoji: '⚖️' },
   { id: 'costos' as ModuleId, label: 'Alquileres & Costos', emoji: '🏠' },
   { id: 'autos' as ModuleId, label: 'Vehículos & Fotomultas', emoji: '🚗' },
@@ -1229,7 +1229,11 @@ export default function IApoyoPage() {
                 {MODULOS_GRID.map(m => (
                   <button key={m.id} onClick={() => selectModulo(m.id)}
                     className="bg-white border-2 border-gray-200 rounded-xl p-4 text-left hover:border-[#4CAF50] hover:shadow-sm transition-all flex flex-col items-center text-center gap-1">
-                    <span className="text-3xl">{m.emoji}</span>
+                    {m.id === 'marcas' ? (
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/RegisteredTM.svg" alt="®" className="w-8 h-8" />
+                    ) : (
+                      <span className="text-3xl">{m.emoji}</span>
+                    )}
                     <span className="text-base font-semibold text-[#2D4A6B] leading-tight">{m.label}</span>
                   </button>
                 ))}
@@ -1244,7 +1248,13 @@ export default function IApoyoPage() {
                   <button onClick={goBack} className="text-[#2D4A6B] hover:text-[#1e3350]">
                     <ArrowLeft size={18} />
                   </button>
-                  <span className="font-semibold text-[#2D4A6B] text-base">{MODULOS_GRID.find(m => m.id === modulo)?.emoji} {eco.titulo}</span>
+                  {modulo === 'marcas' ? (
+                    <span className="font-semibold text-[#2D4A6B] text-base flex items-center gap-1">
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/RegisteredTM.svg" alt="®" className="w-4 h-4" /> {eco.titulo}
+                    </span>
+                  ) : (
+                    <span className="font-semibold text-[#2D4A6B] text-base">{MODULOS_GRID.find(m => m.id === modulo)?.emoji} {eco.titulo}</span>
+                  )}
                 </div>
 
                 {/* Quick question buttons */}
