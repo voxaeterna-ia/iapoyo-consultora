@@ -34,13 +34,18 @@ export default function LoginPage() {
         setError(error.message)
         setLoading(false)
       } else {
-        // Try to sign in immediately (works when email confirmation is disabled)
-        const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
+        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({ email, password })
         if (loginError) {
-          // Confirmation required
           setRegistered(true)
           setLoading(false)
         } else {
+          if (loginData.session) {
+            try {
+              await fetch('/api/subscription/status', {
+                headers: { Authorization: `Bearer ${loginData.session.access_token}` },
+              })
+            } catch {}
+          }
           router.push('/dashboard')
         }
       }
@@ -67,7 +72,6 @@ export default function LoginPage() {
           </div>
         ) : (
           <>
-            {/* Tabs */}
             <div className="flex mb-6 border border-gray-200 rounded-lg overflow-hidden">
               <button onClick={() => { setModo('login'); setError('') }}
                 className={`flex-1 py-2 text-sm font-medium transition-colors ${modo === 'login' ? 'bg-[#2D4A6B] text-white' : 'text-gray-500 hover:bg-gray-50'}`}>
