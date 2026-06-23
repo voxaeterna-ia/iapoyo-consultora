@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
 interface UserSub {
@@ -25,20 +24,19 @@ export default function AdminPage() {
   const [adminEmail, setAdminEmail] = useState('')
   const [msg, setMsg] = useState('')
 
-  async function loadUsers() {
+  async function loadUsers(key: string) {
     setLoading(true)
-    const supabase = createClient()
-    const { data } = await supabase.from('subscriptions').select('*').order('created_at', { ascending: false })
-    setUsers(data || [])
+    const res = await fetch('/api/admin/users', {
+      headers: { 'x-admin-key': key },
+    })
+    if (res.ok) setUsers(await res.json())
     setLoading(false)
   }
 
   function handleAuth() {
-    if (adminKey === (process.env.NEXT_PUBLIC_ADMIN_KEY || 'iapoyo2025')) {
+    if (adminKey.trim()) {
       setAuthenticated(true)
-      loadUsers()
-    } else {
-      alert('Clave incorrecta')
+      loadUsers(adminKey)
     }
   }
 
@@ -50,7 +48,7 @@ export default function AdminPage() {
       headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
       body: JSON.stringify({ target_user_id: userId, extra_days: days, admin_email: adminEmail }),
     })
-    if (res.ok) { setMsg('Días otorgados'); loadUsers() }
+    if (res.ok) { setMsg('Días otorgados'); loadUsers(adminKey) }
     else setMsg('Error')
   }
 
@@ -62,12 +60,12 @@ export default function AdminPage() {
       headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
       body: JSON.stringify({ target_user_id: userId, status, admin_email: adminEmail }),
     })
-    if (res.ok) { setMsg('Estado actualizado'); loadUsers() }
+    if (res.ok) { setMsg('Estado actualizado'); loadUsers(adminKey) }
     else setMsg('Error')
   }
 
   const filtered = users.filter(u =>
-    u.user_id.includes(search) || u.email?.includes(search) || u.status.includes(search)
+    u.user_id.includes(search) || (u.email || '').includes(search) || u.status.includes(search)
   )
 
   const stats = {
@@ -84,6 +82,7 @@ export default function AdminPage() {
           <h1 className="text-xl font-bold text-[#2D4A6B] mb-6 text-center">Panel Admin</h1>
           <input type="password" placeholder="Clave de administrador" value={adminKey}
             onChange={e => setAdminKey(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleAuth()}
             className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
           <button onClick={handleAuth}
             className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg font-medium text-sm hover:bg-[#1e3350]">
@@ -120,6 +119,7 @@ export default function AdminPage() {
           <input placeholder="Tu email (admin)" value={adminEmail}
             onChange={e => setAdminEmail(e.target.value)}
             className="w-56 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          <button onClick={() => loadUsers(adminKey)} className="bg-gray-100 px-3 py-2 rounded-lg text-sm hover:bg-gray-200">↺</button>
         </div>
 
         {loading ? <div className="text-center py-8 text-gray-400">Cargando...</div> : (
@@ -128,8 +128,8 @@ export default function AdminPage() {
               <div key={u.user_id} className="bg-white rounded-xl shadow-sm p-4">
                 <div className="flex items-start justify-between flex-wrap gap-3">
                   <div>
-                    <div className="text-xs text-gray-400 font-mono">{u.user_id}</div>
-                    <div className="text-sm font-medium text-gray-700">{u.email || '—'}</div>
+                    <div className="text-sm font-semibold text-gray-800">{u.email || '—'}</div>
+                    <div className="text-xs text-gray-400 font-mono mt-0.5">{u.user_id}</div>
                     <div className="flex items-center gap-2 mt-1">
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                         u.status === 'active' ? 'bg-green-100 text-green-700' :
