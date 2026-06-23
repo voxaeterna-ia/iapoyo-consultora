@@ -3,16 +3,33 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
+import SubscriptionWall from '@/components/SubscriptionWall'
+import TrialBanner from '@/components/TrialBanner'
+
+interface Subscription {
+  status: string
+  trial_end: string
+}
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const [checking, setChecking] = useState(true)
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) router.push('/login')
-      else setChecking(false)
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) {
+        router.push('/login')
+        return
+      }
+      try {
+        const res = await fetch('/api/subscription/status', {
+          headers: { Authorization: `Bearer ${data.session.access_token}` },
+        })
+        if (res.ok) setSubscription(await res.json())
+      } catch {}
+      setChecking(false)
     })
   }, [router])
 
@@ -24,5 +41,14 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     )
   }
 
-  return <>{children}</>
+  if (subscription && ['expired', 'past_due'].includes(subscription.status)) {
+    return <SubscriptionWall />
+  }
+
+  return (
+    <>
+      <TrialBanner />
+      {children}
+    </>
+  )
 }
