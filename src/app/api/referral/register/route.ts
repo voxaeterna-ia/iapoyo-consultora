@@ -18,10 +18,11 @@ export async function POST(req: NextRequest) {
   if (!referrer_id || referrer_id === user.id) return NextResponse.json({ ok: true })
 
   // Registrar referido
-  await supabase.from('referrals').insert({
+  const { error: insertError } = await supabase.from('referrals').insert({
     referrer_id,
     referred_id: user.id,
-  }).onConflict('referred_id').ignore()
+  })
+  if (insertError) return NextResponse.json({ ok: true })
 
   // Contar referidos del referente
   const { data: referrals } = await supabase
