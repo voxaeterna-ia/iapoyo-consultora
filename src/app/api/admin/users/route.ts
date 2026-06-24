@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   const { data: { users } } = await supabase.auth.admin.listUsers()
 
   const emailMap: Record<string, string> = {}
-  users?.forEach((u: any) => { emailMap[u.id] = u.email })
+  users?.forEach((u: { id: string; email: string }) => { emailMap[u.id] = u.email })
 
   const result = subs.map(s => ({ ...s, email: emailMap[s.user_id] || '—' }))
 
