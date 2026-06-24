@@ -255,23 +255,41 @@ export default function Dashboard() {
 }
 
 function InvitarAmigos() {
+  const [link, setLink] = useState('')
+  const [count, setCount] = useState(0)
+  const [nextAt, setNextAt] = useState(3)
   const [copiado, setCopiado] = useState(false)
-  const link = 'https://iapoyo-consultora.vercel.app'
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return
+      const res = await fetch('/api/referral', {
+        headers: { Authorization: `Bearer ${data.session.access_token}` },
+      })
+      if (res.ok) {
+        const d = await res.json()
+        setLink(d.referral_link)
+        setCount(d.count)
+        setNextAt(d.next_bonus_at)
+      }
+    })
+  }, [])
 
   function compartir() {
     if (navigator.share) {
-      navigator.share({ title: 'IApoyo Consultora', text: '¡Te invito a usar IApoyo, la app de gestión fiscal y legal para monotributistas!', url: link })
+      navigator.share({ title: 'IApoyo', text: '¡Probá IApoyo gratis!', url: link })
     } else {
       navigator.clipboard.writeText(link)
       setCopiado(true)
-      setTimeout(() => setCopiado(false), 2500)
+      setTimeout(() => setCopiado(false), 2000)
     }
   }
 
   return (
-    <div className="bg-gradient-to-r from-[#2D4A6B] to-[#3d6a9e] rounded-xl p-5 text-white">
+    <div className="mx-4 mb-6 bg-[#2D4A6B] rounded-2xl p-4 text-white">
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0">
+        <div className="bg-white/10 rounded-xl p-2">
           <Gift size={20} className="text-yellow-300" />
         </div>
         <div>
@@ -282,19 +300,25 @@ function InvitarAmigos() {
 
       <div className="flex gap-1.5 mb-4">
         {[1, 2, 3].map(n => (
-          <div key={n} className="flex-1 bg-white/10 rounded-lg py-2 text-center">
-            <span className="text-lg">👤</span>
+          <div key={n} className={`flex-1 rounded-lg py-2 text-center ${n <= count % 3 || (count > 0 && count % 3 === 0) ? 'bg-green-500' : 'bg-white/10'}`}>
+            <span className="text-lg">{n <= count % 3 || (count > 0 && count % 3 === 0 && count >= n) ? '✓' : '👤'}</span>
             <p className="text-xs text-blue-200 mt-0.5">Amigo {n}</p>
           </div>
         ))}
       </div>
 
+      {count > 0 && (
+        <p className="text-xs text-green-300 mb-2 text-center">
+          {count} amigo{count !== 1 ? 's' : ''} invitado{count !== 1 ? 's' : ''} · {nextAt === 3 ? 'Invitá 3 más para otro mes gratis' : `Faltan ${nextAt} para tu próximo mes gratis`}
+        </p>
+      )}
+
       <button onClick={compartir}
-        className="w-full flex items-center justify-center gap-2 bg-[#4CAF50] hover:bg-[#43a047] text-white font-semibold py-3 rounded-xl transition-colors text-base">
+        className="w-full flex items-center-center justify-center gap-2 bg-[#4CAF50] hover:bg-[#43a047] text-white font-semibold py-3 rounded-xl transition-colors text-sm">
         <Share2 size={18} />
         {copiado ? '¡Link copiado!' : 'Compartir IApoyo'}
       </button>
-      <p className="text-center text-xs text-blue-200 mt-2">{link}</p>
+      <p className="text-center text-xs text-blue-200 mt-2 truncate">{link}</p>
     </div>
   )
 }
