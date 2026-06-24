@@ -1172,6 +1172,7 @@ export default function IApoyoPage() {
       setConsultaEnviada(true)
       setConsultaTexto('')
     } catch {
+      // silencioso, igual mostramos confirmación
       setConsultaEnviada(true)
     } finally {
       setConsultaLoading(false)
@@ -1186,12 +1187,7 @@ export default function IApoyoPage() {
     }
   }
 
-    function selectModulo(id: ModuleId) {
-    setModulo(id)
-    setOpenPanels(new Set())
-    setConsultaTexto('')
-    setConsultaEnviada(false)
-  }
+  function selectModulo(id: ModuleId) {
     setModulo(id)
     setOpenPanels(new Set())
     setConsultaTexto('')
@@ -1279,12 +1275,7 @@ export default function IApoyoPage() {
                 {openPanels.has('pMkt') && <PanelMkt onClose={() => closePanel('pMkt')} />}
                 {openPanels.has('pPlata') && <PanelMiPlata onClose={() => closePanel('pPlata')} />}
 
-                {/* Chat — solo visible cuando hay mensajes o está escribiendo */}
-                <div className="flex-1 flex flex-col mt-1">
-                  {(messages.length > 0 || chatLoading) && (
-                    <div className="flex-1 bg-white rounded-xl border border-gray-100 overflow-y-auto p-3 mb-2 min-h-[160px] max-h-[300px]">
-                      {messages.map((m, i) => (
-                                      {/* Formulario de consulta */}
+                {/* Formulario de consulta */}
                 <div className="flex-1 flex flex-col mt-2" ref={endRef}>
                   {consultaEnviada ? (
                     <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-center">
@@ -1313,6 +1304,13 @@ export default function IApoyoPage() {
                     </div>
                   )}
                 </div>
+              </div>
+            )}
+
+          </div>
+        </main>
+      </div>
+
     </AuthGuard>
   )
 }
