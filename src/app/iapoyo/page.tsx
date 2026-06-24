@@ -1186,7 +1186,12 @@ export default function IApoyoPage() {
     }
   }
 
-  function selectModulo(id: ModuleId) {
+    function selectModulo(id: ModuleId) {
+    setModulo(id)
+    setOpenPanels(new Set())
+    setConsultaTexto('')
+    setConsultaEnviada(false)
+  }
     setModulo(id)
     setOpenPanels(new Set())
     setConsultaTexto('')
