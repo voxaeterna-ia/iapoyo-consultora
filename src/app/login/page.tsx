@@ -14,11 +14,22 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const [modo, setModo] = useState<'login' | 'register'>('login')
   const [registered, setRegistered] = useState(false)
+  const [forgotSent, setForgotSent] = useState(false)
   const refId = searchParams.get('ref')
 
   useEffect(() => {
     if (refId) setModo('register')
   }, [refId])
+
+  async function handleForgot() {
+    if (!email) { setError('Ingresá tu email primero'); return }
+    const supabase = createClient()
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    setError('')
+    setForgotSent(true)
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -81,7 +92,17 @@ function LoginForm() {
           )}
         </div>
 
-        {registered ? (
+        {forgotSent ? (
+          <div className="text-center space-y-4">
+            <div className="text-4xl">📧</div>
+            <p className="text-[#2D4A6B] font-semibold">¡Email enviado!</p>
+            <p className="text-sm text-gray-500">Revisá tu email y seguí el enlace para restablecer tu contraseña.</p>
+            <button onClick={() => setForgotSent(false)}
+              className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg font-medium text-sm hover:bg-[#1e3350] transition-colors">
+              Volver al inicio
+            </button>
+          </div>
+        ) : registered ? (
           <div className="text-center space-y-4">
             <div className="text-4xl">📧</div>
             <p className="text-[#2D4A6B] font-semibold">¡Registro exitoso!</p>
@@ -124,6 +145,13 @@ function LoginForm() {
                 className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg font-medium text-sm hover:bg-[#1e3350] transition-colors disabled:opacity-50">
                 {loading ? '...' : modo === 'login' ? 'Ingresar' : 'Crear cuenta'}
               </button>
+
+              {modo === 'login' && (
+                <button type="button" onClick={handleForgot}
+                  className="w-full text-xs text-gray-400 hover:text-gray-600 mt-1">
+                  ¿Olvidaste tu contraseña?
+                </button>
+              )}
             </form>
           </>
         )}
