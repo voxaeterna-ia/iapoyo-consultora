@@ -1,18 +1,24 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import Image from 'next/image'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [modo, setModo] = useState<'login' | 'register'>('login')
   const [registered, setRegistered] = useState(false)
+  const refId = searchParams.get('ref')
+
+  useEffect(() => {
+    if (refId) setModo('register')
+  }, [refId])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -44,6 +50,16 @@ export default function LoginPage() {
               await fetch('/api/subscription/status', {
                 headers: { Authorization: `Bearer ${loginData.session.access_token}` },
               })
+              if (refId) {
+                await fetch('/api/referral/register', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${loginData.session.access_token}`,
+                  },
+                  body: JSON.stringify({ referrer_id: refId }),
+                })
+              }
             } catch {}
           }
           router.push('/dashboard')
@@ -58,6 +74,11 @@ export default function LoginPage() {
         <div className="flex flex-col items-center mb-8">
           <Image src="/logo.png" alt="IApoyo Consultora" width={120} height={132} className="mb-1" />
           <p className="text-xs text-gray-500 mt-1">Gestión Fiscal · Legal · Marketing</p>
+          {refId && (
+            <p className="text-xs text-green-600 font-medium mt-2 bg-green-50 px-3 py-1 rounded-full">
+              ¡Fuiste invitado! Registrate para activar tu cuenta
+            </p>
+          )}
         </div>
 
         {registered ? (
