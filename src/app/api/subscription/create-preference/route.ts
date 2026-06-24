@@ -17,12 +17,14 @@ export async function POST(req: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://iapoyo-consultora.vercel.app'
 
   const body = {
-    items: [{
-      title: 'IApoyo - Plan Mensual',
-      quantity: 1,
-      unit_price: 5000,
-      currency_id: 'ARS',
-    }],
+   items: [{
+  title: 'IApoyo - Plan Mensual',
+  description: 'Acceso mensual a la plataforma IApoyo: asistente fiscal, legal y contable con IA',
+  quantity: 1,
+  unit_price: 5000,
+  currency_id: 'ARS',
+  category_id: 'services',
+}],
     back_urls: {
       success: `${appUrl}/dashboard?payment=success`,
       failure: `${appUrl}/dashboard?payment=failure`,
