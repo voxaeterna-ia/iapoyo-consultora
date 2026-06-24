@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import Sidebar from '@/components/Sidebar'
 import AuthGuard from '@/components/AuthGuard'
-import { ChatMessage, formatARS } from '@/types'
-import { Send, Bot, User, ArrowLeft } from 'lucide-react'
+import { formatARS } from '@/types'
+import { Send, ArrowLeft } from 'lucide-react'
 
 // ─── Colors ─────────────────────────────────────────────────────────────────
 // --az:#2D4A6B  --vd:#4CAF50  --na:#FF7043
@@ -1141,11 +1141,10 @@ function InformePlata({ tipoIngreso, ingresoTotal, horasTotal, valorHora, ingres
 export default function IApoyoPage() {
   const [modulo, setModulo] = useState<ModuleId | null>(null)
   const [openPanels, setOpenPanels] = useState<Set<string>>(new Set())
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [chatInput, setChatInput] = useState('')
-  const [chatLoading, setChatLoading] = useState(false)
+  const [consultaTexto, setConsultaTexto] = useState('')
+  const [consultaEnviada, setConsultaEnviada] = useState(false)
+  const [consultaLoading, setConsultaLoading] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
   function togglePanel(panelId: string) {
     setOpenPanels(prev => {
@@ -1160,34 +1159,28 @@ export default function IApoyoPage() {
     setOpenPanels(prev => { const n = new Set(prev); n.delete(panelId); return n })
   }
 
-  async function sendChat(overrideMsg?: string) {
-    const msg = overrideMsg ?? chatInput
-    if (!msg.trim() || chatLoading) return
-    setMessages(prev => [...prev, { role: 'user', content: msg }])
-    if (!overrideMsg) setChatInput('')
-    setChatLoading(true)
+  async function enviarConsulta() {
+    if (!consultaTexto.trim() || consultaLoading) return
+    setConsultaLoading(true)
     try {
-      const res = await fetch('/api/chat', {
+      const eco = modulo ? ECOSISTEMAS[modulo] : null
+      await fetch('/api/consulta-simple', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg, module: modulo ?? 'general', history: messages.slice(-10) }),
+        body: JSON.stringify({ modulo: eco?.titulo ?? modulo ?? 'General', consulta: consultaTexto }),
       })
-      const { response } = await res.json()
-      setMessages(prev => [...prev, { role: 'assistant', content: response }])
+      setConsultaEnviada(true)
+      setConsultaTexto('')
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Error al conectar. Intentá de nuevo.' }])
-    } finally { setChatLoading(false) }
-  }
-
-  function addDirectMsg(msg: string) {
-    setMessages(prev => [...prev, { role: 'assistant', content: msg }])
+      setConsultaEnviada(true)
+    } finally {
+      setConsultaLoading(false)
+    }
   }
 
   function handleEcoBtn(btn: EcoBtn) {
     if (btn.action === 'chat' && btn.chatMsg) {
-      sendChat(btn.chatMsg)
-    } else if (btn.action === 'directMsg' && btn.directMsg) {
-      addDirectMsg(btn.directMsg)
+      setConsultaTexto(btn.chatMsg)
     } else if (btn.action === 'panel' && btn.panelId) {
       togglePanel(btn.panelId)
     }
@@ -1196,14 +1189,15 @@ export default function IApoyoPage() {
   function selectModulo(id: ModuleId) {
     setModulo(id)
     setOpenPanels(new Set())
-    setMessages([])
-    setChatInput('')
+    setConsultaTexto('')
+    setConsultaEnviada(false)
   }
 
   function goBack() {
     setModulo(null)
     setOpenPanels(new Set())
-    setMessages([])
+    setConsultaTexto('')
+    setConsultaEnviada(false)
   }
 
   const eco = modulo ? ECOSISTEMAS[modulo] : null
@@ -1285,51 +1279,35 @@ export default function IApoyoPage() {
                   {(messages.length > 0 || chatLoading) && (
                     <div className="flex-1 bg-white rounded-xl border border-gray-100 overflow-y-auto p-3 mb-2 min-h-[160px] max-h-[300px]">
                       {messages.map((m, i) => (
-                        <div key={i} className={`flex gap-1.5 mb-2 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                          {m.role === 'assistant' && (
-                            <div className="w-6 h-6 rounded-full bg-[#2D4A6B] flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <Bot size={12} className="text-white" />
-                            </div>
-                          )}
-                          <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap ${
-                            m.role === 'user' ? 'bg-[#2D4A6B] text-white rounded-tr-sm' : 'bg-gray-100 text-gray-800 rounded-tl-sm'
-                          }`}>{m.content}</div>
-                          {m.role === 'user' && (
-                            <div className="w-6 h-6 rounded-full bg-[#4CAF50] flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <User size={12} className="text-white" />
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                      {chatLoading && (
-                        <div className="flex gap-1.5">
-                          <div className="w-6 h-6 rounded-full bg-[#2D4A6B] flex items-center justify-center">
-                            <Bot size={12} className="text-white" />
-                          </div>
-                          <div className="bg-gray-100 rounded-2xl px-3 py-2 text-sm text-gray-400">Consultando...</div>
-                        </div>
-                      )}
-                      <div ref={endRef} />
+                                      {/* Formulario de consulta */}
+                <div className="flex-1 flex flex-col mt-2" ref={endRef}>
+                  {consultaEnviada ? (
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-center">
+                      <p className="text-2xl mb-2">✅</p>
+                      <p className="font-semibold text-green-800 text-base">¡Consulta enviada!</p>
+                      <p className="text-green-700 text-sm mt-1">El equipo de IApoyo te va a contactar a la brevedad.</p>
+                      <button onClick={() => setConsultaEnviada(false)}
+                        className="mt-4 text-sm text-green-700 underline">Hacer otra consulta</button>
+                    </div>
+                  ) : (
+                    <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
+                      <p className="text-sm text-gray-500">Escribí tu consulta y te respondemos por email o WhatsApp.</p>
+                      <textarea
+                        value={consultaTexto}
+                        onChange={e => setConsultaTexto(e.target.value)}
+                        placeholder="Escribí tu consulta..."
+                        rows={4}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#2D4A6B] resize-none"
+                      />
+                      <button
+                        onClick={enviarConsulta}
+                        disabled={consultaLoading || !consultaTexto.trim()}
+                        className="w-full flex items-center justify-center gap-2 bg-[#2D4A6B] text-white py-3 rounded-xl font-semibold text-base hover:bg-[#1e3350] disabled:opacity-40 transition">
+                        {consultaLoading ? 'Enviando...' : <><Send size={14} /> Enviar consulta</>}
+                      </button>
                     </div>
                   )}
-                  <div className="flex gap-2">
-                    <input value={chatInput} onChange={e => setChatInput(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendChat()}
-                      placeholder="Escribí tu consulta..."
-                      className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
-                    <button onClick={() => sendChat()} disabled={chatLoading || !chatInput.trim()}
-                      className="bg-[#2D4A6B] text-white px-3 py-2 rounded-xl hover:bg-[#1e3350] disabled:opacity-40">
-                      <Send size={14} />
-                    </button>
-                  </div>
                 </div>
-              </div>
-            )}
-
-          </div>
-        </main>
-      </div>
-
     </AuthGuard>
   )
 }
