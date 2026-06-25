@@ -576,7 +576,7 @@ function PanelMkt({ onClose }: { onClose: () => void }) {
 }
 
 // ─── Ecosistema por módulo ─────────────────────────────────────────────────────
-type ModuleId = 'fiscal' | 'marcas' | 'inden' | 'costos' | 'autos' | 'mkt' | 'plata'
+type ModuleId = 'fiscal' | 'marcas' | 'inden' | 'costos' | 'autos' | 'mkt' | 'plata' | 'construccion'
 
 interface EcoBtn {
   label: string
@@ -587,6 +587,12 @@ interface EcoBtn {
 }
 
 const ECOSISTEMAS: Record<ModuleId, { titulo: string; btns: EcoBtn[] }> = {
+  construccion: {
+    titulo: 'Cálculo de Materiales',
+    btns: [
+      { label: '🧱 Muro Simple', action: 'panel', panelId: 'pConstruccion' },
+    ],
+  },
   fiscal: {
     titulo: 'Consultas Fiscales',
     btns: [
@@ -657,6 +663,7 @@ const MODULOS_GRID = [
   { id: 'autos' as ModuleId, label: 'Vehículos & Fotomultas', emoji: '🚗' },
   { id: 'mkt' as ModuleId, label: 'Marketing', emoji: '📱' },
   { id: 'plata' as ModuleId, label: 'Mi Plata', emoji: '💰' },
+  { id: 'construccion' as ModuleId, label: 'Construcción', emoji: '🧱' },
 ]
 
 // ─── Panel pPlata (Mi Plata) ──────────────────────────────────────────────────
@@ -1144,6 +1151,119 @@ function InformePlata({ tipoIngreso, ingresoTotal, horasTotal, valorHora, ingres
   )
 }
 
+// ─── Panel pConstruccion (Cálculo de Materiales) ──────────────────────────────
+const LADRILLOS: Record<string, { label: string; cemento: number; cal: number; arena: number; ladrillos: number }> = {
+  '15': { label: 'Ladrillo común 15 cm', cemento: 8.09, cal: 7.88, arena: 0.038, ladrillos: 58 },
+  '30': { label: 'Ladrillo común 30 cm', cemento: 16.18, cal: 16.28, arena: 0.080, ladrillos: 116 },
+  '45': { label: 'Ladrillo común 45 cm', cemento: 24.27, cal: 24.42, arena: 0.120, ladrillos: 174 },
+}
+
+function PanelConstruccion({ onClose }: { onClose: () => void }) {
+  const [longitud, setLongitud] = useState('')
+  const [altura, setAltura] = useState('')
+  const [desperdicio, setDesperdicio] = useState('0')
+  const [tipo, setTipo] = useState('15')
+  const [resultado, setResultado] = useState<null | {
+    superficie: number; superficieFinal: number;
+    cemento: number; cal: number; arena: number; ladrillos: number
+  }>(null)
+
+  function calcular() {
+    const lon = parseFloat(longitud) || 0
+    const alt = parseFloat(altura) || 0
+    const des = parseFloat(desperdicio) || 0
+    if (!lon || !alt) return
+    const sup = lon * alt
+    const supFinal = sup * (1 + des / 100)
+    const c = LADRILLOS[tipo]
+    setResultado({
+      superficie: sup,
+      superficieFinal: supFinal,
+      cemento: supFinal * c.cemento,
+      cal: supFinal * c.cal,
+      arena: supFinal * c.arena,
+      ladrillos: Math.ceil(supFinal * c.ladrillos),
+    })
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mt-3 w-full overflow-hidden">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-semibold text-[#2D4A6B] text-lg">🧱 Muro Simple</h3>
+        <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+      </div>
+
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Longitud (m)</label>
+            <input type="number" value={longitud} onChange={e => setLongitud(e.target.value)} placeholder="Ej: 5"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Altura (m)</label>
+            <input type="number" value={altura} onChange={e => setAltura(e.target.value)} placeholder="Ej: 3"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-gray-600 mb-1 block">Tipo de ladrillo</label>
+          <select value={tipo} onChange={e => setTipo(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]">
+            {Object.entries(LADRILLOS).map(([k, v]) => (
+              <option key={k} value={k}>{v.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-gray-600 mb-1 block">Desperdicio (%)</label>
+          <input type="number" value={desperdicio} onChange={e => setDesperdicio(e.target.value)} placeholder="0"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+        </div>
+
+        <button onClick={calcular}
+          className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-[#1e3350] transition">
+          Calcular materiales
+        </button>
+
+        {resultado && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-2 mt-2">
+            <p className="font-semibold text-[#2D4A6B] text-sm mb-3">Materiales necesarios</p>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Superficie neta</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.superficie.toFixed(2)} m²</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Superficie c/desperdicio</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.superficieFinal.toFixed(2)} m²</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Cemento</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.cemento.toFixed(1)} kg</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Cal hidratada</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.cal.toFixed(1)} kg</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Arena</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.arena.toFixed(3)} m³</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Ladrillos</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.ladrillos.toLocaleString()} u.</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function IApoyoPage() {
   const [modulo, setModulo] = useState<ModuleId | null>(null)
@@ -1281,6 +1401,7 @@ export default function IApoyoPage() {
                 {openPanels.has('pPatente') && <PanelPatente onClose={() => closePanel('pPatente')} />}
                 {openPanels.has('pMkt') && <PanelMkt onClose={() => closePanel('pMkt')} />}
                 {openPanels.has('pPlata') && <PanelMiPlata onClose={() => closePanel('pPlata')} />}
+                {openPanels.has('pConstruccion') && <PanelConstruccion onClose={() => closePanel('pConstruccion')} />}
 
                 {/* Formulario de consulta */}
                 <div className="flex-1 flex flex-col mt-2" ref={endRef}>
