@@ -146,7 +146,7 @@ export default function NegocioPage() {
                           value={row[field] || ''}
                           onChange={e => updateCell(row.mes, field, e.target.value)}
                           onBlur={() => saveRow(row)}
-                          className="w-full text-right bg-transparent border-b border-transparent focus:border-[#4CAF50] focus:outline-none text-base py-1"
+                          className="w-full text-right bg-transparent border-b border-transparent focus:border-[#4CAF50] focus:outline-none text-base py-1 text-gray-800"
                           placeholder="0"
                         />
                       </td>
