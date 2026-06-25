@@ -517,7 +517,14 @@ function PanelPatente({ onClose }: { onClose: () => void }) {
         <h3 className="font-semibold text-[#2D4A6B] text-lg">🚗 Multas & Fotomultas</h3>
         <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
-      <p className="text-base text-gray-500 mb-4">Usá el chat de abajo para hacer tu consulta sobre una infracción específica.</p>
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4">
+        <p className="text-sm font-semibold text-[#2D4A6B] mb-1">📋 Para consultar tus infracciones informá:</p>
+        <ul className="text-sm text-gray-700 space-y-1 list-disc list-inside">
+          <li><b>Dominio del vehículo</b> (patente) o <b>DNI del titular</b></li>
+          <li>Jurisdicción: <b>Provincia de Buenos Aires</b> o <b>CABA</b></li>
+        </ul>
+        <p className="text-xs text-gray-400 mt-2">⚠️ Solo operamos en PBA y CABA.</p>
+      </div>
       {/* Motivos de Nulidad */}
       <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-3">
         <h4 className="font-semibold text-[#FF7043] text-lg mb-2">Motivos de Nulidad de Fotomulta</h4>
