@@ -1153,16 +1153,19 @@ function InformePlata({ tipoIngreso, ingresoTotal, horasTotal, valorHora, ingres
 
 // ─── Panel pConstruccion (Cálculo de Materiales) ──────────────────────────────
 const LADRILLOS: Record<string, { label: string; cemento: number; cal: number; arena: number; ladrillos: number }> = {
-  '15': { label: 'Ladrillo común 15 cm', cemento: 8.09, cal: 7.88, arena: 0.038, ladrillos: 58 },
-  '30': { label: 'Ladrillo común 30 cm', cemento: 16.18, cal: 16.28, arena: 0.080, ladrillos: 116 },
-  '45': { label: 'Ladrillo común 45 cm', cemento: 24.27, cal: 24.42, arena: 0.120, ladrillos: 174 },
+  'comun_15': { label: 'Ladrillo común 15 cm', cemento: 8.09, cal: 7.88, arena: 0.038, ladrillos: 58 },
+  'comun_30': { label: 'Ladrillo común 30 cm', cemento: 16.18, cal: 16.28, arena: 0.080, ladrillos: 116 },
+  'comun_45': { label: 'Ladrillo común 45 cm', cemento: 24.27, cal: 24.42, arena: 0.120, ladrillos: 174 },
+  'hueco_8':  { label: 'Ladrillo hueco 8x18x33', cemento: 0.99, cal: 1.89, arena: 0.009, ladrillos: 15.20 },
+  'hueco_12': { label: 'Ladrillo hueco 12x18x33', cemento: 1.48, cal: 2.83, arena: 0.014, ladrillos: 15.20 },
+  'hueco_18': { label: 'Ladrillo hueco 18x18x33', cemento: 2.22, cal: 4.24, arena: 0.021, ladrillos: 15.20 },
 }
 
 function PanelConstruccion({ onClose }: { onClose: () => void }) {
   const [longitud, setLongitud] = useState('')
   const [altura, setAltura] = useState('')
   const [desperdicio, setDesperdicio] = useState('0')
-  const [tipo, setTipo] = useState('15')
+  const [tipo, setTipo] = useState('comun_15')
   const [resultado, setResultado] = useState<null | {
     superficie: number; superficieFinal: number;
     cemento: number; cal: number; arena: number; ladrillos: number
