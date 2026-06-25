@@ -592,6 +592,7 @@ const ECOSISTEMAS: Record<ModuleId, { titulo: string; btns: EcoBtn[] }> = {
     btns: [
       { label: '🧱 Muro Simple', action: 'panel', panelId: 'pConstruccion' },
       { label: '🧱🧱 Muro Doble', action: 'panel', panelId: 'pMuroDoble' },
+      { label: '🏗️ Contrapiso', action: 'panel', panelId: 'pContrapiso' },
     ],
   },
   fiscal: {
@@ -1381,6 +1382,117 @@ function PanelMuroDoble({ onClose }: { onClose: () => void }) {
   )
 }
 
+// ─── Panel pContrapiso ────────────────────────────────────────────────────────
+function PanelContrapiso({ onClose }: { onClose: () => void }) {
+  const [largo, setLargo] = useState('')
+  const [ancho, setAncho] = useState('')
+  const [espesor, setEspesor] = useState('')
+  const [desperdicio, setDesperdicio] = useState('0')
+  const [resultado, setResultado] = useState<null | {
+    superficie: number; superficieFinal: number; volumen: number
+    cemento: number; arena: number; piedra: number; malla: number
+  }>(null)
+
+  function calcular() {
+    const l = parseFloat(largo) || 0
+    const a = parseFloat(ancho) || 0
+    const e = parseFloat(espesor) || 0
+    const d = parseFloat(desperdicio) || 0
+    if (!l || !a || !e) return
+    const sup = l * a
+    const supFinal = sup * (1 + d / 100)
+    const vol = supFinal * (e / 100)
+    setResultado({
+      superficie: sup,
+      superficieFinal: supFinal,
+      volumen: vol,
+      cemento: vol * 300,
+      arena: vol * 0.65,
+      piedra: vol * 0.65,
+      malla: supFinal * 1.05,
+    })
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mt-3 w-full overflow-hidden">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-semibold text-[#2D4A6B] text-lg">🏗️ Contrapiso</h3>
+        <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+      </div>
+      <p className="text-xs text-gray-400 mb-3">Armado con malla SIMA R-188 (15×25 cm Ø6 mm)</p>
+
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Largo (m)</label>
+            <input type="number" value={largo} onChange={e => setLargo(e.target.value)} placeholder="Ej: 6"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Ancho (m)</label>
+            <input type="number" value={ancho} onChange={e => setAncho(e.target.value)} placeholder="Ej: 3"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Espesor (cm)</label>
+            <input type="number" value={espesor} onChange={e => setEspesor(e.target.value)} placeholder="Ej: 8"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Desperdicio (%)</label>
+            <input type="number" value={desperdicio} onChange={e => setDesperdicio(e.target.value)} placeholder="0"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+        </div>
+
+        <button onClick={calcular}
+          className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-[#1e3350] transition">
+          Calcular materiales
+        </button>
+
+        {resultado && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-2 mt-2">
+            <p className="font-semibold text-[#2D4A6B] text-sm mb-3">Materiales necesarios</p>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Superficie neta</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.superficie.toFixed(2)} m²</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Superficie c/desperdicio</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.superficieFinal.toFixed(2)} m²</p>
+              </div>
+              <div className="col-span-2 bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Volumen de contrapiso</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.volumen.toFixed(3)} m³</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Cemento</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.cemento.toFixed(1)} kg</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Arena</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.arena.toFixed(3)} m³</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Piedra partida</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.piedra.toFixed(3)} m³</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Malla SIMA R-188</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.malla.toFixed(2)} m²</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function IApoyoPage() {
   const [modulo, setModulo] = useState<ModuleId | null>(null)
@@ -1520,6 +1632,7 @@ export default function IApoyoPage() {
                 {openPanels.has('pPlata') && <PanelMiPlata onClose={() => closePanel('pPlata')} />}
                 {openPanels.has('pConstruccion') && <PanelConstruccion onClose={() => closePanel('pConstruccion')} />}
                 {openPanels.has('pMuroDoble') && <PanelMuroDoble onClose={() => closePanel('pMuroDoble')} />}
+                {openPanels.has('pContrapiso') && <PanelContrapiso onClose={() => closePanel('pContrapiso')} />}
 
                 {/* Formulario de consulta */}
                 <div className="flex-1 flex flex-col mt-2" ref={endRef}>
