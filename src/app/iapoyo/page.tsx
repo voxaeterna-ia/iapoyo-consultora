@@ -1159,6 +1159,10 @@ const LADRILLOS: Record<string, { label: string; cemento: number; cal: number; a
   'hueco_8':  { label: 'Ladrillo hueco 8x18x33', cemento: 0.99, cal: 1.89, arena: 0.009, ladrillos: 15.20 },
   'hueco_12': { label: 'Ladrillo hueco 12x18x33', cemento: 1.48, cal: 2.83, arena: 0.014, ladrillos: 15.20 },
   'hueco_18': { label: 'Ladrillo hueco 18x18x33', cemento: 2.22, cal: 4.24, arena: 0.021, ladrillos: 15.20 },
+  'bloque_10': { label: 'Bloque cemento portante 19x10x39', cemento: 0.76, cal: 0.98, arena: 0.009, ladrillos: 12.50 },
+  'bloque_13': { label: 'Bloque cemento portante 19x13x39', cemento: 0.97, cal: 1.22, arena: 0.012, ladrillos: 12.50 },
+  'bloque_15': { label: 'Bloque cemento portante 19x15x39', cemento: 1.15, cal: 1.46, arena: 0.014, ladrillos: 12.50 },
+  'bloque_20': { label: 'Bloque cemento portante 19x20x39', cemento: 1.53, cal: 1.95, arena: 0.018, ladrillos: 12.50 },
 }
 
 function PanelConstruccion({ onClose }: { onClose: () => void }) {
