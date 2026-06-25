@@ -1277,13 +1277,10 @@ function PanelMuroDoble({ onClose }: { onClose: () => void }) {
   const [longitud, setLongitud] = useState('')
   const [altura, setAltura] = useState('')
   const [desperdicio, setDesperdicio] = useState('0')
-  const [tipoExt, setTipoExt] = useState('comun_15')
-  const [tipoInt, setTipoInt] = useState('hueco_8')
+  const [tipo, setTipo] = useState('comun_15')
   const [resultado, setResultado] = useState<null | {
-    superficieFinal: number
-    cemento: number; cal: number; arena: number
-    ladrillosExt: number; ladrillosInt: number
-    labelExt: string; labelInt: string
+    superficie: number; superficieFinal: number
+    cemento: number; cal: number; arena: number; ladrillos: number
   }>(null)
 
   function calcular() {
@@ -1291,22 +1288,18 @@ function PanelMuroDoble({ onClose }: { onClose: () => void }) {
     const alt = parseFloat(altura) || 0
     const des = parseFloat(desperdicio) || 0
     if (!lon || !alt) return
-    const supFinal = lon * alt * (1 + des / 100)
-    const ext = LADRILLOS[tipoExt]
-    const int = LADRILLOS[tipoInt]
+    const sup = lon * alt
+    const supFinal = sup * (1 + des / 100)
+    const c = LADRILLOS[tipo]
     setResultado({
+      superficie: sup,
       superficieFinal: supFinal,
-      cemento: supFinal * (ext.cemento + int.cemento),
-      cal: supFinal * (ext.cal + int.cal),
-      arena: supFinal * (ext.arena + int.arena),
-      ladrillosExt: supFinal * ext.ladrillos,
-      ladrillosInt: supFinal * int.ladrillos,
-      labelExt: ext.label,
-      labelInt: int.label,
+      cemento: supFinal * c.cemento * 2,
+      cal: supFinal * c.cal * 2,
+      arena: supFinal * c.arena * 2,
+      ladrillos: Math.ceil(supFinal * c.ladrillos * 2),
     })
   }
-
-  const opciones = Object.entries(LADRILLOS)
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mt-3 w-full overflow-hidden">
@@ -1330,18 +1323,10 @@ function PanelMuroDoble({ onClose }: { onClose: () => void }) {
         </div>
 
         <div>
-          <label className="text-xs font-medium text-gray-600 mb-1 block">Ladrillo exterior</label>
-          <select value={tipoExt} onChange={e => setTipoExt(e.target.value)}
+          <label className="text-xs font-medium text-gray-600 mb-1 block">Tipo de ladrillo</label>
+          <select value={tipo} onChange={e => setTipo(e.target.value)}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]">
-            {opciones.map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
-          </select>
-        </div>
-
-        <div>
-          <label className="text-xs font-medium text-gray-600 mb-1 block">Ladrillo interior</label>
-          <select value={tipoInt} onChange={e => setTipoInt(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]">
-            {opciones.map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+            {Object.entries(LADRILLOS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
           </select>
         </div>
 
@@ -1360,29 +1345,33 @@ function PanelMuroDoble({ onClose }: { onClose: () => void }) {
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-2 mt-2">
             <p className="font-semibold text-[#2D4A6B] text-sm mb-3">Materiales necesarios</p>
             <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="col-span-2 bg-white rounded-lg p-3 border border-blue-100">
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Superficie neta</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.superficie.toFixed(2)} m²</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
                 <p className="text-gray-500 text-xs">Superficie c/desperdicio</p>
                 <p className="font-bold text-[#2D4A6B]">{resultado.superficieFinal.toFixed(2)} m²</p>
               </div>
               <div className="bg-white rounded-lg p-3 border border-blue-100">
-                <p className="text-gray-500 text-xs">Cemento total</p>
+                <p className="text-gray-500 text-xs">Cemento</p>
                 <p className="font-bold text-[#2D4A6B]">{resultado.cemento.toFixed(1)} kg</p>
               </div>
               <div className="bg-white rounded-lg p-3 border border-blue-100">
-                <p className="text-gray-500 text-xs">Cal hidratada total</p>
+                <p className="text-gray-500 text-xs">Cal hidratada</p>
                 <p className="font-bold text-[#2D4A6B]">{resultado.cal.toFixed(1)} kg</p>
               </div>
               <div className="bg-white rounded-lg p-3 border border-blue-100">
                 <p className="text-gray-500 text-xs">Arena total</p>
                 <p className="font-bold text-[#2D4A6B]">{resultado.arena.toFixed(3)} m³</p>
               </div>
-              <div className="col-span-2 bg-white rounded-lg p-3 border border-blue-100">
-                <p className="text-gray-500 text-xs">Exterior — {resultado.labelExt}</p>
-                <p className="font-bold text-[#2D4A6B]">{Math.ceil(resultado.ladrillosExt).toLocaleString()} u.</p>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Arena</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.arena.toFixed(3)} m³</p>
               </div>
-              <div className="col-span-2 bg-white rounded-lg p-3 border border-blue-100">
-                <p className="text-gray-500 text-xs">Interior — {resultado.labelInt}</p>
-                <p className="font-bold text-[#2D4A6B]">{Math.ceil(resultado.ladrillosInt).toLocaleString()} u.</p>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Ladrillos</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.ladrillos.toLocaleString()} u.</p>
               </div>
             </div>
           </div>
