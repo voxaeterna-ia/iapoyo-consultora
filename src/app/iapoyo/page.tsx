@@ -594,6 +594,7 @@ const ECOSISTEMAS: Record<ModuleId, { titulo: string; btns: EcoBtn[] }> = {
       { label: '🧱🧱 Muro Doble', action: 'panel', panelId: 'pMuroDoble' },
       { label: '🏗️ Contrapiso', action: 'panel', panelId: 'pContrapiso' },
       { label: '🪟 Revestimientos', action: 'panel', panelId: 'pRevestimiento' },
+      { label: '🔲 Durlock / Cielorraso', action: 'panel', panelId: 'pDurlock' },
     ],
   },
   fiscal: {
@@ -1510,6 +1511,142 @@ function PanelContrapiso({ onClose }: { onClose: () => void }) {
   )
 }
 
+// ─── Tipos de placa Durlock ───────────────────────────────────────────────────
+const DURLOCK_PLACAS: Record<string, {
+  label: string; montantes: number; t1: number; t2: number; tarugos: number
+}> = {
+  'ciel_7':   { label: 'Placa CIEL Durlock 7 mm',        montantes: 1.00, t1: 8,  t2: 14, tarugos: 3 },
+  'std_9_5':  { label: 'Placa Estándar Durlock 9,5 mm',  montantes: 1.30, t1: 16, t2: 18, tarugos: 6 },
+  'std_12_5': { label: 'Placa Estándar Durlock 12,5 mm', montantes: 1.30, t1: 16, t2: 18, tarugos: 6 },
+}
+
+// ─── Panel pDurlock ───────────────────────────────────────────────────────────
+function PanelDurlock({ onClose }: { onClose: () => void }) {
+  const [largo, setLargo] = useState('')
+  const [ancho, setAncho] = useState('')
+  const [tipoPlaca, setTipoPlaca] = useState('ciel_7')
+  const [desperdicio, setDesperdicio] = useState('0')
+  const [resultado, setResultado] = useState<null | {
+    superficieFinal: number
+    placas: number; soleras: number; montantes: number
+    t1: number; t2: number; cinta: number; masilla: number; tarugos: number; enduido: number
+  }>(null)
+
+  function calcular() {
+    const l = parseFloat(largo) || 0
+    const a = parseFloat(ancho) || 0
+    const d = parseFloat(desperdicio) || 0
+    if (!l || !a) return
+    const supFinal = l * a * (1 + d / 100)
+    const p = DURLOCK_PLACAS[tipoPlaca]
+    setResultado({
+      superficieFinal: supFinal,
+      placas:    Math.ceil(supFinal * 0.40),
+      soleras:   Math.ceil(supFinal * 0.50),
+      montantes: Math.ceil(supFinal * p.montantes),
+      t1:        Math.ceil(supFinal * p.t1),
+      t2:        Math.ceil(supFinal * p.t2),
+      cinta:     supFinal * 1.70,
+      masilla:   supFinal * 0.90,
+      tarugos:   Math.ceil(supFinal * p.tarugos),
+      enduido:   supFinal * 1.00,
+    })
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mt-3 w-full overflow-hidden">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-semibold text-[#2D4A6B] text-lg">🔲 Cielorraso Durlock</h3>
+        <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+      </div>
+
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Largo (m)</label>
+            <input type="number" value={largo} onChange={e => setLargo(e.target.value)} placeholder="Ej: 5"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Ancho (m)</label>
+            <input type="number" value={ancho} onChange={e => setAncho(e.target.value)} placeholder="Ej: 4"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-gray-600 mb-1 block">Tipo de placa</label>
+          <select value={tipoPlaca} onChange={e => setTipoPlaca(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]">
+            {Object.entries(DURLOCK_PLACAS).map(([k, v]) => (
+              <option key={k} value={k}>{v.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-gray-600 mb-1 block">Desperdicio (%)</label>
+          <input type="number" value={desperdicio} onChange={e => setDesperdicio(e.target.value)} placeholder="0"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+        </div>
+
+        <button onClick={calcular}
+          className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-[#1e3350] transition">
+          Calcular materiales
+        </button>
+
+        {resultado && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-2 mt-2">
+            <p className="font-semibold text-[#2D4A6B] text-sm mb-3">Materiales necesarios</p>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="col-span-2 bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Superficie calculada</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.superficieFinal.toFixed(2)} m²</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Placas Durlock</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.placas} u.</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Soleras 35×2,60 m</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.soleras} u.</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Montantes 34×2,60 m</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.montantes} u.</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Tornillos T1</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.t1} u.</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Tornillos T2</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.t2} u.</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Cinta microperforada</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.cinta.toFixed(1)} ml</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Masilla interior</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.masilla.toFixed(1)} kg</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Tarugos N°8 + tornillo</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.tarugos} u.</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Enduido Durlock</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.enduido.toFixed(1)} lts</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── Panel pRevestimiento ─────────────────────────────────────────────────────
 function PanelRevestimiento({ onClose }: { onClose: () => void }) {
   const [largo, setLargo] = useState('')
@@ -1798,6 +1935,7 @@ export default function IApoyoPage() {
                 {openPanels.has('pMuroDoble') && <PanelMuroDoble onClose={() => closePanel('pMuroDoble')} />}
                 {openPanels.has('pContrapiso') && <PanelContrapiso onClose={() => closePanel('pContrapiso')} />}
                 {openPanels.has('pRevestimiento') && <PanelRevestimiento onClose={() => closePanel('pRevestimiento')} />}
+                {openPanels.has('pDurlock') && <PanelDurlock onClose={() => closePanel('pDurlock')} />}
 
                 {/* Formulario de consulta */}
                 <div className="flex-1 flex flex-col mt-2" ref={endRef}>
