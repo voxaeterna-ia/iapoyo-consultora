@@ -593,6 +593,7 @@ const ECOSISTEMAS: Record<ModuleId, { titulo: string; btns: EcoBtn[] }> = {
       { label: '🧱 Muro Simple', action: 'panel', panelId: 'pConstruccion' },
       { label: '🧱🧱 Muro Doble', action: 'panel', panelId: 'pMuroDoble' },
       { label: '🏗️ Contrapiso', action: 'panel', panelId: 'pContrapiso' },
+      { label: '🪟 Revestimientos', action: 'panel', panelId: 'pRevestimiento' },
     ],
   },
   fiscal: {
@@ -1509,6 +1510,153 @@ function PanelContrapiso({ onClose }: { onClose: () => void }) {
   )
 }
 
+// ─── Panel pRevestimiento ─────────────────────────────────────────────────────
+function PanelRevestimiento({ onClose }: { onClose: () => void }) {
+  const [largo, setLargo] = useState('')
+  const [ancho, setAncho] = useState('')
+  const [largoPieza, setLargoPieza] = useState('')
+  const [anchoPieza, setAnchoPieza] = useState('')
+  const [espesorMezcla, setEspesorMezcla] = useState('0.8')
+  const [desperdicio, setDesperdicio] = useState('0')
+  const [zocalo, setZocalo] = useState<'si' | 'no'>('no')
+  const [resultado, setResultado] = useState<null | {
+    superficie: number; superficieFinal: number
+    piezas: number; pegamento: number; pastina: number
+    perimetro?: number; piezasZocalo?: number
+  }>(null)
+
+  function calcular() {
+    const l = parseFloat(largo) || 0
+    const a = parseFloat(ancho) || 0
+    const lp = parseFloat(largoPieza) || 0
+    const ap = parseFloat(anchoPieza) || 0
+    const d = parseFloat(desperdicio) || 0
+    if (!l || !a || !lp || !ap) return
+    const sup = l * a
+    const supFinal = sup * (1 + d / 100)
+    const areaPieza = (lp / 100) * (ap / 100)
+    const piezas = Math.ceil(supFinal / areaPieza)
+    const res: typeof resultado = {
+      superficie: sup,
+      superficieFinal: supFinal,
+      piezas,
+      pegamento: supFinal * 5,
+      pastina: supFinal * 0.30,
+    }
+    if (zocalo === 'si') {
+      const per = (l + a) * 2
+      res.perimetro = per
+      res.piezasZocalo = Math.ceil(per / (lp / 100))
+    }
+    setResultado(res)
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 mt-3 w-full overflow-hidden">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-semibold text-[#2D4A6B] text-lg">🪟 Porcelanato en piso</h3>
+        <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
+      </div>
+
+      <div className="space-y-3">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Ambiente</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Largo (m)</label>
+            <input type="number" value={largo} onChange={e => setLargo(e.target.value)} placeholder="Ej: 4"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Ancho (m)</label>
+            <input type="number" value={ancho} onChange={e => setAncho(e.target.value)} placeholder="Ej: 3"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+        </div>
+
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pieza</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Largo pieza (cm)</label>
+            <input type="number" value={largoPieza} onChange={e => setLargoPieza(e.target.value)} placeholder="Ej: 60"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Ancho pieza (cm)</label>
+            <input type="number" value={anchoPieza} onChange={e => setAnchoPieza(e.target.value)} placeholder="Ej: 60"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Esp. mezcla (cm)</label>
+            <input type="number" value={espesorMezcla} onChange={e => setEspesorMezcla(e.target.value)} placeholder="0.8"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Desperdicio (%)</label>
+            <input type="number" value={desperdicio} onChange={e => setDesperdicio(e.target.value)} placeholder="0"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]" />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-gray-600 mb-2 block">Zócalo</label>
+          <div className="flex gap-2">
+            {(['si', 'no'] as const).map(op => (
+              <button key={op} onClick={() => setZocalo(op)}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${zocalo === op ? 'bg-[#2D4A6B] text-white border-[#2D4A6B]' : 'bg-white text-gray-600 border-gray-200'}`}>
+                {op === 'si' ? 'Sí' : 'No'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button onClick={calcular}
+          className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-[#1e3350] transition">
+          Calcular materiales
+        </button>
+
+        {resultado && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-2 mt-2">
+            <p className="font-semibold text-[#2D4A6B] text-sm mb-3">Resultados</p>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Superficie</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.superficieFinal.toFixed(2)} m²</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Piezas de porcelanato</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.piezas.toLocaleString()} u.</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Pegamento</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.pegamento.toFixed(1)} kg</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-blue-100">
+                <p className="text-gray-500 text-xs">Pastina</p>
+                <p className="font-bold text-[#2D4A6B]">{resultado.pastina.toFixed(2)} kg</p>
+              </div>
+              {resultado.perimetro !== undefined && (
+                <>
+                  <div className="bg-white rounded-lg p-3 border border-blue-100">
+                    <p className="text-gray-500 text-xs">Perímetro</p>
+                    <p className="font-bold text-[#2D4A6B]">{resultado.perimetro.toFixed(2)} m</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 border border-blue-100">
+                    <p className="text-gray-500 text-xs">Zócalo (h=10 cm)</p>
+                    <p className="font-bold text-[#2D4A6B]">{resultado.piezasZocalo} u.</p>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function IApoyoPage() {
   const [modulo, setModulo] = useState<ModuleId | null>(null)
@@ -1649,6 +1797,7 @@ export default function IApoyoPage() {
                 {openPanels.has('pConstruccion') && <PanelConstruccion onClose={() => closePanel('pConstruccion')} />}
                 {openPanels.has('pMuroDoble') && <PanelMuroDoble onClose={() => closePanel('pMuroDoble')} />}
                 {openPanels.has('pContrapiso') && <PanelContrapiso onClose={() => closePanel('pContrapiso')} />}
+                {openPanels.has('pRevestimiento') && <PanelRevestimiento onClose={() => closePanel('pRevestimiento')} />}
 
                 {/* Formulario de consulta */}
                 <div className="flex-1 flex flex-col mt-2" ref={endRef}>
