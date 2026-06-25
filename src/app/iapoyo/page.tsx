@@ -1382,15 +1382,22 @@ function PanelMuroDoble({ onClose }: { onClose: () => void }) {
   )
 }
 
+// ─── Tipos de malla para contrapiso ──────────────────────────────────────────
+const MALLAS_CONTRAPISO: Record<string, { label: string; detalle: string }> = {
+  'r188': { label: 'Malla SIMA R-188', detalle: '15×25 cm Ø6 mm' },
+  'q84':  { label: 'Malla SIMA Q-84',  detalle: '15×15 cm Ø4 mm' },
+}
+
 // ─── Panel pContrapiso ────────────────────────────────────────────────────────
 function PanelContrapiso({ onClose }: { onClose: () => void }) {
   const [largo, setLargo] = useState('')
   const [ancho, setAncho] = useState('')
   const [espesor, setEspesor] = useState('')
   const [desperdicio, setDesperdicio] = useState('0')
+  const [tipoMalla, setTipoMalla] = useState('r188')
   const [resultado, setResultado] = useState<null | {
     superficie: number; superficieFinal: number; volumen: number
-    cemento: number; arena: number; piedra: number; malla: number
+    cemento: number; arena: number; piedra: number; malla: number; labelMalla: string
   }>(null)
 
   function calcular() {
@@ -1410,6 +1417,7 @@ function PanelContrapiso({ onClose }: { onClose: () => void }) {
       arena: vol * 0.65,
       piedra: vol * 0.65,
       malla: supFinal * 1.05,
+      labelMalla: MALLAS_CONTRAPISO[tipoMalla].label,
     })
   }
 
@@ -1419,9 +1427,17 @@ function PanelContrapiso({ onClose }: { onClose: () => void }) {
         <h3 className="font-semibold text-[#2D4A6B] text-lg">🏗️ Contrapiso</h3>
         <button onClick={onClose} className="text-base text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-1">Cerrar</button>
       </div>
-      <p className="text-xs text-gray-400 mb-3">Armado con malla SIMA R-188 (15×25 cm Ø6 mm)</p>
 
       <div className="space-y-3">
+        <div>
+          <label className="text-xs font-medium text-gray-600 mb-1 block">Tipo de malla</label>
+          <select value={tipoMalla} onChange={e => setTipoMalla(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4A6B]">
+            {Object.entries(MALLAS_CONTRAPISO).map(([k, v]) => (
+              <option key={k} value={k}>{v.label} ({v.detalle})</option>
+            ))}
+          </select>
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-medium text-gray-600 mb-1 block">Largo (m)</label>
@@ -1482,7 +1498,7 @@ function PanelContrapiso({ onClose }: { onClose: () => void }) {
                 <p className="font-bold text-[#2D4A6B]">{resultado.piedra.toFixed(3)} m³</p>
               </div>
               <div className="bg-white rounded-lg p-3 border border-blue-100">
-                <p className="text-gray-500 text-xs">Malla SIMA R-188</p>
+                <p className="text-gray-500 text-xs">{resultado.labelMalla}</p>
                 <p className="font-bold text-[#2D4A6B]">{resultado.malla.toFixed(2)} m²</p>
               </div>
             </div>
