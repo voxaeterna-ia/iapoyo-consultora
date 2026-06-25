@@ -97,6 +97,7 @@ function LoginForm() {
             <div className="text-4xl">📧</div>
             <p className="text-[#2D4A6B] font-semibold">¡Email enviado!</p>
             <p className="text-sm text-gray-500">Revisá tu email y seguí el enlace para restablecer tu contraseña.</p>
+            <p className="text-xs text-gray-400 bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2">⚠️ Si no lo encontrás, revisá la carpeta de <b>spam</b> o correo no deseado.</p>
             <button onClick={() => setForgotSent(false)}
               className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg font-medium text-sm hover:bg-[#1e3350] transition-colors">
               Volver al inicio
@@ -107,6 +108,7 @@ function LoginForm() {
             <div className="text-4xl">📧</div>
             <p className="text-[#2D4A6B] font-semibold">¡Registro exitoso!</p>
             <p className="text-sm text-gray-500">Revisá tu email y hacé click en el enlace de confirmación para activar tu cuenta.</p>
+            <p className="text-xs text-gray-400 bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2">⚠️ Si no lo encontrás, revisá la carpeta de <b>spam</b> o correo no deseado.</p>
             <button onClick={() => { setModo('login'); setRegistered(false) }}
               className="w-full bg-[#2D4A6B] text-white py-2.5 rounded-lg font-medium text-sm hover:bg-[#1e3350] transition-colors">
               Volver al inicio
