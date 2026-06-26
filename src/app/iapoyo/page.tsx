@@ -1805,10 +1805,8 @@ export default function IApoyoPage() {
 
   function togglePanel(panelId: string) {
     setOpenPanels(prev => {
-      const next = new Set(prev)
-      if (next.has(panelId)) next.delete(panelId)
-      else next.add(panelId)
-      return next
+      if (prev.has(panelId)) return new Set()
+      return new Set([panelId])
     })
   }
 
