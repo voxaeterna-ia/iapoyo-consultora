@@ -87,8 +87,8 @@ export default function AcreditacionesPage() {
 
   const depuradas = data.total_acred - data.imp_creditos - data.prestamos - data.transferencias - data.otras
   const diferencia = data.facturacion > 0 ? ((depuradas - data.facturacion) / data.facturacion) * 100 : 0
-  const semaforoColor = Math.abs(diferencia) <= 10 ? '#4CAF50' : Math.abs(diferencia) <= 20 ? '#FF9800' : '#f44336'
-  const semaforoLabel = Math.abs(diferencia) <= 10 ? 'Consistente' : Math.abs(diferencia) <= 20 ? 'Revisar' : 'Inconsistente'
+  const semaforoColor = diferencia <= 10 ? '#4CAF50' : diferencia <= 20 ? '#FF9800' : '#f44336'
+  const semaforoLabel = diferencia <= 10 ? 'Consistente' : diferencia <= 20 ? 'Revisar' : 'Inconsistente'
 
   return (
     <AuthGuard>
